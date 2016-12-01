@@ -1,0 +1,14 @@
+---
+- hosts: VMs
+
+  tasks:
+    - name: Get source code from git
+      git: 
+        repo: 'git@github.com:hennersz/finalYearProject.git'
+        dest: /home/server/p2ppki
+        accept_hostkey: yes
+    - name: Install python requirements
+      pip:
+        requirements: ~/p2ppki/requirements.txt
+        virtualenv: ~/p2ppki/ENV
+        virtualenv_command: /home/server/.local/bin/virtualenv
