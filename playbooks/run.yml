@@ -1,0 +1,6 @@
+---
+- hosts: VMs
+
+  tasks: 
+    - name: Run the program
+      shell: . ~/p2ppki/ENV/bin/activate && python ~/p2ppki/p2ppki/core.py
