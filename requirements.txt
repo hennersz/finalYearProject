@@ -1,3 +1,5 @@
 tox>=2.5.0
 pytest>=3.0.4
-cryptography
+twisted
+kademlia
+gnupg

@@ -13,3 +13,7 @@
         virtualenv: ~/p2ppki/ENV
         virtualenv_command: /home/server/.local/bin/virtualenv
         virtualenv_python: python3.5
+    - name: Make main file executable
+      file: 
+        path: ~/p2ppki/p2ppki/core.py
+        mode: 0751
