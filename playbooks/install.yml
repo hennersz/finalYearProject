@@ -1,5 +1,5 @@
 ---
-- hosts: VMs
+- hosts: VMs:bootstrapNodes
 
   tasks:
     - name: Get source code from git

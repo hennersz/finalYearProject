@@ -1,42 +1,26 @@
 #!/usr/bin/env python
 
-import asyncore
-import asynchat
+from twisted.internet import reactor
+from twisted.python import log
+from kademlia.network import Server
+import sys
 
-class Handler(asynchat.async_chat):
-    def __init__(self, socket):
-        asynchat.async_chat.__init__(self, sock=socket)
-        self.inputBuffer = []
-        self.outputBuffer = b""
-        self.set_terminator(b"\n")
-    
-    def collect_incoming_data(self, data):
-        self.inputBuffer.append(data)
-    
-    def found_terminator(self):
-        self.outputBuffer = b"".join(self.inputBuffer)
-        self.outputBuffer += b"\n"        
-        self.push(self.outputBuffer)
-        self.close_when_done()
+log.startLogging(sys.stdout)
 
-class Listener(asyncore.dispatcher):
-    def __init__(self, host, port):
-        asyncore.dispatcher.__init__(self)
-        self.create_socket()
-        self.set_reuse_addr()
-        self.bind((host, port))
-        self.listen(5)
+def quit(result):
+    print "Key result: ", result
+    reactor.stop()
 
-    def handle_accepted(self, sock, addr):
-        print('Incoming connection from %s' % repr(addr))
-        handler = Handler(sock)
+def get(result, server):
+    return server.get("a key").addCallback(quit)
 
+def done(found, server):
+    log.msg("Found nodes: %s" % found)
+    return server.set("a key", "a value").addCallback(get, server)
 
-server = Listener('localhost', 1234)
+server = Server()
 
-try:
-    asyncore.loop() 
-except KeyboardInterrupt:
-    pass
+server.listen(8468)
+server.bootstrap([("192.168.62.128", 8468)]).addCallback(done, server)
 
-server.close()
+reactor.run()

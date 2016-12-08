@@ -1,6 +1,12 @@
 ---
+- hosts: bootstrapNodes
+
+  tasks:
+    - name: run bootstrapping server
+      shell: ~/p2ppki/ENV/bin/activate && nohup twistd -noy ~/p2ppki/bin/server.tac & 
+
 - hosts: VMs
 
   tasks: 
     - name: Run the program
-      shell: . ~/p2ppki/ENV/bin/activate && nohup ~/p2ppki/p2ppki/core.py &
+      shell: . ~/p2ppki/ENV/bin/activate && nohup ~/p2ppki/p2ppki/core.py
