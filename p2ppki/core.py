@@ -20,7 +20,6 @@ class ListStorage(ForgetfulStorage):
     def __getitem__(self, key):
         return self.data[key][1]
 
-log.startLogging(sys.stdout)
 
 def quit(result):
     print "Key result: ", result
@@ -33,9 +32,11 @@ def done(found, server):
     log.msg("Found nodes: %s" % found)
     return server.set("a key", "a value").addCallback(get, server)
 
-server = Server(storage=ListStorage())
+if(__name__ == "__main__"):
+    log.startLogging(sys.stdout)
+    server = Server(storage=ListStorage())
 
-server.listen(8468)
-server.bootstrap([("192.168.62.128", 8468)]).addCallback(done, server)
+    server.listen(8468)
+    server.bootstrap([("192.168.62.128", 8468)]).addCallback(done, server)
 
-reactor.run()
+    reactor.run()

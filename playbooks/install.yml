@@ -2,6 +2,10 @@
 - hosts: VMs:bootstrapNodes
 
   tasks:
+    - name: delete old repo if it exists
+      file: 
+        path: /home/server/p2ppki
+        state: absent
     - name: Get source code from git
       git: 
         repo: 'git@github.com:hennersz/finalYearProject.git'
