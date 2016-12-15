@@ -12,7 +12,13 @@ class ListStorage(ForgetfulStorage):
             self.data[key].append(value)
 	else:
             self.data[key] = [value]	
-        self.cull()
+    def get(self, key, default=None):
+        if key in self.data:
+            return self[key]
+        return default
+
+    def __getitem__(self, key):
+        return self.data[key][1]
 
 log.startLogging(sys.stdout)
 
