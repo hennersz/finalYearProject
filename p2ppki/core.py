@@ -21,7 +21,7 @@ class ListStorage(ForgetfulStorage):
         result = []
         for item in self.data[key]:
             result.append(item[1])
-        return result
+        return str(result)
 
 
 def quit(result):
