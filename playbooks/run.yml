@@ -3,7 +3,7 @@
 
   tasks:
     - name: run bootstrapping server
-      shell: ~/p2ppki/ENV/bin/activate && twistd -noy ~/p2ppki/bin/server.tac
+      shell: . ~/p2ppki/ENV/bin/activate && cd ~/p2ppki/bin && twistd -noy server.tac
 
 - hosts: VMs
 

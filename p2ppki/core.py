@@ -4,12 +4,12 @@ from twisted.internet import reactor
 from twisted.python import log
 from kademlia.network import Server
 from kademlia.storage import ForgetfulStorage
-import sys
+import sys, time
 
 class ListStorage(ForgetfulStorage):
     def __setitem__(self, key, value):
         if key in self.data:
-            self.data[key].append(value)
+            self.data[key].append((time.time(), value))
 	else:
             self.data[key] = [value]	
     def get(self, key, default=None):
@@ -18,7 +18,10 @@ class ListStorage(ForgetfulStorage):
         return default
 
     def __getitem__(self, key):
-        return self.data[key][1]
+        result = []
+        for item in self.data[key]:
+            result.append(item[1])
+        return result
 
 
 def quit(result):
