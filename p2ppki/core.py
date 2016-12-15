@@ -3,7 +3,16 @@
 from twisted.internet import reactor
 from twisted.python import log
 from kademlia.network import Server
+from kademlia.storage import ForgetfulStorage
 import sys
+
+class ListStorage(ForgetfulStorage):
+    def __setitem__(self, key, value):
+        if key in self.data:
+            self.data[key].append(value)
+	else:
+            self.data[key] = [value]	
+        self.cull()
 
 log.startLogging(sys.stdout)
 
@@ -18,7 +27,7 @@ def done(found, server):
     log.msg("Found nodes: %s" % found)
     return server.set("a key", "a value").addCallback(get, server)
 
-server = Server()
+server = Server(storage=ListStorage())
 
 server.listen(8468)
 server.bootstrap([("192.168.62.128", 8468)]).addCallback(done, server)
