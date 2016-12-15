@@ -11,7 +11,7 @@ class ListStorage(ForgetfulStorage):
         if key in self.data:
             self.data[key].append((time.time(), value))
 	else:
-            self.data[key] = [value]	
+            self.data[key] = [(time.time(), value)]	
     def get(self, key, default=None):
         if key in self.data:
             return self[key]
