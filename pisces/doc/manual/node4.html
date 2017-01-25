@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>3. Command-Line Utility: spkitool.py</title>
+<META NAME="description" CONTENT="3. Command-Line Utility: spkitool.py">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" href="manual.css">
+<LINK REL="next" HREF="node6.html">
+<LINK REL="previous" HREF="node3.html">
+<LINK REL="up" HREF="manual.html">
+<LINK REL="next" HREF="node5.html">
+</head>
+<body bgcolor="#ffffff" text="#000000" link="#0000bb"  vlink="#551a8b" alink="#ff0000">
+<div class='navigation'>
+<table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A HREF="node5.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="manual.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A HREF="node3.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A HREF="node5.html">3.1 spkitool.py command reference</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="manual.html">Pisces User Manual</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A HREF="node3.html">2. An Example</A></span>
+<br><hr></div>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION000400000000000000000">
+3. Command-Line Utility: spkitool.py</A>
+</H1>
+
+<P>
+The spkitool.py utility supports several different commands.  The
+specific command to run is passed as an argument to spkitool.py.
+A typical usage would look like this:
+<dl><dd><pre class="verbatim">
+% spkitool.py [generic options] command [command options]
+</pre></dl>
+The options and commands are described in the next section.
+
+<P>
+It may be helpful to think of spkitool.py as an analog to the GPG or
+PGP command-line tools.  It manages a collection of keys and
+certificates stored on your local system.
+
+<P>
+You need to create a directory that spkitool.py will use to store keys
+and certificates.  The default directory is &nbsp;/.spki, but you can
+change this by setting the <a class="envvar" name='l2h-1'>$SPKIHOME</a> environment variable or
+using the generic -d option to spkitool.py.
+
+<P>
+Many of the spkitool commands require the use of a public-private key
+pair.  You should create a default key pair the first time you use
+spkitool.  The default key will be used for all commands that require
+a key, unless you specify a different key.  The easiest way to specify 
+a key is with a SPKI name, which can be created with the name command
+described below.
+
+<P>
+
+<p><hr>
+<!--Table of Child-Links-->
+
+
+<UL>
+<LI><A NAME="tex2html109"
+ HREF="node5.html">3.1 spkitool.py command reference</A>
+</UL>
+<!--End of Table of Child-Links-->
+<p>
+<div class='navigation'><hr><table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A HREF="node5.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="manual.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A HREF="node3.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A HREF="node5.html">3.1 spkitool.py command reference</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="manual.html">Pisces User Manual</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A HREF="node3.html">2. An Example</A></span>
+</div>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

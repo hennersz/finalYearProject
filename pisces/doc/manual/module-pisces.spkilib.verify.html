@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>5.18 pisces.spkilib.verify - Certificate chain verification</title>
+<META NAME="description" CONTENT="5.18 pisces.spkilib.verify - Certificate chain verification">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" href="manual.css">
+<LINK REL="previous" href="module-pisces.spkilib.spki.html">
+<LINK REL="up" HREF="node8.html">
+<LINK REL="next" HREF="node27.html">
+</head>
+<body bgcolor="#ffffff" text="#000000" link="#0000bb"  vlink="#551a8b" alink="#ff0000">
+<div class='navigation'>
+<table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A HREF="node27.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node8.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A href="module-pisces.spkilib.spki.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A HREF="node27.html">A. Installation</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node8.html">5. Pisces Library Reference</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A href="module-pisces.spkilib.spki.html">5.17 pisces.spkilib.spki - Core</A></span>
+<br><hr></div>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION0006180000000000000000">
+5.18 <tt class="module">pisces.spkilib.verify</tt>
+	- Certificate chain verification</A>
+</H2>
+
+
+<P>
+This module processes a collection of certificates to yield an
+authorization result.  The SPKI theory RFC [<A
+ href="cite_saltzer75.html#ellison99-theory">2</A>]
+describes a tuple-reduction process as an example.  The Pisces
+implementation uses a search mechanism that has the same semantics.
+
+<P>
+This module is a little out of date.  It uses the
+<tt class="module">pisces.spkilib.database</tt> interface instead of the higher-level
+<tt class="module">pisces.spkilib.keystore</tt> interface.  It will be revised before
+the final version 1.0 release.
+
+<P>
+<dl><dt><b><a name='l2h-215'><tt class='class'>Verifier</tt></a></b> (<var>acl, certs, keys</var>)
+<dd>
+
+<P>
+A <tt class="class">Verifier</tt> uses an access control list <var>acl</var>, a collection
+of certificates <var>cert</var>, and a collection of public keys <var>keys</var>
+to make access control decisions.  Each argument should be a database
+from <tt class="module">pisces.spkilib.database</tt>: <var>acl</var> is a <tt class="class">ACL</tt>,
+<var>cert</var> is a <tt class="class">CertificateDatabase</tt>, and <var>keys</var> is a 
+<tt class="class">PrincipalDatabase</tt>.
+
+<P>
+<dl><dt><b><a name='l2h-216'><tt class='method'>verify</tt></a></b> (<var>prin, perm</var><big>[</big><var>, delegate</var><big>]</big>)
+<dd>
+Find a valid certificate chain from an ACL entry to the prinicipal
+<var>prin</var> that grants permission <var>perm</var>.
+
+<P>
+This method searches through the collection of certificates to find a
+valid chain from an access control list entry to the principal making
+the request.  The return value is a sequence of certificates forming a
+valid chain.  The first entry in the sequence is a 
+<tt class="class">pisces.spkilib.spki.Entry</tt> object.  Each subsequent element
+will be a certificate delegating some permissions from the previous
+element to the next element.  The last element will delegate
+permissions to the principal.
+
+<P>
+There is a <var>delegate</var> argument, because there can not be more than
+one non-delegate-able certificate between a valid delegate-able
+certificate and the principal requesting permission.  That one
+certificate is the one that grants permissions to the principal, but
+doesn't allow the principal to delegate further.  The delegate flag
+should always be true when called recursively.
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-217'><tt class='class'>ReferenceMonitor</tt></a></b> (<var>acl, certs, keys</var>)
+<dd>
+
+<P>
+A <tt class="class">ReferenceMonitor</tt> provides a simpler interface to a
+<tt class="class">Verifier</tt>.  The constructor arguments for
+<tt class="class">ReferenceMonitor</tt> are the same as for <tt class="class">Verifier</tt>.
+
+<P>
+<dl><dt><b><a name='l2h-218'><tt class='method'>checkPermission</tt></a></b> (<var>caller, perm</var>)
+<dd>
+Check to see if principal <var>caller</var> has permission <var>perm</var> by
+calling <tt class="method">Verifier.verify</tt>.  Raises <tt class="exception">SecurityError</tt> if
+the permission does not exist.  Returns None otherwise.
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-219'><tt class='class'>SecurityError</tt></a></b> ()
+<dd>
+Raised by <tt class="class">ReferenceMonitor</tt> when <tt class="method">checkPermission</tt> fails.
+</dl>
+
+<P>
+
+<P>
+<p>
+<div class='navigation'><hr><table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A HREF="node27.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node8.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A href="module-pisces.spkilib.spki.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A HREF="node27.html">A. Installation</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node8.html">5. Pisces Library Reference</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A href="module-pisces.spkilib.spki.html">5.17 pisces.spkilib.spki - Core</A></span>
+</div>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>3.1 spkitool.py command reference</title>
+<META NAME="description" CONTENT="3.1 spkitool.py command reference">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" href="manual.css">
+<LINK REL="previous" HREF="node4.html">
+<LINK REL="up" HREF="node4.html">
+<LINK REL="next" HREF="node6.html">
+</head>
+<body bgcolor="#ffffff" text="#000000" link="#0000bb"  vlink="#551a8b" alink="#ff0000">
+<div class='navigation'>
+<table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A HREF="node6.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node4.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A HREF="node4.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A HREF="node6.html">4. Other command-line scripts</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node4.html">3. Command-Line Utility: spkitool.py</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A HREF="node4.html">3. Command-Line Utility: spkitool.py</A></span>
+<br><hr></div>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000410000000000000000">
+3.1 spkitool.py command reference</A>
+</H2>
+
+<P>
+<dl><dt><b><tt>spkitool.py </var><big>[</big><var>-v</var><big>]</big><big>[</big><var>-h </var><big>[</big><var><var>cmd</var></var><big>]</big><big>]</big><big>[</big><var>-d <var>dir</var></var><big>]</big><var> <var>command</var> </var><big>[</big><var>command-options</var><big>]</big><var></tt></b>
+<dd>
+This script can be invoked to run any of the commands listed below.
+It supports several generic options that must be listed before the
+command.  Each command also supports command-specific options, which
+must be listed after the command name.
+
+<P>
+The <b class="programopt">-v</b> option causes verbose output while the command
+runs.
+
+<P>
+The <b class="programopt">-h</b> option prints help.  If <b class="programopt">-h</b> is
+specified by itself, a list of all commands is printed.  If
+<b class="programopt">-h</b> is followed by a command name, detailed help for that
+command is printed.  The name 'all' is used as an argument, detailed
+help is printed for each command.
+
+<P>
+The <b class="programopt">-d <var>dir</var></b> specifies the location of the user's
+spkitool configuration directory.  
+</dl>
+
+<P>
+The spkitool script supports the following commands:
+
+<P>
+<dl><dt><b><tt>acl -s/-subject <var>key</var> -p <var>permissions</var>
+	 </var><big>[</big><var>-o output</var><big>]</big><big>[</big><var>-b/-before <var>time</var></var><big>]</big><big>[</big><var>-a/-after <var>time</var></var><big>]</big><var></tt></b>
+<dd>
+<dt><b><tt>&nbsp;&nbsp;&nbsp;&nbsp;</var><big>[</big><var>-test URI</var><big>]</big><big>[</big><var>-d/-delegate</var><big>]</big><big>[</big><var>-db <var>acl</var></var><big>]</big><var></tt></b><dd>
+    Creates a certificate for an access control list (Entry).  The
+    subject can be a hash of a key or a name.  If the subject is a
+    name, the name is interpreted relative to the user's default key.
+
+<P>
+The permissions should be a text representation of a SPKI sexp.
+    This is a little clunky, but it's hard to come up with a general
+    interface for something that is essentially application-specific.
+
+<P>
+If the <b class="programopt">-</b><b class="programopt">-db</b> option is used, the Entry is
+    added to the database.ACL file at the specified path.  If this
+    option is used, it overrides the <b class="programopt">-o</b> option.  Will
+    create a new ACL if one does not exist.
+
+<P>
+The <b class="programopt">-d</b>/<b class="programopt">-</b><b class="programopt">-delegate</b> option allows
+    permissions to be delegated.  By default, delegation is disabled.
+
+<P>
+The before/after/test modifiers are the same as for the cert
+    command.  They affect the validity constraints.
+</dl>
+ 
+<dl><dt><b><tt>cert -s/-subject -p/-permission permission </var><big>[</big><var>-i/-issuer</var><big>]</big><big>[</big><var>-b/-before time</var><big>]</big><var></tt></b>
+<dd> 
+<dt><b><tt>&nbsp;&nbsp;&nbsp;&nbsp;</var><big>[</big><var>-a/-after time</var><big>]</big><big>[</big><var>-t/-test URI</var><big>]</big><big>[</big><var>-d/-delegate</var><big>]</big><big>[</big><var>-k/-key</var><big>]</big><var></tt></b><dd>
+
+<P>
+Create a new certificate.  The certificate has the following
+    parts: subject, issuer, validity, and permissions.  It may also
+    have a delegation tag.  Each of these parts can be specified using
+    a different option; each option has a short name and a long name.
+
+<P>
+Note: To create a name certificate, use the name command.
+
+<P>
+The options for the cert command are list below.  Each take a
+    single argument following the option name.
+
+<P>
+optional: <b class="programopt">-</b><b class="programopt">-issuer</b> (<b class="programopt">-i</b>)
+
+<P>
+The hash or name of the key to use as issuer.  Will use the
+    default key as issuer otherwise.
+
+<P>
+required: <b class="programopt">-</b><b class="programopt">-subject</b> (<b class="programopt">-s</b>)
+
+<P>
+The hash or name of the key that is the subject of the
+    certificate.
+
+<P>
+optional: <b class="programopt">-</b><b class="programopt">-before</b> (<b class="programopt">-b</b>) 
+<BR>
+optional: <b class="programopt">-</b><b class="programopt">-after</b> (<b class="programopt">-a</b>)
+
+<P>
+These options limit the period of time for which the certificate
+    is valid.  The time format is YYYY-MM-DD_HH:MM:SS.  You can also
+    use the string "now" to indicate the current time.
+
+<P>
+optional: <b class="programopt">-</b><b class="programopt">-test</b> (<b class="programopt">-t</b>)
+
+<P>
+Specify an online validity test for the certificate.  The argument
+    should be the URL for the test.  This optional currently has no
+    associated implementation; although it can be included in the
+    certificate, the test will not be performed.
+
+<P>
+required: <b class="programopt">-</b><b class="programopt">-permission</b> (<b class="programopt">-p</b>)
+
+<P>
+Specify the permissions that are being granted to the subject
+    key.  The argument must be an S-expression in human-readable
+    form for the permissions.  The permissions will be wrapped in a
+    (tag ...) S-expression.
+
+<P>
+optional: <b class="programopt">-</b><b class="programopt">-delegate</b> (<b class="programopt">-d</b>)
+
+<P>
+Allow subject to delegate permission.  Default is to disallow
+    delegation. 
+
+<P>
+optional: <b class="programopt">-</b><b class="programopt">-key</b> (<b class="programopt">-k</b>)
+
+<P>
+Include the key of the issuer with the certificate.  By default,
+    the certificate does not include the key itself, only the hash of
+    the key. 
+</dl>
+
+<P>
+<dl><dt><b><tt>create </var><big>[</big><var>-b bits</var><big>]</big><big>[</big><var>-unsafe</var><big>]</big><big>[</big><var>-replace</var><big>]</big><big>[</big><var>-dup</var><big>]</big><big>[</big><var>-default|name</var><big>]</big><var></tt></b>
+<dd>
+    Create a key pair with label as specified by user.  Add the key
+    pair to the user's key file and add the public key to the user's
+    ACL.  The user will be prompted for a pass phrase to encrypt the
+    private key.  Currently on the rsa-pkcs1-md5 algorithm is
+    supported.
+
+<P>
+Options:
+
+<P>
+<b class="programopt">-</b><b class="programopt">-unsafe</b>: use the user's PID as pass
+phrase
+
+<P>
+<b class="programopt">-</b><b class="programopt">-replace</b>: replace an existing default
+key
+
+<P>
+<b class="programopt">-b NNNN</b>: number of bits for key pair (default 1024)
+
+<P>
+<b class="programopt">-</b><b class="programopt">-dup</b>: create a name cert even if name is already used
+
+<P>
+Note: The SPKI protocol allows multiple keys to be bound to the
+    same name, which allows the creation of a group.  But multiple
+    keys with the same name presents a problem for naming private
+    keys, because the name no longer unambiguously refers to a single
+    key. 
+</dl>    
+
+<P>
+<dl><dt><b><tt>export </var><big>[</big><var>-o output</var><big>]</big><big>[</big><var>-canonical</var><big>]</big><var> &lt;hash-or-name&gt;</tt></b>
+<dd>
+    Export a public key from the store.  The key may be specified by
+    its hash or its name.  The <b class="programopt">-o</b> flag can be used to
+    specify a file to place the key; if no file is specified, the key
+    will be printed on stdout.
+
+<P>
+Keys are output in base64 encoding by default.  Use the
+    <b class="programopt">-</b><b class="programopt">-canonical</b> flag to specify the
+    canonical (binary) encoding instead. 
+</dl>
+
+<P>
+<dl><dt><b><tt>import </var><big>[</big><var>path</var><big>]</big><var></tt></b>
+<dd>
+
+<P>
+Load a new public key or certificate into the keystore.  The
+    object will be loaded from a file containing either the canonical
+    or base64 encoding of the S-expression.  If no path is specified,
+    the object will be read from stdin.
+
+<P>
+For a certificate to be useful in verifying a certificate chain,
+    it must be signed.  A public key, however, needs no signature.
+</dl>
+
+<P>
+<dl><dt><b><tt>list </var><big>[</big><var>-public</var><big>]</big><big>[</big><var>-private</var><big>]</big><big>[</big><var>-name</var><big>]</big><var></tt></b>
+<dd>
+    List all the keys stored in the KeyStore and all the name
+    certificates issued by the private keys.  For private keys, the
+    hash of the corresponding public key is listed.  As a result, the
+    same hash should appear in the private and public lists.  
+
+<P>
+Specifying the options, limits the listing to only the specified
+    sections.
+</dl>
+    
+<dl><dt><b><tt>name  -n/-name name -h/-hash hash </var><big>[</big><var>-i/-issuer principal</var><big>]</big><big>[</big><var>-o output</var><big>]</big><var></tt></b>
+<dd>
+
+<P>
+Create a name certificate.  Can be used to associate a name with a
+    public key on the key server.
+
+<P>
+The hash designates the public key that the name will be bound
+    to.  The hash can either by the advanced form of a SPKI hash
+    object, or just the base64 encoded digest.  Thus, either of the
+    following is allowed: '(hash md5 |hTK6mv8Nbspy9jsljfb2DQ==|)' or
+    'hTK6mv8Nbspy9jsljfb2DQ=='.
+
+<P>
+By default, the issuer is the user's default key.  To use a
+    different key, the user should specify the name or hash of the key
+    with the <b class="programopt">-</b><b class="programopt">-issuer</b> argument.
+
+<P>
+The <b class="programopt">-o</b> option can be used to make a local copy of the
+    name cert. 
+
+<P>
+This command needs to be extended with validity handling.
+</dl>
+
+<P>
+<dl><dt><b><tt>show </var><big>[</big><var>-i input</var><big>]</big><big>[</big><var>-o output</var><big>]</big><var></tt></b>
+<dd>
+
+<P>
+Read in an arbitrary SPKI object and display it in human-readable
+    form.  The show command will read the object from stdin and
+    display it on stdout.  The source and destination can be changed
+    with the <b class="programopt">-i</b> and <b class="programopt">-o</b> arguments.
+</dl>
+    
+<dl><dt><b><tt>sign </var><big>[</big><var>-s/-signer name</var><big>]</big><big>[</big><var>-o output</var><big>]</big><var> file</tt></b>
+<dd>
+
+<P>
+Create a digital signature for the contents of the specified
+    file.  By default, the signature is placed stored as file.sig, but
+    you can use the <b class="programopt">-o</b> option to specify a different
+    output location. 
+
+<P>
+The signature is created using the default key, unless the
+    <b class="programopt">-</b><b class="programopt">-signer</b> option is used to specify a
+    different key.  The <b class="programopt">-</b><b class="programopt">-signer</b>
+    option will accept the name or hash of a key.
+</dl>
+    
+<dl><dt><b><tt>verify </var><big>[</big><var>-i signaturefile</var><big>]</big><var> file</tt></b>
+<dd>
+
+<P>
+Verify a digital signature of a file.  The default behavior is to
+    look for the signature in file.sig.  The <b class="programopt">-i</b> option
+    can be used to specify a different path for the signature.
+</dl><p>
+<div class='navigation'><hr><table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A HREF="node6.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node4.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A HREF="node4.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A HREF="node6.html">4. Other command-line scripts</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node4.html">3. Command-Line Utility: spkitool.py</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A HREF="node4.html">3. Command-Line Utility: spkitool.py</A></span>
+</div>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>5.3 pisces.cryptrand - Interface to cryptographic random number generators</title>
+<META NAME="description" CONTENT="5.3 pisces.cryptrand - Interface to cryptographic random number generators">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" href="manual.css">
+<LINK REL="next" href="module-pisces.egdlib.html">
+<LINK REL="previous" href="module-pisces.asn1.html">
+<LINK REL="up" HREF="node8.html">
+<LINK REL="next" href="module-pisces.egdlib.html">
+</head>
+<body bgcolor="#ffffff" text="#000000" link="#0000bb"  vlink="#551a8b" alink="#ff0000">
+<div class='navigation'>
+<table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A href="module-pisces.egdlib.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node8.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A href="module-pisces.asn1.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A href="module-pisces.egdlib.html">5.4 pisces.egdlib - Interface</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node8.html">5. Pisces Library Reference</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A href="module-pisces.asn1.html">5.2 pisces.asn1 - Encode</A></span>
+<br><hr></div>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000630000000000000000">
+5.3 <tt class="module">pisces.cryptrand</tt>
+	- Interface to cryptographic random number generators</A>
+</H2>
+
+
+<P>
+This module provides a common interface to the various cryptographic
+random numbers that may be available on a particular system.
+The module defines one function <tt class="function">random</tt> and one constant
+<tt class="constant">implementation</tt>, which is a string that describes the
+implementation used for <tt class="function">random</tt>.
+
+<P>
+<dl><dt><b><a name='l2h-20'><tt class='function'>random</tt></a></b> (<var>num</var>)
+<dd>
+Return <var>num</var> bytes of random data.
+</dl>
+
+<P>
+The implementation depends on the random number generators available
+on a particular system.  On Linux systems, <font class="file" face="sans-serif">/dev/random</font> is
+used.  This module can also use the Yarrow daemon provided with Pisces
+or the Entropy Gathering Daemon from gpg if it
+is installed in <font class="file" face="sans-serif">'&nbsp;/.gnupg/entropy</font>.
+
+<P>
+<i>WARNING:</i> If no cryptographic random number generator is
+available, Python's <tt class="module">whrandom</tt> implementation will be used.
+The is <i>not</i> a cryptographic random number generator.
+
+<P>
+<p>
+<div class='navigation'><hr><table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A href="module-pisces.egdlib.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node8.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A href="module-pisces.asn1.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A href="module-pisces.egdlib.html">5.4 pisces.egdlib - Interface</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node8.html">5. Pisces Library Reference</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A href="module-pisces.asn1.html">5.2 pisces.asn1 - Encode</A></span>
+</div>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

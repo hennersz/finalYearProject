@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>5.13 pisces.spkilib.database - Store keys and certificates in text file</title>
+<META NAME="description" CONTENT="5.13 pisces.spkilib.database - Store keys and certificates in text file">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" href="manual.css">
+<LINK REL="next" href="module-pisces.spkilib.keystore.html">
+<LINK REL="previous" href="module-pisces.spkilib.config.html">
+<LINK REL="up" HREF="node8.html">
+<LINK REL="next" href="module-pisces.spkilib.keystore.html">
+</head>
+<body bgcolor="#ffffff" text="#000000" link="#0000bb"  vlink="#551a8b" alink="#ff0000">
+<div class='navigation'>
+<table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A href="module-pisces.spkilib.keystore.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node8.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A href="module-pisces.spkilib.config.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A href="module-pisces.spkilib.keystore.html">5.14 pisces.spkilib.keystore - Abstract</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node8.html">5. Pisces Library Reference</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A href="module-pisces.spkilib.config.html">5.12 pisces.spkilib.config - Configuration</A></span>
+<br><hr></div>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION0006130000000000000000">
+5.13 <tt class="module">pisces.spkilib.database</tt>
+	- Store keys and certificates in text file</A>
+</H2>
+
+
+<P>
+This module defines a format for storing S-expressions in a text
+file.  The file contains one or more base64-encoded S-expressions.
+Comment lines begin with a #.  The classes defined all include a
+human-readable description of the S-expression in a comment before the
+actual encoded object.  Each type of database defines some specific
+semantics for the object.
+
+<P>
+<dl><dt><b><a name='l2h-80'><tt class='class'>AbstractDatabase</tt></a></b> (<var>path</var>)
+<dd>
+
+<P>
+The <tt class="class">AbstractDatabase</tt> class is the parent of all the specific
+database types.  It implements two general methods and requires that
+subclasses implement three other that describe the specific kind of
+S-expressions that are supported.
+
+<P>
+The constructor argument <var>path</var> specifies the file that contains
+the database.
+
+<P>
+The two general methods are:
+
+<P>
+<dl><dt><b><a name='l2h-81'><tt class='method'>reload</tt></a></b> (<big>[</big><var>create</var><big>]</big>)
+<dd>
+Load the contents of the database file into memory.  If the optional
+<var>create</var> argument is non-zero, succeed if the file does not exist;
+otherwise, an <tt class="exception">IOError</tt> will be raised if the file does not
+exist.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-82'><tt class='method'>rewrite</tt></a></b> ()
+<dd>
+Save the current contents of the database into the database file.
+</dl>
+
+<P>
+The methods that must be implemented by subclasses are:
+
+<P>
+<dl><dt><b><a name='l2h-83'><tt class='method'>loadObject</tt></a></b> (<var>obj</var>)
+<dd>
+Called for each S-expression in the file when <tt class="method">reload</tt> is
+executed.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-84'><tt class='method'>getObjects</tt></a></b> ()
+<dd>
+Called by <tt class="method">rewrite</tt>.  This method should return a list of all
+objects to be written out.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-85'><tt class='method'>writeStorageHint</tt></a></b> (<var>obj, io</var>)
+<dd>
+Called for each S-expression to be written out by <tt class="method">rewrite</tt>.
+A hint for S-expression <var>obj</var> should be written to the file-like
+object <var>io</var>.
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-86'><tt class='class'>DebugDatabase</tt></a></b> (<var>path</var>)
+<dd>
+
+<P>
+This method loads in an arbitrary database, but is not capable of
+rewriting it.  It is useful for debugging a database.
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-87'><tt class='class'>ACL</tt></a></b> (<var>path</var><big>[</big><var>, create</var><big>]</big>)
+<dd>
+
+<P>
+This class defines a file containing <tt class="class">pisces.spkilib.spki.Entry</tt>
+objects.  Each <tt class="class">Entry</tt> is written with two hints: the subject
+and the tag.
+
+<P>
+This class defines the following additional methods:
+
+<P>
+<dl><dt><b><a name='l2h-88'><tt class='method'>add</tt></a></b> (<var>entry</var>)
+<dd>
+Add a new <tt class="class">Entry</tt> object to the database.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-89'><tt class='method'>lookup</tt></a></b> (<var>subject</var>)
+<dd>
+Return all <tt class="class">Entry</tt> objects that match <var>subject</var>.
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-90'><tt class='class'>CertificateDatabase</tt></a></b> (<var>path</var><big>[</big><var>, create</var><big>]</big>)
+<dd>
+
+<P>
+This class defines a file containing <tt class="class">pisces.spkilib.spki.Cert</tt>
+objects, including name certs.  Each cert is written with two hints:
+the subject and issuer.
+
+<P>
+This class defines the following additional methods:
+
+<P>
+<dl><dt><b><a name='l2h-91'><tt class='method'>lookupBySubject</tt></a></b> (<var>subject</var>)
+<dd>
+Return all certs that match <var>subject</var>.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-92'><tt class='method'>lookupByIssuer</tt></a></b> (<var>issuer</var>)
+<dd>
+Return all certs that match <var>issuer</var>.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-93'><tt class='method'>add</tt></a></b> (<var>cert</var>)
+<dd>
+Add a new cert <var>cert</var> to the database.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-94'><tt class='method'>delete</tt></a></b> (<var>obj</var>)
+<dd>
+Delete all certificates with issuer and subject fields that match
+<var>obj</var>. 
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-95'><tt class='class'>PrincipalDatabase</tt></a></b> (<var>path</var><big>[</big><var>, create</var><big>]</big>)
+<dd>
+
+<P>
+A <tt class="class">PrincipalDatabase</tt> stores public keys.
+
+<P>
+This class defines the following additional methods:
+
+<P>
+<dl><dt><b><a name='l2h-96'><tt class='method'>add</tt></a></b> (<var>key</var>)
+<dd>
+Add the public key <var>key</var>.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-97'><tt class='method'>lookup</tt></a></b> (<var>p</var>)
+<dd>
+Return the key corresponding to hash <var>p</var>.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-98'><tt class='method'>delete</tt></a></b> (<var>p</var>)
+<dd>
+Delete a public key.  Accepts a single argument <var>p</var> that can be
+either a key or its hash.
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-99'><tt class='class'>PrivateKeyDatabase</tt></a></b> (<var>path</var><big>[</big><var>, create</var><big>]</big>)
+<dd>
+
+<P>
+This class stores private keys.  Unlike other database classes, it
+depends on the order of the objects in the database file being
+preserved.  It stores a collection of private keys and their
+associated public keys.  One of the keys is marked as the default
+key. 
+
+<P>
+This class defines the following additional methods:
+
+<P>
+<dl><dt><b><a name='l2h-100'><tt class='method'>lookup</tt></a></b> (<var>hash</var>)
+<dd>
+Return a private key for the principal <var>hash</var>.  The <var>hash</var> is
+of the public part of the key pair.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-101'><tt class='method'>setDefault</tt></a></b> (<var>hash</var>)
+<dd>
+Make the private key for the principal <var>hash</var> the default key.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-102'><tt class='method'>getDefault</tt></a></b> ()
+<dd>
+Return the hash of the public part of the default key.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-103'><tt class='method'>add</tt></a></b> (<var>pub, priv</var>)
+<dd>
+Add the key pair with public part <var>pub</var> and private part
+<var>priv</var> to the database.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-104'><tt class='method'>listPublicKeys</tt></a></b> ()
+<dd>
+Return a list of all the public keys.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-105'><tt class='method'>listPrivateKeys</tt></a></b> ()
+<dd>
+Return a list of all the private keys.
+</dl>
+
+<P>
+</dl>
+
+<P>
+<p>
+<div class='navigation'><hr><table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A href="module-pisces.spkilib.keystore.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node8.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A href="module-pisces.spkilib.config.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A href="module-pisces.spkilib.keystore.html">5.14 pisces.spkilib.keystore - Abstract</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node8.html">5. Pisces Library Reference</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A href="module-pisces.spkilib.config.html">5.12 pisces.spkilib.config - Configuration</A></span>
+</div>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

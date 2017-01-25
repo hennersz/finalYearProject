@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>5.5 pisces.hmac - Keyed-hashing for message authentication</title>
+<META NAME="description" CONTENT="5.5 pisces.hmac - Keyed-hashing for message authentication">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" href="manual.css">
+<LINK REL="next" href="module-pisces.pkcs1.html">
+<LINK REL="previous" href="module-pisces.egdlib.html">
+<LINK REL="up" HREF="node8.html">
+<LINK REL="next" href="module-pisces.pkcs1.html">
+</head>
+<body bgcolor="#ffffff" text="#000000" link="#0000bb"  vlink="#551a8b" alink="#ff0000">
+<div class='navigation'>
+<table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A href="module-pisces.pkcs1.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node8.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A href="module-pisces.egdlib.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A href="module-pisces.pkcs1.html">5.6 pisces.pkcs1 - A</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node8.html">5. Pisces Library Reference</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A href="module-pisces.egdlib.html">5.4 pisces.egdlib - Interface</A></span>
+<br><hr></div>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000650000000000000000">
+5.5 <tt class="module">pisces.hmac</tt>
+	- Keyed-hashing for message authentication</A>
+</H2>
+
+
+<P>
+This module implements HMAC, a method for message authentication
+using cryptographic hash functions described in <a class="rfc" name="rfcref-3055"
+href="http://www.ietf.org/rfc/rfc2104.txt">RFC 2104</a>.  It is a
+slight improvement to an earlier version written by Barry Warsaw.
+
+<P>
+<dl><dt><b><a name='l2h-28'><tt class='class'>HMAC</tt></a></b> (<var>hashmodule</var>)
+<dd>
+Instances of the <tt class="class">HMAC</tt> class implement HMAC for a specific hash
+function.  The constructor takes the <var>hashmodule</var> as an argument.
+It must be a module that follows conforms to the interface of the
+hashes in <tt class="module">Crypto.Hash</tt>.  This requires that the module have a
+<tt class="member">digestsize</tt> attribute and a <tt class="function">new</tt> function.
+
+<P>
+<tt class="class">HMAC</tt> provides the following method:
+
+<P>
+<dl><dt><b><a name='l2h-29'><tt class='method'>hash</tt></a></b> (<var>key, block</var>)
+<dd>
+Produce the HMAC hash for the given string, <var>block</var>.  <var>Key</var> is
+the shared secret authentication key, as a string.  For best results
+<a class="rfc" name="rfcref-3057"
+href="http://www.ietf.org/rfc/rfc2104.txt">RFC 2104</a> recommends that the length of key should be at least as large
+as the underlying hash's output block size, but this is not enforced.
+
+<P>
+If the key length is greater than the hash algorithm's basic
+compression function's block size (typically 64 bytes), then it is
+hashed to get the used key value.  If it is less than this block
+size, it is padded by appending enough zero bytes to the key.
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-30'><tt class='class'>HMACSpecializer</tt></a></b> (<var>hashmodule, key</var>)
+<dd>
+Instances of the <tt class="class">HMACSpecializer</tt> class implement an HMAC for a
+particular hash module and key.  If many HMACs will be computed with
+the same key, it is more efficient to use this class than
+<tt class="class">HMAC</tt>.  There is no other reason to use this class.
+
+<P>
+<tt class="class">HMACSpecializer</tt> provides the following method:
+
+<P>
+<dl><dt><b><a name='l2h-31'><tt class='method'>hash</tt></a></b> (<var>block</var>)
+<dd>
+Produce the HMAC hash for the given string, <var>block</var>.  See
+<tt class="method">HMAC.hash</tt> for details.
+</dl>
+
+<P>
+</dl>
+
+<P>
+<p>
+<div class='navigation'><hr><table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A href="module-pisces.pkcs1.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node8.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A href="module-pisces.egdlib.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A href="module-pisces.pkcs1.html">5.6 pisces.pkcs1 - A</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node8.html">5. Pisces Library Reference</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A href="module-pisces.egdlib.html">5.4 pisces.egdlib - Interface</A></span>
+</div>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

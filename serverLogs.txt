@@ -1,0 +1,413 @@
+2017-01-16 17:27:59+0000 [-] Log opened.
+2017-01-16 17:28:54+0000 [-] Log opened.
+2017-01-16 17:28:54+0000 [-] KademliaProtocol starting on 8468
+2017-01-16 17:28:54+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:28:54+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 17:28:54+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:28:54+0000 [-] Unhandled error in Deferred:
+2017-01-16 17:28:54+0000 [-] Unhandled Error
+	Traceback (most recent call last):
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 1030, in _cbDeferred
+	    self.callback(self.resultList)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 457, in callback
+	    self._startRunCallbacks(result)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 565, in _startRunCallbacks
+	    self._runCallbacks()
+	--- <exception caught here> ---
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	exceptions.TypeError: done() takes exactly 1 argument (2 given)
+	
+2017-01-16 17:29:38+0000 [-] Received SIGINT, shutting down.
+2017-01-16 17:29:38+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-16 17:29:38+0000 [-] Main loop terminated.
+2017-01-16 17:29:49+0000 [-] Log opened.
+2017-01-16 17:29:49+0000 [-] KademliaProtocol starting on 8468
+2017-01-16 17:29:49+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:29:49+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 17:29:49+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:29:49+0000 [-] Unhandled error in Deferred:
+2017-01-16 17:29:49+0000 [-] Unhandled Error
+	Traceback (most recent call last):
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 1030, in _cbDeferred
+	    self.callback(self.resultList)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 457, in callback
+	    self._startRunCallbacks(result)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 565, in _startRunCallbacks
+	    self._runCallbacks()
+	--- <exception caught here> ---
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	exceptions.TypeError: done() takes exactly 1 argument (2 given)
+	
+2017-01-16 17:30:39+0000 [-] Received SIGINT, shutting down.
+2017-01-16 17:30:39+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-16 17:30:39+0000 [-] Main loop terminated.
+2017-01-16 17:46:20+0000 [-] Log opened.
+2017-01-16 17:46:20+0000 [-] KademliaProtocol starting on 8468
+2017-01-16 17:46:20+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:46:20+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 17:46:20+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:46:20+0000 [KademliaProtocol (UDP)] Found nodes: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:46:20+0000 [Server] [DEBUG] setting 'a key' = 'a value' on network
+2017-01-16 17:46:20+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:46:20+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 17:46:20+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:46:20+0000 [Server] [INFO] setting 'a key' on ['192.168.62.128:8468']
+2017-01-16 17:46:20+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:46:20+0000 [-] Unhandled error in Deferred:
+2017-01-16 17:46:20+0000 [-] Unhandled Error
+	Traceback (most recent call last):
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 1030, in _cbDeferred
+	    self.callback(self.resultList)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 457, in callback
+	    self._startRunCallbacks(result)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 565, in _startRunCallbacks
+	    self._runCallbacks()
+	--- <exception caught here> ---
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	exceptions.TypeError: checkValue() takes exactly 1 argument (2 given)
+	
+2017-01-16 17:47:44+0000 [-] Received SIGINT, shutting down.
+2017-01-16 17:47:44+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-16 17:47:44+0000 [-] Main loop terminated.
+2017-01-16 17:49:56+0000 [-] Log opened.
+2017-01-16 17:49:56+0000 [-] KademliaProtocol starting on 8468
+2017-01-16 17:49:56+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:49:56+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 17:49:56+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:49:56+0000 [KademliaProtocol (UDP)] Found nodes: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:49:56+0000 [Server] [DEBUG] setting 'a key' = 'a value' on network
+2017-01-16 17:49:56+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:49:56+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 17:49:56+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:49:56+0000 [Server] [INFO] setting 'a key' on ['192.168.62.128:8468']
+2017-01-16 17:49:56+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:49:56+0000 [-] Unhandled error in Deferred:
+2017-01-16 17:49:56+0000 [-] Unhandled Error
+	Traceback (most recent call last):
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 1030, in _cbDeferred
+	    self.callback(self.resultList)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 457, in callback
+	    self._startRunCallbacks(result)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 565, in _startRunCallbacks
+	    self._runCallbacks()
+	--- <exception caught here> ---
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	exceptions.TypeError: checkValue() takes exactly 1 argument (2 given)
+	
+2017-01-16 17:50:01+0000 [-] Received SIGINT, shutting down.
+2017-01-16 17:50:01+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-16 17:50:01+0000 [-] Main loop terminated.
+2017-01-16 17:50:33+0000 [-] Log opened.
+2017-01-16 17:50:33+0000 [-] KademliaProtocol starting on 8468
+2017-01-16 17:50:33+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:50:33+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 17:50:33+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:50:33+0000 [KademliaProtocol (UDP)] Found nodes: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:50:33+0000 [Server] [DEBUG] setting 'a key' = 'a value' on network
+2017-01-16 17:50:33+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:50:33+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 17:50:33+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:50:33+0000 [Server] [INFO] setting 'a key' on ['192.168.62.128:8468']
+2017-01-16 17:50:33+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:50:33+0000 [-] Unhandled error in Deferred:
+2017-01-16 17:50:33+0000 [-] Unhandled Error
+	Traceback (most recent call last):
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 1030, in _cbDeferred
+	    self.callback(self.resultList)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 457, in callback
+	    self._startRunCallbacks(result)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 565, in _startRunCallbacks
+	    self._runCallbacks()
+	--- <exception caught here> ---
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/tests/dht_test.py", line 7, in checkValue
+	    assert result == 'a value'
+	exceptions.AssertionError: assert True == 'a value'
+	
+2017-01-16 17:50:40+0000 [-] Received SIGINT, shutting down.
+2017-01-16 17:50:40+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-16 17:50:40+0000 [-] Main loop terminated.
+2017-01-16 17:52:23+0000 [-] Log opened.
+2017-01-16 17:52:23+0000 [-] KademliaProtocol starting on 8468
+2017-01-16 17:52:23+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:52:23+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 17:52:23+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:52:23+0000 [KademliaProtocol (UDP)] Found nodes: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:52:23+0000 [Server] [DEBUG] setting 'a key' = 'a value' on network
+2017-01-16 17:52:23+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:52:23+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 17:52:23+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:52:23+0000 [Server] [INFO] setting 'a key' on ['192.168.62.128:8468']
+2017-01-16 17:52:23+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:52:23+0000 [-] Unhandled error in Deferred:
+2017-01-16 17:52:23+0000 [-] Unhandled Error
+	Traceback (most recent call last):
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 1030, in _cbDeferred
+	    self.callback(self.resultList)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 457, in callback
+	    self._startRunCallbacks(result)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 565, in _startRunCallbacks
+	    self._runCallbacks()
+	--- <exception caught here> ---
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/tests/dht_test.py", line 7, in checkValue
+	    assert result == 'a value'
+	exceptions.AssertionError: assert True == 'a value'
+	
+2017-01-16 17:53:01+0000 [-] Received SIGINT, shutting down.
+2017-01-16 17:53:01+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-16 17:53:01+0000 [-] Main loop terminated.
+2017-01-16 17:53:26+0000 [-] Log opened.
+2017-01-16 17:53:26+0000 [-] KademliaProtocol starting on 8468
+2017-01-16 17:53:26+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:53:26+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 17:53:26+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:53:26+0000 [KademliaProtocol (UDP)] Found nodes: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:53:26+0000 [Server] [DEBUG] setting 'a key' = 'a value' on network
+2017-01-16 17:53:26+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:53:26+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 17:53:26+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:53:26+0000 [Server] [INFO] setting 'a key' on ['192.168.62.128:8468']
+2017-01-16 17:53:26+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:53:26+0000 [-] Unhandled error in Deferred:
+2017-01-16 17:53:26+0000 [-] Unhandled Error
+	Traceback (most recent call last):
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 1030, in _cbDeferred
+	    self.callback(self.resultList)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 457, in callback
+	    self._startRunCallbacks(result)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 565, in _startRunCallbacks
+	    self._runCallbacks()
+	--- <exception caught here> ---
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/tests/dht_test.py", line 7, in checkValue
+	    assert result == 'a value'
+	exceptions.AssertionError: assert <p2ppki.dhtServer.DHTServer object at 0x10d5a4f10> == 'a value'
+	
+2017-01-16 17:53:32+0000 [-] Received SIGINT, shutting down.
+2017-01-16 17:53:32+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-16 17:53:32+0000 [-] Main loop terminated.
+2017-01-16 17:54:50+0000 [-] Log opened.
+2017-01-16 17:54:50+0000 [-] KademliaProtocol starting on 8468
+2017-01-16 17:54:50+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:54:50+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 17:54:50+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:54:50+0000 [KademliaProtocol (UDP)] Found nodes: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:54:50+0000 [Server] [DEBUG] setting 'a key' = 'a value' on network
+2017-01-16 17:54:50+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:54:50+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 17:54:50+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:54:50+0000 [Server] [INFO] setting 'a key' on ['192.168.62.128:8468']
+2017-01-16 17:54:50+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:54:50+0000 [-] Unhandled error in Deferred:
+2017-01-16 17:54:50+0000 [-] Unhandled Error
+	Traceback (most recent call last):
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 1030, in _cbDeferred
+	    self.callback(self.resultList)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 457, in callback
+	    self._startRunCallbacks(result)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 565, in _startRunCallbacks
+	    self._runCallbacks()
+	--- <exception caught here> ---
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	exceptions.TypeError: checkValue() takes exactly 1 argument (2 given)
+	
+2017-01-16 17:54:57+0000 [-] Received SIGINT, shutting down.
+2017-01-16 17:54:57+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-16 17:54:57+0000 [-] Main loop terminated.
+2017-01-16 17:58:58+0000 [-] Log opened.
+2017-01-16 17:58:58+0000 [-] KademliaProtocol starting on 8468
+2017-01-16 17:58:58+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:58:58+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 17:58:58+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:58:58+0000 [KademliaProtocol (UDP)] Found nodes: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:58:58+0000 [Server] [DEBUG] setting 'a key' = 'a value' on network
+2017-01-16 17:58:58+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:58:58+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 17:58:58+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:58:58+0000 [Server] [INFO] setting 'a key' on ['192.168.62.128:8468']
+2017-01-16 17:58:58+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:58:58+0000 [-] Unhandled error in Deferred:
+2017-01-16 17:58:58+0000 [-] Unhandled Error
+	Traceback (most recent call last):
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 1030, in _cbDeferred
+	    self.callback(self.resultList)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 457, in callback
+	    self._startRunCallbacks(result)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 565, in _startRunCallbacks
+	    self._runCallbacks()
+	--- <exception caught here> ---
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/tests/dht_test.py", line 28, in getValue
+	    self.server.get('a key', self.printValue)
+	exceptions.AttributeError: Controller instance has no attribute 'printValue'
+	
+2017-01-16 17:59:09+0000 [-] Received SIGINT, shutting down.
+2017-01-16 17:59:09+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-16 17:59:09+0000 [-] Main loop terminated.
+2017-01-16 17:59:42+0000 [-] Log opened.
+2017-01-16 17:59:42+0000 [-] KademliaProtocol starting on 8468
+2017-01-16 17:59:42+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:59:42+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 17:59:42+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:59:42+0000 [KademliaProtocol (UDP)] Found nodes: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:59:42+0000 [Server] [DEBUG] setting 'a key' = 'a value' on network
+2017-01-16 17:59:42+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 17:59:42+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 17:59:42+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:59:42+0000 [Server] [INFO] setting 'a key' on ['192.168.62.128:8468']
+2017-01-16 17:59:42+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 17:59:42+0000 [-] Unhandled error in Deferred:
+2017-01-16 17:59:42+0000 [-] Unhandled Error
+	Traceback (most recent call last):
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 1030, in _cbDeferred
+	    self.callback(self.resultList)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 457, in callback
+	    self._startRunCallbacks(result)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 565, in _startRunCallbacks
+	    self._runCallbacks()
+	--- <exception caught here> ---
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/tests/dht_test.py", line 28, in getValue
+	    self.server.get('a key', self.checkValue)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/p2ppki/dhtServer.py", line 27, in get
+	    return self.server.get(key).addCallback(callback)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/kademlia/network.py", line 140, in get
+	    if self.storage.get(dkey) is not None:
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/p2ppki/storage.py", line 36, in get
+	    return self[key]
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/p2ppki/storage.py", line 31, in __getitem__
+	    result.append(json.loads(item[1]))
+	  File "/usr/local/Cellar/python/2.7.12_2/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/__init__.py", line 339, in loads
+	    return _default_decoder.decode(s)
+	  File "/usr/local/Cellar/python/2.7.12_2/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/decoder.py", line 364, in decode
+	    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+	  File "/usr/local/Cellar/python/2.7.12_2/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/decoder.py", line 382, in raw_decode
+	    raise ValueError("No JSON object could be decoded")
+	exceptions.ValueError: No JSON object could be decoded
+	
+2017-01-16 17:59:51+0000 [-] Received SIGINT, shutting down.
+2017-01-16 17:59:51+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-16 17:59:51+0000 [-] Main loop terminated.
+2017-01-16 18:00:56+0000 [-] Log opened.
+2017-01-16 18:00:56+0000 [-] KademliaProtocol starting on 8468
+2017-01-16 18:00:56+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 18:00:56+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 18:00:56+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 18:00:56+0000 [KademliaProtocol (UDP)] Found nodes: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 18:00:56+0000 [Server] [DEBUG] setting 'a key' = 'a value' on network
+2017-01-16 18:00:56+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 18:00:56+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 18:00:56+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 18:00:56+0000 [Server] [INFO] setting 'a key' on ['192.168.62.128:8468']
+2017-01-16 18:00:56+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 18:00:56+0000 [ValueSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 18:00:56+0000 [ValueSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 18:00:56+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 18:00:56+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-16 18:00:56+0000 [-] Main loop terminated.
+2017-01-16 18:34:33+0000 [-] Log opened.
+2017-01-16 18:34:33+0000 [-] KademliaProtocol starting on 8468
+2017-01-16 18:34:33+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 18:34:33+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 18:34:33+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 18:34:33+0000 [KademliaProtocol (UDP)] Found nodes: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 18:34:33+0000 [-] Unhandled error in Deferred:
+2017-01-16 18:34:33+0000 [-] Unhandled Error
+	Traceback (most recent call last):
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 1030, in _cbDeferred
+	    self.callback(self.resultList)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 457, in callback
+	    self._startRunCallbacks(result)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 565, in _startRunCallbacks
+	    self._runCallbacks()
+	--- <exception caught here> ---
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/p2ppki/dhtServer.py", line 21, in done
+	    if readyCallback is not None:
+	exceptions.NameError: global name 'readyCallback' is not defined
+	
+2017-01-16 18:35:06+0000 [-] Received SIGINT, shutting down.
+2017-01-16 18:35:06+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-16 18:35:06+0000 [-] Main loop terminated.
+2017-01-16 18:35:45+0000 [-] Log opened.
+2017-01-16 18:35:45+0000 [-] KademliaProtocol starting on 8468
+2017-01-16 18:35:45+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 18:35:45+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 18:35:45+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 18:35:45+0000 [KademliaProtocol (UDP)] Found nodes: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 18:35:45+0000 [Server] [DEBUG] setting 'a key' = 'a value' on network
+2017-01-16 18:35:45+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 18:35:45+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 18:35:45+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 18:35:45+0000 [Server] [INFO] setting 'a key' on ['192.168.62.128:8468']
+2017-01-16 18:35:45+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 18:35:45+0000 [ValueSpiderCrawl] [INFO] creating spider with peers: [[1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468]]
+2017-01-16 18:35:45+0000 [ValueSpiderCrawl] [INFO] crawling with nearest: ([1418938165641541645363477400294636438323052247203L, '192.168.62.128', 8468],)
+2017-01-16 18:35:45+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-16 18:35:45+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-16 18:35:45+0000 [-] Main loop terminated.
+2017-01-24 18:02:05+0000 [-] Log opened.
+2017-01-24 18:02:05+0000 [-] KademliaProtocol starting on 8468
+2017-01-24 18:02:10+0000 [-] 'Did not received reply for msg id otJW+/ZCrb3V+/4ajDZpGFYW3qU= within 5 seconds'
+2017-01-24 18:02:10+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: []
+2017-01-24 18:02:10+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ()
+2017-01-24 18:02:10+0000 [NodeSpiderCrawl] [INFO] last iteration same as current - checking all in list now
+2017-01-24 18:02:10+0000 [-] Found nodes: []
+2017-01-24 18:02:10+0000 [Server] [DEBUG] setting 'a key' = 'a value' on network
+2017-01-24 18:02:10+0000 [Server] [WARNING] There are no known neighbors to set key a key
+2017-01-24 18:02:10+0000 [Server] [WARNING] There are no known neighbors to get key a key
+2017-01-24 18:02:10+0000 [-] Unhandled error in Deferred:
+2017-01-24 18:02:10+0000 [-] Unhandled Error
+	Traceback (most recent call last):
+	  File "/Users/henrymortimer/Projects/finalYearProject/tests/dht_test.py", line 14, in getValue
+	    self.server.get('a key', self.checkValue)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/p2ppki/dhtServer.py", line 33, in get
+	    return self.server.get(key).addCallback(callback)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 319, in addCallback
+	    callbackKeywords=kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 308, in addCallbacks
+	    self._runCallbacks()
+	--- <exception caught here> ---
+	  File "/Users/henrymortimer/Projects/finalYearProject/.tox/py27/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/tests/dht_test.py", line 17, in checkValue
+	    assert result == 'a value'
+	exceptions.AssertionError: assert None == 'a value'
+	
+2017-01-24 18:02:13+0000 [-] Received SIGINT, shutting down.
+2017-01-24 18:02:13+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-24 18:02:13+0000 [-] Main loop terminated.

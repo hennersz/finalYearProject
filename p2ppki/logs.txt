@@ -1,0 +1,156 @@
+2017-01-15 12:59:47+0000 [-] Log opened.
+2017-01-15 12:59:47+0000 [-] KademliaProtocol starting on 8468
+2017-01-15 12:59:47+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 12:59:47+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[425768369132583873005477986917050829654685911918L, '192.168.62.128', 8468]]
+2017-01-15 12:59:47+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([425768369132583873005477986917050829654685911918L, '192.168.62.128', 8468],)
+2017-01-15 12:59:47+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-15 12:59:47+0000 [KademliaProtocol (UDP)] Found nodes: [[425768369132583873005477986917050829654685911918L, '192.168.62.128', 8468]]
+2017-01-15 12:59:47+0000 [-] hello
+2017-01-15 13:00:06+0000 [Server] [DEBUG] setting 'hello' = 'value' on network
+2017-01-15 13:00:06+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[425768369132583873005477986917050829654685911918L, '192.168.62.128', 8468]]
+2017-01-15 13:00:06+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([425768369132583873005477986917050829654685911918L, '192.168.62.128', 8468],)
+2017-01-15 13:00:06+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-15 13:00:06+0000 [Server] [INFO] setting 'hello' on ['192.168.62.128:8468']
+2017-01-15 13:00:06+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-15 13:00:10+0000 [-] Received SIGINT, shutting down.
+2017-01-15 13:00:10+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-15 13:00:10+0000 [-] Main loop terminated.
+2017-01-15 13:03:17+0000 [-] Log opened.
+2017-01-15 13:03:17+0000 [-] KademliaProtocol starting on 8468
+2017-01-15 13:03:17+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[425768369132583873005477986917050829654685911918L, '192.168.62.128', 8468]]
+2017-01-15 13:03:17+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([425768369132583873005477986917050829654685911918L, '192.168.62.128', 8468],)
+2017-01-15 13:03:17+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-15 13:03:17+0000 [KademliaProtocol (UDP)] Found nodes: [[425768369132583873005477986917050829654685911918L, '192.168.62.128', 8468]]
+2017-01-15 13:03:17+0000 [-] <LoggingFile stdout#info>
+2017-01-15 13:03:20+0000 [KademliaProtocol (UDP)] Received SIGINT, shutting down.
+2017-01-15 13:03:22+0000 [-] Unhandled error in Deferred:
+2017-01-15 13:03:22+0000 [-] Unhandled Error
+	Traceback (most recent call last):
+	  File "/Users/henrymortimer/Projects/finalYearProject/ENV/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "/Users/henrymortimer/Projects/finalYearProject/ENV/lib/python2.7/site-packages/twisted/internet/defer.py", line 1030, in _cbDeferred
+	    self.callback(self.resultList)
+	  File "/Users/henrymortimer/Projects/finalYearProject/ENV/lib/python2.7/site-packages/twisted/internet/defer.py", line 457, in callback
+	    self._startRunCallbacks(result)
+	  File "/Users/henrymortimer/Projects/finalYearProject/ENV/lib/python2.7/site-packages/twisted/internet/defer.py", line 565, in _startRunCallbacks
+	    self._runCallbacks()
+	--- <exception caught here> ---
+	  File "/Users/henrymortimer/Projects/finalYearProject/ENV/lib/python2.7/site-packages/twisted/internet/defer.py", line 651, in _runCallbacks
+	    current.result = callback(current.result, *args, **kw)
+	  File "core.py", line 19, in done
+	    key = raw_input('enter a key')
+	exceptions.EOFError: EOF when reading a line
+	
+2017-01-15 13:03:22+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-15 13:03:22+0000 [-] Main loop terminated.
+2017-01-15 13:09:15+0000 [-] Log opened.
+2017-01-15 13:09:15+0000 [-] KademliaProtocol starting on 8468
+2017-01-15 13:09:15+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 13:09:15+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[425768369132583873005477986917050829654685911918L, '192.168.62.128', 8468]]
+2017-01-15 13:09:15+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([425768369132583873005477986917050829654685911918L, '192.168.62.128', 8468],)
+2017-01-15 13:09:15+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-15 13:09:15+0000 [KademliaProtocol (UDP)] Found nodes: [[425768369132583873005477986917050829654685911918L, '192.168.62.128', 8468]]
+2017-01-15 13:09:20+0000 [Server] [DEBUG] setting 'hello' = 'hi' on network
+2017-01-15 13:09:20+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[425768369132583873005477986917050829654685911918L, '192.168.62.128', 8468]]
+2017-01-15 13:09:20+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([425768369132583873005477986917050829654685911918L, '192.168.62.128', 8468],)
+2017-01-15 13:09:20+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-15 13:09:20+0000 [Server] [INFO] setting 'hello' on ['192.168.62.128:8468']
+2017-01-15 13:09:20+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-15 13:29:42+0000 [-] Received SIGINT, shutting down.
+2017-01-15 13:29:42+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-15 13:29:42+0000 [-] Main loop terminated.
+2017-01-15 13:29:44+0000 [-] Log opened.
+2017-01-15 13:30:07+0000 [-] Log opened.
+2017-01-15 13:30:07+0000 [-] EchoFactory starting on 8007
+2017-01-15 13:30:07+0000 [-] Starting factory <__main__.EchoFactory instance at 0x107f643b0>
+2017-01-15 13:30:07+0000 [-] KademliaProtocol starting on 8468
+2017-01-15 13:30:07+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 13:30:07+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[425768369132583873005477986917050829654685911918L, '192.168.62.128', 8468]]
+2017-01-15 13:30:07+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([425768369132583873005477986917050829654685911918L, '192.168.62.128', 8468],)
+2017-01-15 13:30:07+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-15 13:30:07+0000 [KademliaProtocol (UDP)] Found nodes: [[425768369132583873005477986917050829654685911918L, '192.168.62.128', 8468]]
+2017-01-15 13:30:52+0000 [Server] [DEBUG] setting 'key' = 'value' on network
+2017-01-15 13:30:52+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: [[425768369132583873005477986917050829654685911918L, '192.168.62.128', 8468]]
+2017-01-15 13:30:52+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ([425768369132583873005477986917050829654685911918L, '192.168.62.128', 8468],)
+2017-01-15 13:30:52+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-15 13:30:52+0000 [Server] [INFO] setting 'key' on ['192.168.62.128:8468']
+2017-01-15 13:30:52+0000 [KademliaProtocol] [INFO] got response from 192.168.62.128:8468, adding to router
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [INFO] finding neighbors of 425768369132583873005477986917050829654685911918 in local table
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 14:49:13+0000 [KademliaProtocol] [DEBUG] got a store request from ('192.168.62.128', 8468), storing value
+2017-01-15 15:15:46+0000 [-] Received SIGINT, shutting down.
+2017-01-15 15:15:46+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-15 15:15:46+0000 [__main__.EchoFactory] (TCP Port 8007 Closed)
+2017-01-15 15:15:46+0000 [-] Stopping factory <__main__.EchoFactory instance at 0x107f643b0>
+2017-01-15 15:15:46+0000 [-] Main loop terminated.
+2017-01-16 21:51:52+0000 [-] Log opened.
+2017-01-16 21:51:52+0000 [-] EchoFactory starting on 8007
+2017-01-16 21:51:52+0000 [-] Starting factory <__main__.EchoFactory instance at 0x10c4796c8>
+2017-01-16 21:51:52+0000 [-] KademliaProtocol starting on 8468
+2017-01-16 21:51:57+0000 [-] Received SIGINT, shutting down.
+2017-01-16 21:51:57+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-16 21:51:57+0000 [__main__.EchoFactory] (TCP Port 8007 Closed)
+2017-01-16 21:51:57+0000 [-] Stopping factory <__main__.EchoFactory instance at 0x10c4796c8>
+2017-01-16 21:51:57+0000 [-] Main loop terminated.
+2017-01-16 21:53:33+0000 [-] Log opened.
+2017-01-16 21:53:33+0000 [-] EchoFactory starting on 8007
+2017-01-16 21:53:33+0000 [-] Starting factory <__main__.EchoFactory instance at 0x107725170>
+2017-01-16 21:53:33+0000 [-] KademliaProtocol starting on 8468
+2017-01-16 21:53:38+0000 [-] 'Did not received reply for msg id XPNQX286ekT3kLp5s1hgRdktH/Q= within 5 seconds'
+2017-01-16 21:53:38+0000 [NodeSpiderCrawl] [INFO] creating spider with peers: []
+2017-01-16 21:53:38+0000 [NodeSpiderCrawl] [INFO] crawling with nearest: ()
+2017-01-16 21:53:38+0000 [NodeSpiderCrawl] [INFO] last iteration same as current - checking all in list now
+2017-01-16 21:53:38+0000 [-] Found nodes: []
+2017-01-16 21:53:38+0000 [Server] [DEBUG] setting 'a key' = 'a value' on network
+2017-01-16 21:53:38+0000 [Server] [WARNING] There are no known neighbors to set key a key
+2017-01-16 21:53:38+0000 [Server] [WARNING] There are no known neighbors to get key a key
+2017-01-16 21:53:46+0000 [-] Received SIGINT, shutting down.
+2017-01-16 21:53:46+0000 [__main__.EchoFactory] (TCP Port 8007 Closed)
+2017-01-16 21:53:46+0000 [-] Stopping factory <__main__.EchoFactory instance at 0x107725170>
+2017-01-16 21:53:46+0000 [KademliaProtocol (UDP)] (UDP Port 8468 Closed)
+2017-01-16 21:53:46+0000 [-] Main loop terminated.

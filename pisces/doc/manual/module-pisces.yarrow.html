@@ -1,0 +1,313 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>5.9 pisces.yarrow - Yarrow random number generator</title>
+<META NAME="description" CONTENT="5.9 pisces.yarrow - Yarrow random number generator">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" href="manual.css">
+<LINK REL="next" href="module-pisces.ttls.html">
+<LINK REL="previous" href="module-pisces.utils.html">
+<LINK REL="up" HREF="node8.html">
+<LINK REL="next" href="module-pisces.ttls.html">
+</head>
+<body bgcolor="#ffffff" text="#000000" link="#0000bb"  vlink="#551a8b" alink="#ff0000">
+<div class='navigation'>
+<table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A href="module-pisces.ttls.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node8.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A href="module-pisces.utils.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A href="module-pisces.ttls.html">5.10 pisces.ttls - Trivial</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node8.html">5. Pisces Library Reference</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A href="module-pisces.utils.html">5.8 pisces.utils - Internal</A></span>
+<br><hr></div>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000690000000000000000">
+5.9 <tt class="module">pisces.yarrow</tt> 
+	- Yarrow random number generator</A>
+</H2>
+
+
+<P>
+This module implements a Yarrow-160 cryptographic pseudorandom number
+generator for Unix.  It is based on a design described in the
+following paper: John Kelsey, Bruce Schneier, and Niels Ferguson:
+``Yarrow-160: Notes on the Design and Analysis of the Yarrow
+Cryptographic Pseudorandom Number Generator,''
+<a class="url" href="http://www.counterpane.com/yarrow.html">http://www.counterpane.com/yarrow.html</a>.  The documentation here
+assumes you are familiar with the design described there.
+
+<P>
+Counterpane also provides an implementation, Yarrow 0.8.71, for
+Windows developed by Ari Benbasat.  The implementation appears to
+diverge from the design document in numerous respects, e.g. entropy
+estimation and generating pseudorandom ouputs from the pool values.
+
+<P>
+A note on the implementation: The Yarrow design paper uses 3DES in
+counter mode.  Counter mode is fairly unusual.  It is not implemented
+in the Python Crypto Toolkit or OpenSSL; it only merits a
+one-paragraph mention in Schneier's book Applied Cryptography.  The
+implementation here uses 3DES in ECB mode with a counter.  The counter
+is encrypted with the key, then XORed with the plaintext.
+
+<P>
+<dl><dt><b><a name='l2h-55'><tt class='class'>EntroypSource</tt></a></b> ()
+<dd>
+
+<P>
+<tt class="class">EntropySource</tt> instances track the amount of entropy available
+from a single source.  It is used internally by <tt class="class">EntropyPool</tt>.
+
+<P>
+The design document proposes three different methods for Entropy
+Estimation: It estimates the entropy using three different methods and
+returns the lowest result.
+
+<P>
+This implementation, following Benbasat, uses two estimates: one
+provided by the programming who supplies the input and another
+generator from zlib.
+
+<P>
+<dl><dt><b><a name='l2h-56'><tt class='method'>addInput</tt></a></b> (<var>buf, estbits</var>)
+<dd>
+Update the estimate to account for the entropy in <var>buf</var> with
+<var>estbits</var> bits of entropy.  Both the actual data and the
+user-supplied estimare are necessary to update the internal entropy
+estimate. 
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-57'><tt class='method'>getEntropy</tt></a></b> ()
+<dd>
+Return the minimum estimated entropy currently available.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-58'><tt class='method'>reset</tt></a></b> ()
+<dd>
+Reset the estimates to zero.
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-59'><tt class='class'>EntroypPool</tt></a></b> (<var>threshold, count</var>)
+<dd>
+
+<P>
+The <tt class="class">EntropyPool</tt> collects samples from entropy sources.  The
+design document described an Entropy Accumulator, which collects
+samples from entropy sources and puts them into two pools.  This class
+implements the pools.
+
+<P>
+A pool contains the running hash of all inputs fed into it since the
+<tt class="method">accumulate</tt> method was called.  The <tt class="method">accumulate</tt> method is
+called by the <tt class="class">Yarrow</tt> class during reseed operations.
+
+<P>
+The pool keeps estimates about the entropy of each individual
+source, although the digest is over all sources.  Each souce must
+be initialized by calling <tt class="method">addSouce</tt> and passing the source's name.
+The instance variable sources maps from names to <tt class="class">EntropySource</tt>
+instances.
+
+<P>
+The constructor takes two arguments, the <var>threshold</var> and a
+<var>count</var>.  A pool is ready to be used when at least <var>count</var> of
+its sources have an entropy greater than or equal to <var>threshold</var>.
+The <tt class="member">isReady</tt> method returns true when this condition is met.
+
+<P>
+<tt class="class">EntropyPool</tt> instances are thread safe, because a typical use
+is to have multiple threads adding entropy to the pool.
+
+<P>
+<dl><dt><b><a name='l2h-60'><tt class='method'>addSource</tt></a></b> (<var>name</var>)
+<dd>
+Prepare pool for accepting input from source named <var>source</var>.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-61'><tt class='method'>addInput</tt></a></b> (<var>source, buf, estbits</var>)
+<dd>
+Update hash of pool <var>source</var> with <var>buf</var> containing
+<var>estbits</var> estimated entropy.
+
+<P>
+If the source was not initialized via <tt class="method">addSource</tt>, this method
+will raise a <tt class="exception">KeyError</tt>.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-62'><tt class='method'>isReady</tt></a></b> ()
+<dd>
+Returns true if there is enough entropy in the pool. Enough is defined
+by the threshold and count arguments to the constructor.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-63'><tt class='method'>accumulate</tt></a></b> ()
+<dd>
+Return the current pool digest and reset the pool.
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-64'><tt class='class'>Yarrow</tt></a></b> ()
+<dd>
+
+<P>
+The <tt class="class">Yarrow</tt> class generates random data and managed the fast
+and slow entropy pools for seeding the PRNG.  These functions are
+described as three seperate entities in the design document:
+``generating pseudorandom outputs,'' ``reseed mechanism,'' and
+``reseed control.''
+
+<P>
+The main API for this class is three methods: <tt class="method">getOutput</tt>, 
+<tt class="method">addSource</tt>, and <tt class="method">addInput</tt>.
+
+<P>
+A client may also call <tt class="method">forceReseed</tt> and <tt class="method">allowReseed</tt>
+to cause a reseed to occur.  However, reseed control is implemented
+internally and should occur regularly even if the client does not call
+these methods.
+
+<P>
+The reseed methods take an optional <var>ticks</var> argument that
+affects how long the reseed will take.  The class implements a
+default number, which should be sufficient, but the user can
+override it.
+
+<P>
+The <tt class="class">Yarrow</tt> class is not threadsafe.
+
+<P>
+<dl><dt><b><a name='l2h-65'><tt class='method'>getOuput</tt></a></b> (<var>num</var>)
+<dd>
+Return <var>num</var> bytes of random data.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-66'><tt class='method'>addSource</tt></a></b> (<var>sourceName</var>)
+<dd>
+Intialize a new entropy source named <var>sourceName</var>.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-67'><tt class='method'>addInput</tt></a></b> (<var>source, input, estbits</var>)
+<dd>
+Add <var>input</var> string to <var>source</var> pool, estimating <var>estbits</var>
+of entropy.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-68'><tt class='method'>forceReseed</tt></a></b> (<big>[</big><var>ticks</var><big>]</big>)
+<dd>
+Force a reseed.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-69'><tt class='method'>allowReseed</tt></a></b> (<big>[</big><var>ticks</var><big>]</big>)
+<dd>
+Perform a reseed in enough entropy is available.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-70'><tt class='method'>reseed</tt></a></b> (<big>[</big><var>ticks</var><big>]</big>)
+<dd>
+Use current entropy to generate new seed.
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-71'><tt class='class'>ThreadedYarrow</tt></a></b> ()
+<dd>
+This subclass of <tt class="class">Yarrow</tt> adds locking on <tt class="method">addInput</tt>,
+<tt class="method">getOutput</tt> and <tt class="method">allowReseed</tt> calls.  This locking is
+sufficient to make the class thread-safe.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-72'><tt class='class'>EntropyGatherer</tt></a></b> (<var>jobs, yarrow</var>)
+<dd>
+An <tt class="class">EntropyGatherer</tt> runs a collection of system utilities
+periodically.  Each instance is a <tt class="class">threading.Thread</tt> designed
+to be run via a <tt class="method">start</tt> method.  One instance should be created
+for each collection of utilities that are run at the same period.
+
+<P>
+The arguments are: <var>jobs</var>, a description of the system utilities
+to run, and <var>yarrow</var>, a <tt class="class">Yarrow</tt> instance to feed the data
+to. 
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-73'><tt class='function'>pad64</tt></a></b> (<var>s</var>)
+<dd>
+Returns a copy <var>s</var> padded to 64 bits.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-74'><tt class='function'>hash</tt></a></b> (<var>x</var>)
+<dd>
+Returns the SHA digest of <var>x</var>.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-75'><tt class='function'>hash_ex</tt></a></b> (<var>m, k</var>)
+<dd>
+Extend input <var>m</var> to <var>k</var> bytes using SHA digests.
+</dl>
+
+<P>
+<p>
+<div class='navigation'><hr><table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A href="module-pisces.ttls.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node8.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A href="module-pisces.utils.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A href="module-pisces.ttls.html">5.10 pisces.ttls - Trivial</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node8.html">5. Pisces Library Reference</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A href="module-pisces.utils.html">5.8 pisces.utils - Internal</A></span>
+</div>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

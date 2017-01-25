@@ -1,0 +1,683 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>5.17 pisces.spkilib.spki - Core SPKI implementation</title>
+<META NAME="description" CONTENT="5.17 pisces.spkilib.spki - Core SPKI implementation">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" href="manual.css">
+<LINK REL="next" href="module-pisces.spkilib.verify.html">
+<LINK REL="previous" href="module-pisces.spkilib.sexpsocket.html">
+<LINK REL="up" HREF="node8.html">
+<LINK REL="next" href="module-pisces.spkilib.verify.html">
+</head>
+<body bgcolor="#ffffff" text="#000000" link="#0000bb"  vlink="#551a8b" alink="#ff0000">
+<div class='navigation'>
+<table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A href="module-pisces.spkilib.verify.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node8.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A href="module-pisces.spkilib.sexpsocket.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A href="module-pisces.spkilib.verify.html">5.18 pisces.spkilib.verify - Certificate</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node8.html">5. Pisces Library Reference</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A href="module-pisces.spkilib.sexpsocket.html">5.16 pisces.spkilib.sexpsocket - Send</A></span>
+<br><hr></div>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION0006170000000000000000">
+5.17 <tt class="module">pisces.spkilib.spki</tt>
+	- Core SPKI implementation</A>
+</H2>
+
+
+<P>
+This module implements Python classes that correspond to SPKI object.
+The objects defined by SPKI are S-expressions consisting of an object
+name and zero or more ``parts.''  This module defines a Python class
+for each SPKI object, where the object name corresponds to the class
+name and the parts correspond to instance attributes.
+
+<P>
+Each SPKI object is represented in Pisces by a subclass of
+<tt class="class">SPKIObject</tt>.  These classes have attributes for each of the
+parts of the S-expression.  Some classes also have methods for performing
+operations using the data contained in the SPKI object;
+e.g. <code>public-key</code> objects have <tt class="method">encrypt</tt> and
+<tt class="method">decrypt</tt> methods.
+
+<P>
+<dl><dt><b><a name='l2h-136'><tt class='class'>SPKIObject</tt></a></b> ()
+<dd>
+
+<P>
+This abstract base class defines the <tt class="method">sexp</tt> method and several
+operators that rely on the S-expression of an object.
+
+<P>
+The constructors for <tt class="class">SPKIObject</tt> instances take a number of
+argument equal to the number of parts in the S-expression, i.e. the
+number of parts following the object name.
+
+<P>
+<dl><dt><b><a name='l2h-137'><tt class='method'>sexp</tt></a></b> ()
+<dd>
+Returns a <tt class="class">pisces.spkilib.sexp.SExp</tt> for the object.
+</dl>
+
+<P>
+The following methods use Python operator overloading.  They should
+not be called directly but provide support for Python builtin
+operations like <tt class="function">repr</tt>, comparison, and use as a dictionary
+key. 
+
+<P>
+<dl><dt><b><a name='l2h-138'><tt class='method'>__repr__</tt></a></b> ()
+<dd>
+Returns the advanced form of the S-expression.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-139'><tt class='method'>__cmp__</tt></a></b> (<var>other</var>)
+<dd>
+<tt class="class">SPKIObject</tt> instances are compared using the canonical
+S-expression encoding.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-140'><tt class='method'>__hash__</tt></a></b> ()
+<dd>
+The hash of an object is that hash of the canonical encoding of its
+S-expression. 
+</dl>
+
+<P>
+</dl>
+
+<P>
+The object names used by SPKI can not be used directly as Python class
+names because they contain hyphens.  They also clash with typical
+Python style which uses capital letters.  SPKI object names are
+converted to class names using the <tt class="function">name_to_impl</tt> function.
+
+<P>
+<dl><dt><b><a name='l2h-141'><tt class='function'>name_to_impl</tt></a></b> (<var>name</var>)
+<dd>
+Returns the class name corresponding to a SPKI object.  Names are
+translated as follows: The SPKI name is broken up into multiple
+components at each hyphen.  The first letter of each component is
+capitalized.  If the first character of the first component is a
+number, an underscore is prepended.  The SPKI name <code>*</code> is
+translated as <tt class="class">TagExpr</tt>.
+
+<P>
+For example, the SPKI name <code>rsa-pkcs1-md5</code> is translated as
+<tt class="function">RsaPkcs1Md5</tt>.
+</dl>
+
+<P>
+In some cases, the name returned by <tt class="function">name_to_impl</tt> refers to
+a factory function that will produce instances of the desired class.
+The factory functions are necessary when the class returned depends on
+some part of the S-expression other than the object name.
+
+<P>
+There are several helper functions that convert from S-expressions to
+Python instances.  
+
+<P>
+<dl><dt><b><a name='l2h-142'><tt class='function'>parse</tt></a></b> (<var>buf</var>)
+<dd>
+Parse the canonical S-expression <var>buf</var> and return a
+<tt class="class">SPKIObject</tt> instance.  Uses <tt class="function">pisces.spkilib.sexp.parse</tt>.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-143'><tt class='function'>parseText</tt></a></b> (<var>s</var>)
+<dd>
+Parse the human-readable S-expression <var>s</var> and return a
+<tt class="class">SPKIObject</tt> instance. Uses <tt class="function">pisces.spkilib.sexp.parseText</tt>.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-144'><tt class='class'>Evaluator</tt></a></b> (<var>*namespaces</var>)
+<dd>
+An <tt class="class">Evaluator</tt> instance is used to translate from S-expressions
+to Python objects.  It contains one or more namespaces that map from
+SPKI object names to factory functions and classes.  The optional
+<var>namespaces</var> arguments must support the mapping protocol.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-145'><tt class='function'>eval</tt></a></b> (<var>s, </var><big>[</big><var>tag</var><big>]</big>)
+<dd>
+Returns a <tt class="class">SPKIObject</tt> corresponding to the
+<tt class="class">pisces.spkilib.sexp.SExp</tt>.  It uses an <tt class="class">Evaluator</tt>
+intialized with the current module's namespace.
+</dl>
+
+<P>
+The module defines the following utility functions:
+
+<P>
+<dl><dt><b><a name='l2h-146'><tt class='function'>isPrincipal</tt></a></b> (<var>obj</var>)
+<dd>
+Return true if <var>obj</var> is a public key or hash.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-147'><tt class='function'>encryptWithPassword</tt></a></b> (<var>object, pw</var><big>[</big><var>, bogus</var><big>]</big>)
+<dd>
+Return a <tt class="class">PasswordEncrypted</tt> instance containing an encrypted
+copy of <var>object</var>.  The encryption is performed using the PBES2
+scheme defined by PKCS #5 using <var>pw</var> as the password, a triple
+DES in CBC mode as the cipher.
+
+<P>
+If the optional argument <var>bogus</var> is specified, the object is
+marked as using a bogus password.  This is useful only for testing
+purposes.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-148'><tt class='function'>getTime</tt></a></b> (<big>[</big><var>t</var><big>]</big>)
+<dd>
+Return a time in SPKI format.  If <var>t</var> is specified, it must be a
+numer representing the current Unix time, e.g. as returned by
+<tt class="function">time.time</tt>.  If <var>t</var> is not specified, the current time
+is returned.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-149'><tt class='function'>checkTime</tt></a></b> (<var>t</var>)
+<dd>
+Returns true if <var>t</var> is a syntactically valid SPKI time.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-150'><tt class='function'>getIssuerAndSubject</tt></a></b> (<var>obj</var><big>[</big><var>warning</var><big>]</big>)
+<dd>
+Retrieve issuer and subject from <var>obj</var>, which may be a Sequence
+containing a cert.  This function will search through a sequence
+looking for a cert object or use a cert object passed directly.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-151'><tt class='function'>extractSignedCert</tt></a></b> (<var>seq</var>)
+<dd>
+Extract a cert and its signature from a sequence.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-152'><tt class='function'>makePublicKey</tt></a></b> (<var>impl</var>)
+<dd>
+Return a <tt class="class">PublicKey</tt> SPKI object from <var>impl</var>, an instance of
+<tt class="class">pisces.pkcs1.RSA_pkcs1</tt>.  By default, produces an
+<code>rsa-pkcs1-md5</code> key.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-153'><tt class='function'>makePrivateKey</tt></a></b> (<var>impl</var>)
+<dd>
+Return a <tt class="class">PrivateKey</tt> SPKI object from <var>impl</var>, an instance of
+<tt class="class">pisces.pkcs1.RSA_pkcs1</tt>.   By default, produces an
+<code>rsa-pkcs1-md5</code> key. 
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-154'><tt class='function'>setHashAlgorithm</tt></a></b> (<var>alg</var>)
+<dd>
+Change the hash function used by <tt class="function">makePublicKey</tt> and
+<tt class="function">makePrivateKey</tt> to the algorithm identified by <var>alg</var>, a
+<tt class="class">pisces.asn1.OID</tt>. 
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-155'><tt class='function'>makeRSAKeyPair</tt></a></b> (<var>bits</var>)
+<dd>
+Create a new <var>bits</var>-bit RSA key pair.  Return two values, the
+public and private components.  Uses <tt class="function">makePublicKey</tt> and
+<tt class="function">makePrivateKey</tt>.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-156'><tt class='class'>RSAKeyMaker</tt></a></b> (<big>[</big><var>algid</var><big>]</big>)
+<dd>
+
+<P>
+The functions <tt class="function">makePublicKey</tt> and <tt class="function">makePrivateKey</tt>
+are defined by a default instance of <tt class="class">RSAKeyMaker</tt>.  This class,
+which is instantiated with the OID of a hash function, generates keys
+that use that hash function for signing.
+
+<P>
+<dl><dt><b><a name='l2h-157'><tt class='method'>makePublicKey</tt></a></b> (<var>impl</var>)
+<dd>
+See the function <tt class="function">makePublicKey</tt>.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-158'><tt class='method'>makePrivateKey</tt></a></b> (<var>impl</var>)
+<dd>
+See the function <tt class="function">makePrivateKey</tt>.
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-159'><tt class='function'>makeCert</tt></a></b> (<var>issuer, subject, tag</var><big>[</big><var>, propagate 
+	</var><big>[</big><var>, valid</var><big>]</big><big>]</big>)
+<dd>
+Create a SPKI <code>cert</code>.  The <var>issuer</var> and <var>subject</var> must be
+principals; the function will wrap them in <code>issuer</code> and
+<code>subject</code> S-expressions.  If the <var>propagate</var> keyword arg is
+true, a propagate entry will be added to the cert.  If the <var>valid</var>
+keyword argument is supplied, it should contain a sequence of validity
+constraints, e.g. <code>not-before</code>, <code>not-after</code>, and <code>online</code>.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-160'><tt class='function'>makeNameCert</tt></a></b> (<var>issuer, subject, name</var><big>[</big><var>, valid</var><big>]</big>)
+<dd>
+Create a SPKI name <code>cert</code> binding the string <var>name</var> to
+<var>subject</var> in <var>issuer</var>'s namespace.  The <var>valid</var> keyword
+argument should contain one or more validity constraints.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-161'><tt class='function'>makeAclEntry</tt></a></b> (<var>subject, valid, propagate, permissions</var>)
+<dd>
+Return a <tt class="class">Entry</tt> object for an access control list.  An
+<tt class="class">Entry</tt> is like a <tt class="class">Cert</tt>, but without an issuer.
+</dl>
+
+<P>
+The rest of this section describes the Python classes that correspond
+to SPKI objects.
+
+<P>
+Many of the SPKI objects defined in this module do not have methods
+associated with them.  They do define attributes, which are themselves
+SPKI objects or strings.  These objects include <tt class="class">Hash</tt>,
+<tt class="class">Signature</tt>, <tt class="class">Do</tt>, and <tt class="class">Name</tt>.  Other objects are
+always contained by another object; e.g. <tt class="class">RSAPublicKey</tt> is
+always used as a component of <tt class="class">PublicKey</tt>.  The contained
+classes are not documented.
+
+<P>
+<dl><dt><b><a name='l2h-162'><tt class='class'>PublicKey</tt></a></b> (<var>key</var>)
+<dd>
+
+<P>
+The implementation delegates all calls to the contained
+<tt class="class">RSAPublicKey</tt> object, which in turn delegates to a
+<tt class="class">pisces.pkcs1.RSA_pkcs1</tt> object.
+
+<P>
+<dl><dt><b><a name='l2h-163'><tt class='method'>verify</tt></a></b> (<var>obj, sig</var>)
+<dd>
+Verify that the <tt class="class">Signature</tt> <var>sig</var> matches <var>obj</var>.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-164'><tt class='method'>getPrincipal</tt></a></b> ()
+<dd>
+Return the principal (hash) of the key.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-165'><tt class='method'>encrypt</tt></a></b> (<var>plain</var>)
+<dd>
+Return a string containing <var>plain</var> encrypted with the key.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-166'><tt class='method'>decrypt</tt></a></b> (<var>cipher</var>)
+<dd>
+Return a string containing the plain text recover from decrypting the
+string <var>cipher</var> with the key.
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-167'><tt class='class'>PrivateKey</tt></a></b> (<var>key</var>)
+<dd>
+
+<P>
+The implementation delegates all calls to the contained
+<tt class="class">RSAPrivateKey</tt> object, which in turn delegates to a
+<tt class="class">pisces.pkcs1.RSA_pkcs1</tt> object.
+
+<P>
+<dl><dt><b><a name='l2h-168'><tt class='method'>sign</tt></a></b> (<var>obj</var>)
+<dd>
+Return a <tt class="class">Signature</tt> object for the SPKI object or string
+<var>obj</var>. 
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-169'><tt class='method'>getPrincipal</tt></a></b> ()
+<dd>
+Return the principal (hash) of the public key.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-170'><tt class='method'>getPublicKey</tt></a></b> ()
+<dd>
+Return the public key that corresponds to this private key.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-171'><tt class='method'>encrypt</tt></a></b> (<var>plain</var>)
+<dd>
+Return a string containing <var>plain</var> encrypted with the key.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-172'><tt class='method'>decrypt</tt></a></b> (<var>cipher</var>)
+<dd>
+Return a string containing the plain text recover from decrypting the
+string <var>cipher</var> with the key.
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-173'><tt class='class'>Sequence</tt></a></b> ()
+<dd>
+
+<P>
+Behaves like a Python sequence.
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-174'><tt class='class'>Valid</tt></a></b> ()
+<dd>
+
+<P>
+subclasses <tt class="class">NotBefore</tt>, <tt class="class">NotAfter</tt>, <tt class="class">Online</tt>
+
+<P>
+<dl><dt><b><a name='l2h-175'><tt class='method'>isValid</tt></a></b> ()
+<dd>
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-176'><tt class='class'>Cert</tt></a></b> ()
+<dd>
+
+<P>
+<dl><dt><b><a name='l2h-177'><tt class='method'>getTag</tt></a></b> ()
+<dd>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-178'><tt class='method'>isValid</tt></a></b> ()
+<dd>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-179'><tt class='method'>isNameCert</tt></a></b> ()
+<dd>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-180'><tt class='method'>getSubject</tt></a></b> ()
+<dd>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-181'><tt class='method'>getIssuer</tt></a></b> ()
+<dd>
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-182'><tt class='class'>SignedCert</tt></a></b> (<var>cert, sig</var>)
+<dd>
+
+<P>
+<dl><dt><b><a name='l2h-183'><tt class='method'>getSequence</tt></a></b> ()
+<dd>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-184'><tt class='method'>verifySignature</tt></a></b> (<var>keydb</var>)
+<dd>
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-185'><tt class='class'>Issuer</tt></a></b> ()
+<dd>
+
+<P>
+<dl><dt><b><a name='l2h-186'><tt class='method'>isName</tt></a></b> ()
+<dd>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-187'><tt class='method'>getPrincipal</tt></a></b> ()
+<dd>
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-188'><tt class='class'>Subject</tt></a></b> ()
+<dd>
+
+<P>
+<dl><dt><b><a name='l2h-189'><tt class='method'>isName</tt></a></b> ()
+<dd>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-190'><tt class='method'>getPrincipal</tt></a></b> ()
+<dd>
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-191'><tt class='class'>Entry</tt></a></b> ()
+<dd>
+
+<P>
+<dl><dt><b><a name='l2h-192'><tt class='method'>getTag</tt></a></b> ()
+<dd>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-193'><tt class='method'>isValid</tt></a></b> ()
+<dd>
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-194'><tt class='class'>Keyholder</tt></a></b> ()
+<dd>
+
+<P>
+<dl><dt><b><a name='l2h-195'><tt class='method'>getPrincipal</tt></a></b> ()
+<dd>
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-196'><tt class='class'>Tag</tt></a></b> ()
+<dd>
+
+<P>
+supports __nonzero__, __cmp__, __and__
+
+<P>
+<dl><dt><b><a name='l2h-197'><tt class='method'>intersect</tt></a></b> (<var>atag</var>)
+<dd>
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-198'><tt class='class'>TagExpr</tt></a></b> ()
+<dd>
+
+<P>
+note: realy _TagExpr
+
+<P>
+subclasses <tt class="class">TagStar</tt>, <tt class="class">TagSet</tt>, <tt class="class">TagRange</tt>,
+<tt class="class">TagPrefix</tt>
+
+<P>
+<dl><dt><b><a name='l2h-199'><tt class='method'>copy</tt></a></b> ()
+<dd>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-200'><tt class='method'>contains</tt></a></b> ()
+<dd>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-201'><tt class='method'>intersect</tt></a></b> ()
+<dd>
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-202'><tt class='class'>TagSet</tt></a></b> ()
+<dd>
+
+<P>
+<dl><dt><b><a name='l2h-203'><tt class='method'>add</tt></a></b> (<var>arg</var>)
+<dd>
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-204'><tt class='class'>AppTag</tt></a></b> ()
+<dd>
+
+<P>
+<dl><dt><b><a name='l2h-205'><tt class='method'>copy</tt></a></b> ()
+<dd>
+</dl>
+
+<P>
+</dl>
+
+<P>
+XXX need to define SPKI-style bnf for
+password-encrypted
+pbes2-hmac
+3des-cipher
+
+<P>
+<dl><dt><b><a name='l2h-206'><tt class='class'>PasswordEncrypted</tt></a></b> ()
+<dd>
+
+<P>
+<dl><dt><b><a name='l2h-207'><tt class='method'>getKey</tt></a></b> (<big>[</big><var>pw</var><big>]</big>)
+<dd>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-208'><tt class='method'>decrypt</tt></a></b> (<big>[</big><var>pw</var><big>]</big>)
+<dd>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-209'><tt class='method'>isBogus</tt></a></b> ()
+<dd>
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-210'><tt class='class'>Pbes2Hmac</tt></a></b> ()
+<dd>
+
+<P>
+<dl><dt><b><a name='l2h-211'><tt class='method'>getKey</tt></a></b> (<var>pw</var>)
+<dd>
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-212'><tt class='class'>_3desCipher</tt></a></b> ()
+<dd>
+
+<P>
+<dl><dt><b><a name='l2h-213'><tt class='method'>decrypt</tt></a></b> (<var>key</var>)
+<dd>
+</dl>
+
+<P>
+</dl>
+
+<P>
+<p>
+<div class='navigation'><hr><table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A href="module-pisces.spkilib.verify.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node8.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A href="module-pisces.spkilib.sexpsocket.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A href="module-pisces.spkilib.verify.html">5.18 pisces.spkilib.verify - Certificate</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node8.html">5. Pisces Library Reference</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A href="module-pisces.spkilib.sexpsocket.html">5.16 pisces.spkilib.sexpsocket - Send</A></span>
+</div>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

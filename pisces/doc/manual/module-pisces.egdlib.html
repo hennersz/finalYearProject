@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>5.4 pisces.egdlib - Interface to the Entropy Gathering Daemon</title>
+<META NAME="description" CONTENT="5.4 pisces.egdlib - Interface to the Entropy Gathering Daemon">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" href="manual.css">
+<LINK REL="next" href="module-pisces.hmac.html">
+<LINK REL="previous" href="module-pisces.cryptrand.html">
+<LINK REL="up" HREF="node8.html">
+<LINK REL="next" href="module-pisces.hmac.html">
+</head>
+<body bgcolor="#ffffff" text="#000000" link="#0000bb"  vlink="#551a8b" alink="#ff0000">
+<div class='navigation'>
+<table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A href="module-pisces.hmac.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node8.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A href="module-pisces.cryptrand.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A href="module-pisces.hmac.html">5.5 pisces.hmac - Keyed-hashing</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node8.html">5. Pisces Library Reference</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A href="module-pisces.cryptrand.html">5.3 pisces.cryptrand - Interface</A></span>
+<br><hr></div>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000640000000000000000">
+5.4 <tt class="module">pisces.egdlib</tt>
+	- Interface to the Entropy Gathering Daemon</A>
+</H2>
+
+
+<P>
+EGD (Entropy Gathering Daemon) is a tool designed to be used by GPG
+(GNU Privacy Guard) on systems that do not have a
+<font class="file" face="sans-serif">/dev/random</font>.  It is a user-space program that culls entropy
+from system statistics reported by various commands like <b class="program">w</b>
+or <b class="program">vmstat</b>.  EGD is available from 
+<a class="url" href="http://www.lothar.com/tech/crypto/">http://www.lothar.com/tech/crypto/</a>.
+
+<P>
+This module implements an interface for request random data from EGD.
+For most purposes, it is better to use the interface provided by
+<tt class="module">pisces.cryptrand</tt> which provides an abstraction layer on top
+of this and other modules.
+
+<P>
+<dl><dt><b><a name='l2h-22'><tt class='class'>EGD</tt></a></b> (<var>path</var>)
+<dd>
+The <tt class="class">EGD</tt> class provides a high-level interface for
+communicating with an EGD daemon.  The constructor takes that path of
+the Unix-domain socket used by the daemon.
+
+<P>
+<tt class="class">EGD</tt> defines the following methods:
+
+<P>
+<dl><dt><b><a name='l2h-23'><tt class='method'>getAvailableEntropy</tt></a></b> ()
+<dd>
+Returns the number of bits of entropy currently available.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-24'><tt class='method'>getRandomBytes</tt></a></b> (<var>num</var>)
+<dd>
+Returns up to <var>num</var> bytes of random data.  It will return less
+than <var>num</var> bytes if sufficient entropy is not available.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-25'><tt class='method'>getRandomBytesSync</tt></a></b> (<var>num</var>)
+<dd>
+Returns exactly <var>num</var> bytes of random data.  <i>WARNING:</i> This
+method does not appear to behave correctly, perhaps because of a bug
+in EGD.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-26'><tt class='method'>getPID</tt></a></b> ()
+<dd>
+Returns the daemon's process id.
+</dl>
+
+<P>
+</dl>
+
+<P>
+<p>
+<div class='navigation'><hr><table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A href="module-pisces.hmac.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node8.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A href="module-pisces.cryptrand.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A href="module-pisces.hmac.html">5.5 pisces.hmac - Keyed-hashing</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node8.html">5. Pisces Library Reference</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A href="module-pisces.cryptrand.html">5.3 pisces.cryptrand - Interface</A></span>
+</div>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>Pisces User Manual</title>
+<META NAME="description" CONTENT="Pisces User Manual">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" href="manual.css">
+<LINK REL="next" href="contents.html">
+</head>
+<body bgcolor="#ffffff" text="#000000" link="#0000bb"  vlink="#551a8b" alink="#ff0000">
+<div class='navigation'>
+<table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A href="contents.html">Contents</A></span>
+<br><hr></div>
+<!--End of Navigation Panel-->
+
+<div class='titlepage'><center>
+<h1>Pisces User Manual</h1>
+<p><b><font size='+2'>Jeremy Hylton</font></b></p>
+<p>
+	Corporation for National Research Initiatives 
+<BR>
+Reston, VA 
+<BR>
+E-mail: jeremy@alum.mit.edu</p>
+<p>
+</center></div>
+
+<P>
+
+<H3>Abstract:</H3>
+<DIV CLASS="ABSTRACT">
+
+Pisces is a Python implementation of the SPKI certificate standard.
+This document provides a brief introduction to SPKI (the Simple Public
+Key Infrastructure) and describes the tools available in the Pisces
+distribution.  Pisces contains a library and command-line utility for
+creating and using SPKI certificates in Python.  It also contains a
+toy secure socket library that demonstrates the use of the library.
+</DIV>
+<P>
+
+<P>
+
+<p><hr>
+<!--Table of Child-Links-->
+
+
+<UL>
+<LI><A NAME="tex2html9"
+ href="contents.html">Contents</A>
+<LI><A NAME="tex2html10"
+ HREF="node2.html">1. Introduction</A>
+<LI><A NAME="tex2html11"
+ HREF="node3.html">2. An Example</A>
+<LI><A NAME="tex2html12"
+ HREF="node4.html">3. Command-Line Utility: spkitool.py</A>
+<UL>
+<LI><A NAME="tex2html13"
+ HREF="node5.html">3.1 spkitool.py command reference</A>
+</UL>
+<LI><A NAME="tex2html14"
+ HREF="node6.html">4. Other command-line scripts</A>
+<UL>
+<LI><A NAME="tex2html15"
+ HREF="node7.html">4.1 pyarrowd.py command reference</A>
+</UL>
+<LI><A NAME="tex2html16"
+ HREF="node8.html">5. Pisces Library Reference</A>
+<UL>
+<LI><A NAME="tex2html17"
+ href="module-pisces.algid.html">5.1 <tt class="module">pisces.algid</tt> 
+	- Constants for PKCS #1 AlgorithmIdentifiers</A>
+<LI><A NAME="tex2html18"
+ href="module-pisces.asn1.html">5.2 <tt class="module">pisces.asn1</tt>
+	- Encode and decode ASN.1 BER format</A>
+<LI><A NAME="tex2html19"
+ href="module-pisces.cryptrand.html">5.3 <tt class="module">pisces.cryptrand</tt>
+	- Interface to cryptographic random number generators</A>
+<LI><A NAME="tex2html20"
+ href="module-pisces.egdlib.html">5.4 <tt class="module">pisces.egdlib</tt>
+	- Interface to the Entropy Gathering Daemon</A>
+<LI><A NAME="tex2html21"
+ href="module-pisces.hmac.html">5.5 <tt class="module">pisces.hmac</tt>
+	- Keyed-hashing for message authentication</A>
+<LI><A NAME="tex2html22"
+ href="module-pisces.pkcs1.html">5.6 <tt class="module">pisces.pkcs1</tt> 
+	- A PKCS #1 wrapper for Crypto.PublicKey.RSA keys</A>
+<LI><A NAME="tex2html23"
+ href="module-pisces.pwcrypt.html">5.7 <tt class="module">pisces.pwcrypt</tt>
+	- Support for password-based cryptography (PKCS #5)</A>
+<LI><A NAME="tex2html24"
+ href="module-pisces.utils.html">5.8 <tt class="module">pisces.utils</tt> 
+	- Internal pisces utility functions</A>
+<LI><A NAME="tex2html25"
+ href="module-pisces.yarrow.html">5.9 <tt class="module">pisces.yarrow</tt> 
+	- Yarrow random number generator</A>
+<LI><A NAME="tex2html26"
+ href="module-pisces.ttls.html">5.10 <tt class="module">pisces.ttls</tt>
+	- Trivial transport-layer security</A>
+<LI><A NAME="tex2html27"
+ href="module-pisces.spkilib.html">5.11 <tt class="module">pisces.spkilib</tt>
+	- SPKI package</A>
+<LI><A NAME="tex2html28"
+ href="module-pisces.spkilib.config.html">5.12 <tt class="module">pisces.spkilib.config</tt>
+	- Configuration and command-line argument handling</A>
+<LI><A NAME="tex2html29"
+ href="module-pisces.spkilib..html">5.13 <tt class="module">pisces.spkilib.database</tt>
+	- Store keys and certificates in text file</A>
+<LI><A NAME="tex2html30"
+ href="module-pisces.spkilib.keystore.html">5.14 <tt class="module">pisces.spkilib.keystore</tt>
+	- Abstract storage interface for keys and certifications</A>
+<LI><A NAME="tex2html31"
+ href="module-pisces.spkilib.sexp.html">5.15 <tt class="module">pisces.spkilib.sexp</tt>
+	- Support routines from S-expressions</A>
+<LI><A NAME="tex2html32"
+ href="module-pisces.spkilib.sexpsocket.html">5.16 <tt class="module">pisces.spkilib.sexpsocket</tt>
+	- Send and receive s-exps over sockets</A>
+<LI><A NAME="tex2html33"
+ href="module-pisces.spkilib.spki.html">5.17 <tt class="module">pisces.spkilib.spki</tt>
+	- Core SPKI implementation</A>
+<LI><A NAME="tex2html34"
+ href="module-pisces.spkilib.verify.html">5.18 <tt class="module">pisces.spkilib.verify</tt>
+	- Certificate chain verification</A>
+</UL>
+<LI><A NAME="tex2html35"
+ HREF="node27.html">A. Installation</A>
+<LI><A NAME="tex2html36"
+ href="cite_saltzer75.html">Bibliography</A>
+<LI><A NAME="tex2html37"
+ href="about.html">About this document ...</A>
+</UL>
+<!--End of Table of Child-Links-->
+<p>
+<div class='navigation'><hr><table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A href="contents.html">Contents</A></span>
+</div>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

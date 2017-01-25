@@ -1,45 +1,56 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from twisted.internet import reactor
+from twisted.internet.defer import inlineCallbacks, returnValue
+from twisted.internet.protocol import Protocol
 from twisted.python import log
+from twisted.internet.protocol import Factory
+from twisted.internet.endpoints import TCP4ServerEndpoint
 from kademlia.network import Server
-from kademlia.storage import ForgetfulStorage
-import sys, time
+from storage import ListStorage
+from dhtServer import DHTServer
+import sys
 
-class ListStorage(ForgetfulStorage):
-    def __setitem__(self, key, value):
-        if key in self.data:
-            self.data[key].append((time.time(), value))
-	else:
-            self.data[key] = [(time.time(), value)]	
-    def get(self, key, default=None):
-        if key in self.data:
-            return self[key]
-        return default
+class Echo(Protocol):
+    def dataReceived(self, data):
+        print data
 
-    def __getitem__(self, key):
-        result = []
-        for item in self.data[key]:
-            result.append(item[1])
-        return str(result)
+class EchoFactory(Factory):
+    def buildProtocol(self, addr):
+        return Echo()
 
 
-def quit(result):
-    print "Key result: ", result
-    reactor.stop()
+@inlineCallbacks
+def get(result, dht):
+    value = yield dht.get("a key")
+    print(value)
 
-def get(result, server):
-    return server.get("a key").addCallback(quit)
-
+@inlineCallbacks
 def done(found, server):
-    log.msg("Found nodes: %s" % found)
-    return server.set("a key", "a value").addCallback(get, server)
+    dht = DHTServer(server)
+    yield dht.set("a key", "value 1")
+    yield dht.set("a key", "a value")
+    value = yield dht.get("a key")
+    print(value)
+
+    #return server.set("a key", "a value").addCallback(get, server)
+def initServer(localPort, remoteHost,remotePort):
+    server = Server(storage=ListStorage())
+    server.listen(localPort)
+    server.bootstrap([(remoteHost, remotePort)]).addCallback(done, server)
+
+@inlineCallbacks
+def init():
+    server = yield initServer(8469, "127.0.0.1",8468)
+    dht = DHTServer(server)
+    endpoint = TCP4ServerEndpoint(reactor, 8007)
+    endpoint.listen(EchoFactory(dht))
+
+    reactor.run()
 
 if(__name__ == "__main__"):
     log.startLogging(sys.stdout)
-    server = Server(storage=ListStorage())
-
-    server.listen(8468)
-    server.bootstrap([("192.168.62.128", 8468)]).addCallback(done, server)
+    initServer(8469, "127.0.0.1", 8468)
 
     reactor.run()

@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>2. An Example</title>
+<META NAME="description" CONTENT="2. An Example">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" href="manual.css">
+<LINK REL="next" HREF="node4.html">
+<LINK REL="previous" HREF="node2.html">
+<LINK REL="up" HREF="manual.html">
+<LINK REL="next" HREF="node4.html">
+</head>
+<body bgcolor="#ffffff" text="#000000" link="#0000bb"  vlink="#551a8b" alink="#ff0000">
+<div class='navigation'>
+<table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A HREF="node4.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="manual.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A HREF="node2.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A HREF="node4.html">3. Command-Line Utility: spkitool.py</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="manual.html">Pisces User Manual</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A HREF="node2.html">1. Introduction</A></span>
+<br><hr></div>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION000300000000000000000">
+2. An Example</A>
+</H1>
+
+<P>
+The script example.py in the scripts directory shows how you could use 
+Pisces to perform access control on an object.  The example is a bank
+account object, with methods deposit, withdraw, checkBalance, and
+setBalance.
+
+<P>
+The example scenario involves several different keyholders.  This
+scenario isn't meant to be an exact model of the real world or a
+suggestion for how to model a bank's trust relationships; rather, it
+demonstrates the various ways in which keys and certificates can be
+used.  The Pisces distribution contains keys and certificates in the
+test/example directory.  The text below explains the commands used to
+create them.
+
+<P>
+The bank has a key that is on the access control list for bank
+accounts; it is also used to delegate permission to bank employees and
+account holders.  The bank grant the following permissions to
+keyholders:
+
+<P>
+The auditor has permission to check the balance of the account.
+The adjuster has permission to set the balance of the account.
+The account holder has permission to check the balance of the account
+and deposit and withdraw money.
+
+<P>
+The account holder delegates her permissions to these keyholders:
+
+<P>
+The spouse has all the permissions that the account holder has.
+The employer has permissions to deposit money.
+
+<P>
+The permissions are represent as a SPKI tag set.
+
+<P>
+The following commands show how to create each of the keys described
+above.  We start by creating a default key.  The other keys will each
+be issued with names relative to the default key.  Also note that the
+<b class="programopt">-</b><b class="programopt">-unsafe</b> argument is used.
+
+<P>
+<dl><dd><pre class="verbatim">
+spkitool.py -d ../test/example create -b 512 --unsafe --default
+spkitool.py -d ../test/example create -b 512 --unsafe bank
+spkitool.py -d ../test/example create -b 512 --unsafe auditor
+spkitool.py -d ../test/example create -b 512 --unsafe adjuster
+spkitool.py -d ../test/example create -b 512 --unsafe account_holder
+spkitool.py -d ../test/example create -b 512 --unsafe spouse        
+spkitool.py -d ../test/example create -b 512 --unsafe employer
+</pre></dl>
+
+<P>
+Now that all the keys are created, the list command will show the
+hashes for each of them.
+
+<P>
+<dl><dd><pre class="verbatim">
+spkitool.py -d ../test/example list             
+PRIVATE KEYS
+(hash md5 |kcMoJXXqOptLRRZfy4iWqA==|) default
+(hash md5 |j5r4iybdTiCY5W/OEMVykQ==|)
+(hash md5 |C7ZoGtjRIpwpiMj3CrwFBw==|)
+(hash md5 |+39QQ2EKpFCcJvM3X3W2tA==|)
+(hash md5 |1NECGruVdAzXN5cpsH0Bdw==|)
+(hash md5 |I5kaokdnKniSiXLoUh2y/A==|)
+(hash md5 |UUWuzINnGXAxIl4H1OLFpw==|)
+
+NAMES
+Names issued by key (hash md5 |kcMoJXXqOptLRRZfy4iWqA==|)
+"auditor": (hash md5 |j5r4iybdTiCY5W/OEMVykQ==|)
+"employer": (hash md5 |+39QQ2EKpFCcJvM3X3W2tA==|)
+"adjuster": (hash md5 |1NECGruVdAzXN5cpsH0Bdw==|)
+"bank": (hash md5 |I5kaokdnKniSiXLoUh2y/A==|)
+"spouse": (hash md5 |UUWuzINnGXAxIl4H1OLFpw==|)
+"account_holder": (hash md5 |C7ZoGtjRIpwpiMj3CrwFBw==|)
+
+PUBLIC KEYS
+(hash md5 |j5r4iybdTiCY5W/OEMVykQ==|)
+(hash md5 |kcMoJXXqOptLRRZfy4iWqA==|)
+(hash md5 |C7ZoGtjRIpwpiMj3CrwFBw==|)
+(hash md5 |+39QQ2EKpFCcJvM3X3W2tA==|)
+(hash md5 |1NECGruVdAzXN5cpsH0Bdw==|)
+(hash md5 |I5kaokdnKniSiXLoUh2y/A==|)
+(hash md5 |UUWuzINnGXAxIl4H1OLFpw==|)
+</pre></dl>
+
+<P>
+Now we need to create a collection of certificates that authorize the
+keyholders to act on the bank account.  We'll start with the access
+control list for the account:
+
+<P>
+<dl><dd><pre class="verbatim">
+spkitool.py -d ../test/example acl --subject bank -p '(*)' --db \
+    ../test/example/acl
+</pre></dl>
+
+<P>
+The access control list, which is newly created, looks like this:
+
+<P>
+<dl><dd><pre class="verbatim">
+debugdb.py ../test/example/acl 
+../test/example/acl
+(entry 
+   (hash md5 |I5kaokdnKniSiXLoUh2y/A==|)
+   (tag 
+      (*)))
+</pre></dl>
+
+<P>
+<dl><dd><pre class="verbatim">
+spkitool.py -d ../test/example cert --issuer bank --subject auditor \
+    --after now --permission '(* set checkBalance)' 
+spkitool.py -d ../test/example cert --issuer bank --subject adjuster \
+    --after now --permission '(* set setBalance)' 
+spkitool.py -d ../test/example cert --issuer bank --subject account_holder \
+    --after now --before 2002-04-01_00:00:00 \
+    --permission '(* set checkBalance deposit withdraw)' 
+spkitool.py -d ../test/example cert --issuer account_holder \
+    --subject spouse --after now --permission '(*)' 
+spkitool.py -d ../test/example cert --issuer account_holder \
+    --subject employer --after now --permission '(* set deposit)'
+</pre></dl>
+
+<P>
+Now all the permissions should be in place.  The test/example
+directory contains a pickled bank account object in account.pyp.  The
+example.py script has rather complicated calling conventions.  There
+is a lot of state necessary for checking permissions - the ACL, the
+certs and keys, and the key of the caller; each of these items is
+passed on the command line.  The principal making the caller is
+specified with the <b class="programopt">-p name</b> option and the method being
+invoked is specified with the <b class="programopt">-m method_name</b> option.
+
+<P>
+<dl><dd><pre class="verbatim">
+python example.py -d ../test/example -o ../test/example/account.pyp \
+    -a ../test/example/acl -k ../test/example/keys \
+    -p account_holder -m checkBalance
+python example.py -d ../test/example -o ../test/example/account.pyp \
+    -a ../test/example/acl -k ../test/example/keys \
+    -p adjuster -m checkBalance
+python example.py -d ../test/example -o ../test/example/account.pyp \
+    -a ../test/example/acl -k ../test/example/keys \
+    -p employer -m deposit 100
+</pre></dl>
+
+<P>
+<p>
+<div class='navigation'><hr><table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A HREF="node4.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="manual.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A HREF="node2.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A HREF="node4.html">3. Command-Line Utility: spkitool.py</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="manual.html">Pisces User Manual</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A HREF="node2.html">1. Introduction</A></span>
+</div>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

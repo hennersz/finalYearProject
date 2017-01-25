@@ -3,3 +3,6 @@ pytest>=3.0.4
 twisted
 kademlia
 gnupg
+pycrypto
+./pisces
+mock

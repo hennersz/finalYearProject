@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>5.15 pisces.spkilib.sexp - Support routines from S-expressions</title>
+<META NAME="description" CONTENT="5.15 pisces.spkilib.sexp - Support routines from S-expressions">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" href="manual.css">
+<LINK REL="next" href="module-pisces.spkilib.sexpsocket.html">
+<LINK REL="previous" href="module-pisces.spkilib.keystore.html">
+<LINK REL="up" HREF="node8.html">
+<LINK REL="next" href="module-pisces.spkilib.sexpsocket.html">
+</head>
+<body bgcolor="#ffffff" text="#000000" link="#0000bb"  vlink="#551a8b" alink="#ff0000">
+<div class='navigation'>
+<table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A href="module-pisces.spkilib.sexpsocket.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node8.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A href="module-pisces.spkilib.keystore.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A href="module-pisces.spkilib.sexpsocket.html">5.16 pisces.spkilib.sexpsocket - Send</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node8.html">5. Pisces Library Reference</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A href="module-pisces.spkilib.keystore.html">5.14 pisces.spkilib.keystore - Abstract</A></span>
+<br><hr></div>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION0006150000000000000000">
+5.15 <tt class="module">pisces.spkilib.sexp</tt>
+	- Support routines from S-expressions</A>
+</H2>
+
+
+<P>
+This module defines public functions for manipulating
+S-expressions, and a collection of helper functions that are used by
+by other modules in  <tt class="module">pisces.spkilib</tt> to create S-expressions
+for standard SPKI objects. 
+
+<P>
+The SPKI structure draft [<A
+ href="cite_saltzer75.html#ellison99-structure">1</A>] defines a
+canonical S-expression as follows:
+
+<P>
+``All SPKI structures communicated from one machine to another must be
+   in canonical form.  If canonical S-expressions need to be transmitted
+   over a 7-bit channel, there is a form defined for base64 encoding
+   them.
+
+<P>
+``A canonical S-expression is formed from binary byte strings, each
+   prefixed by its length, plus the punctuation characters
+   <code>()[]</code>.  The length of a byte string is a non-negative ASCII
+   decimal number, with no unnecessary leading <code>0</code> digits,
+   terminated by <code>:</code>.  The canonical  form is a unique
+   representation of an S-expression and is used as the input to all
+   hash and signature functions.'' 
+
+<P>
+<dl><dt><b><a name='l2h-127'><tt class='function'>parse</tt></a></b> (<var>buf</var>)
+<dd>
+Parse the S-expression <var>buf</var> encoded in canonical form or in
+base64.  Returns a <tt class="class">SExp</tt> instance or raises
+<tt class="exception">ParseError</tt>.  Can raise <tt class="exception">ParseError</tt>.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-128'><tt class='function'>parseText</tt></a></b> (<var>buf</var>)
+<dd>
+Parse a human-readable version of an S-expression <var>buf</var>.  The
+human-readable form is roughly equivalent to the advanced form
+described in the struction document [<A
+ href="cite_saltzer75.html#ellison99-structure">1</A>], but
+has some significant shortcomings.  It is not possible to use
+<tt class="function">parseText</tt> to parse an S-expression that includes multi-line
+base64 output.  It is most useful for parsing simple S-expressions
+entered by users on a command line.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-129'><tt class='function'>construct</tt></a></b> (<var>elts</var>)
+<dd>
+Construct an S-expression from the Python sequence <var>elts</var>.  Each
+element of <var>elts</var> must be a string or another sequence.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-130'><tt class='class'>SExp</tt></a></b> (<big>[</big><var>canon</var><big>]</big><var>, </var><big>[</big><var>repr</var><big>]</big>)
+<dd>
+
+<P>
+The <tt class="class">SExp</tt> class represents S-expressions.  Instances behave
+like sequences, allowing you to access element <var>n</var> of the
+S-expression using <code>sx[n]</code>.
+
+<P>
+The constructor takes takes a single keyword argument.  It must be
+either <var>canon</var>, a string containing the canonical representation
+of the S-expression, or <var>repr</var>, a Python sequence representing the
+S-expression.  These two constructor forms are equivalent to calling
+the functions <var>parse</var> and <var>construct</var> below.  User code will
+be clearer if these functions are called.
+
+<P>
+The <tt class="method">__str__</tt> method, called by <tt class="function">str</tt> and
+<tt class="function">print</tt>, converts the S-expression to a human-readable form.
+The pretty-printer is not ideal, but it is better than nothing.
+
+<P>
+<dl><dt><b><a name='l2h-131'><tt class='method'>encode_base64</tt></a></b> ()
+<dd>
+Return a string containing the base64 encoding of the S-expression.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-132'><tt class='method'>encode_canonical</tt></a></b> ()
+<dd>
+Return a string containing the canonical encoding of the S-expression.
+</dl>
+
+<P>
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-133'><tt class='exception'>ParseError</tt></a></b>
+<dd>
+A <tt class="exception">ParseError</tt> is raised when <tt class="function">parse</tt> is called
+with invalid data.  The exception object contains three attributes: 
+<tt class="member">exp</tt>, the data expected, <tt class="member">got</tt>, the data actually
+found, and <tt class="member">ref</tt>, the encoded data that contained the error.
+The <tt class="member">ref</tt> attribute may be None.
+</dl>
+
+<P>
+<p>
+<div class='navigation'><hr><table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A href="module-pisces.spkilib.sexpsocket.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node8.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A href="module-pisces.spkilib.keystore.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A href="module-pisces.spkilib.sexpsocket.html">5.16 pisces.spkilib.sexpsocket - Send</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node8.html">5. Pisces Library Reference</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A href="module-pisces.spkilib.keystore.html">5.14 pisces.spkilib.keystore - Abstract</A></span>
+</div>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

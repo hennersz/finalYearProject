@@ -1,0 +1,2128 @@
+\documentclass{howto}
+
+%  This is a template for short or medium-size Python-related documents, 
+% mostly notably the series of HOWTOs, but it can be used for any
+% document you like.   
+
+% The title should be descriptive enough for people to be able to find
+% the relevant document. 
+\title{Pisces User Manual}
+
+% Increment the release number whenever significant changes are made.
+% The author and/or editor can define 'significant' however they like.
+\release{1.0 alpha 1}
+
+% At minimum, give your name and an e-mail address.  You can include a
+% snail-mail address if you like.
+\author{Jeremy Hylton}
+\authoraddress{
+	Corporation for National Research Initiatives \\
+	Reston, VA \\
+	E-mail: jeremy@alum.mit.edu}
+
+\begin{document}
+\maketitle
+
+% The abstract should be a paragraph or two long, and describe the
+% scope of the document.
+\begin{abstract}
+\noindent
+Pisces is a Python implementation of the SPKI certificate standard.
+This document provides a brief introduction to SPKI (the Simple Public
+Key Infrastructure) and describes the tools available in the Pisces
+distribution.  Pisces contains a library and command-line utility for
+creating and using SPKI certificates in Python.  It also contains a
+toy secure socket library that demonstrates the use of the library.
+\end{abstract}
+
+\tableofcontents
+
+\thanks{\emph{Acknowledgements.} Roger Masse and Guido van Rossum made
+helpful comments on library design.  The {HMAC} implementation is
+based on an earlier version by Barry Warsaw. This work was supported
+in part by the Advanced Research Projects Agency of the United States
+Department of Defense under grant MDA972-95-1-0003.}
+
+\section{Introduction}
+
+SPKI (Simple Public Key Infrastructure) is an experimental protocol
+developed by an IETF working group [Ell99].  This protocol defines
+public key certificate and signature formats, along with many
+associated objects, to support security for a wide range of
+applications.  The SPKI protocol is simple to understand, use, and
+implement.
+
+The CNRI SPKI library provides an implementation of the SPKI protocol
+for the Python language and a command-line utility, spkitool, for
+creating and using keys and certificates.  This document primarily
+describes the utility.
+
+Before going on to a detailed look at spkitool, we offer a brief
+introduction to the SPKI protocol based on the language in \rfc{2693}
+\cite{ellison99-theory}.  For a more thorough discussion of SPKI, RFC
+2693 itself, which lays out the basic theory underlying the protocol,
+and Carl Ellison's SPKI Web page,
+\url{http://world.std.com/~cme/html/spki.html}.
+
+A certificate is a signed object that transfers some authority for the
+certificate's issuer to its subject.  The main purpose of a SPKI
+certificate is to authorize the subject to perform some action.  The
+subject and issuer are principals, i.e. a cryptographic key capable of
+generating a signature.  The principals are represented by the key
+itself, a hash of the key, or a name that is bound to the key.  A
+certificate that gives some authority to a key is, in effect,
+transferring some authority to the keyholder (anyone with access to
+the private key).  The principal speaks for the keyholder by creating
+signed objects.
+
+Unlike other public key infrastructures, SPKI principals are not named
+users, they are just keys.  As it turns out, most authorization
+decisions are based not on the name of the keyholder, but on some
+attribute of the keyholder, e.g. whether she is a member of a
+particular organization, has paid some access fee, etc.  A SPKI
+certificate can carry any authorizations or attributes the creator
+wishes; the specific interpretation is left to the applications that
+uses them.
+
+A typical use of SPKI certificates is to implement a protected
+subsystem \cite{saltzer75}.  The root of each certificate's authority
+is an access control list (ACL).
+
+The basic SPKI theory and protocol describe formats and uses for keys,
+certificates, and many associated objects.  They do not describe
+protocols or APIs for transferring certificates between programs or
+storing them on disk.  The implementation of Pisces SPKI library makes
+a number of concrete decisions about issues like these.
+
+\section{An Example}
+
+The script example.py in the scripts directory shows how you could use 
+Pisces to perform access control on an object.  The example is a bank
+account object, with methods deposit, withdraw, checkBalance, and
+setBalance.
+
+The example scenario involves several different keyholders.  This
+scenario isn't meant to be an exact model of the real world or a
+suggestion for how to model a bank's trust relationships; rather, it
+demonstrates the various ways in which keys and certificates can be
+used.  The Pisces distribution contains keys and certificates in the
+test/example directory.  The text below explains the commands used to
+create them.
+
+The bank has a key that is on the access control list for bank
+accounts; it is also used to delegate permission to bank employees and
+account holders.  The bank grant the following permissions to
+keyholders:
+
+The auditor has permission to check the balance of the account.
+The adjuster has permission to set the balance of the account.
+The account holder has permission to check the balance of the account
+and deposit and withdraw money.
+
+The account holder delegates her permissions to these keyholders:
+
+The spouse has all the permissions that the account holder has.
+The employer has permissions to deposit money.
+
+The permissions are represent as a SPKI tag set.
+
+The following commands show how to create each of the keys described
+above.  We start by creating a default key.  The other keys will each
+be issued with names relative to the default key.  Also note that the
+\programopt{-}\programopt{-unsafe} argument is used.
+
+\begin{verbatim}
+spkitool.py -d ../test/example create -b 512 --unsafe --default
+spkitool.py -d ../test/example create -b 512 --unsafe bank
+spkitool.py -d ../test/example create -b 512 --unsafe auditor
+spkitool.py -d ../test/example create -b 512 --unsafe adjuster
+spkitool.py -d ../test/example create -b 512 --unsafe account_holder
+spkitool.py -d ../test/example create -b 512 --unsafe spouse        
+spkitool.py -d ../test/example create -b 512 --unsafe employer
+\end{verbatim}
+
+Now that all the keys are created, the list command will show the
+hashes for each of them.
+
+\begin{verbatim}
+spkitool.py -d ../test/example list             
+PRIVATE KEYS
+(hash md5 |kcMoJXXqOptLRRZfy4iWqA==|) default
+(hash md5 |j5r4iybdTiCY5W/OEMVykQ==|)
+(hash md5 |C7ZoGtjRIpwpiMj3CrwFBw==|)
+(hash md5 |+39QQ2EKpFCcJvM3X3W2tA==|)
+(hash md5 |1NECGruVdAzXN5cpsH0Bdw==|)
+(hash md5 |I5kaokdnKniSiXLoUh2y/A==|)
+(hash md5 |UUWuzINnGXAxIl4H1OLFpw==|)
+
+NAMES
+Names issued by key (hash md5 |kcMoJXXqOptLRRZfy4iWqA==|)
+"auditor": (hash md5 |j5r4iybdTiCY5W/OEMVykQ==|)
+"employer": (hash md5 |+39QQ2EKpFCcJvM3X3W2tA==|)
+"adjuster": (hash md5 |1NECGruVdAzXN5cpsH0Bdw==|)
+"bank": (hash md5 |I5kaokdnKniSiXLoUh2y/A==|)
+"spouse": (hash md5 |UUWuzINnGXAxIl4H1OLFpw==|)
+"account_holder": (hash md5 |C7ZoGtjRIpwpiMj3CrwFBw==|)
+
+PUBLIC KEYS
+(hash md5 |j5r4iybdTiCY5W/OEMVykQ==|)
+(hash md5 |kcMoJXXqOptLRRZfy4iWqA==|)
+(hash md5 |C7ZoGtjRIpwpiMj3CrwFBw==|)
+(hash md5 |+39QQ2EKpFCcJvM3X3W2tA==|)
+(hash md5 |1NECGruVdAzXN5cpsH0Bdw==|)
+(hash md5 |I5kaokdnKniSiXLoUh2y/A==|)
+(hash md5 |UUWuzINnGXAxIl4H1OLFpw==|)
+\end{verbatim}
+
+Now we need to create a collection of certificates that authorize the
+keyholders to act on the bank account.  We'll start with the access
+control list for the account:
+
+\begin{verbatim}
+spkitool.py -d ../test/example acl --subject bank -p '(*)' --db \
+    ../test/example/acl 
+\end{verbatim}
+
+The access control list, which is newly created, looks like this:
+
+\begin{verbatim}
+debugdb.py ../test/example/acl 
+../test/example/acl
+(entry 
+   (hash md5 |I5kaokdnKniSiXLoUh2y/A==|)
+   (tag 
+      (*)))
+\end{verbatim}
+
+\begin{verbatim}
+spkitool.py -d ../test/example cert --issuer bank --subject auditor \
+    --after now --permission '(* set checkBalance)' 
+spkitool.py -d ../test/example cert --issuer bank --subject adjuster \
+    --after now --permission '(* set setBalance)' 
+spkitool.py -d ../test/example cert --issuer bank --subject account_holder \
+    --after now --before 2002-04-01_00:00:00 \
+    --permission '(* set checkBalance deposit withdraw)' 
+spkitool.py -d ../test/example cert --issuer account_holder \
+    --subject spouse --after now --permission '(*)' 
+spkitool.py -d ../test/example cert --issuer account_holder \
+    --subject employer --after now --permission '(* set deposit)' 
+\end{verbatim}
+
+Now all the permissions should be in place.  The test/example
+directory contains a pickled bank account object in account.pyp.  The
+example.py script has rather complicated calling conventions.  There
+is a lot of state necessary for checking permissions -- the ACL, the
+certs and keys, and the key of the caller; each of these items is
+passed on the command line.  The principal making the caller is
+specified with the \programopt{-p name} option and the method being
+invoked is specified with the \programopt{-m method_name} option.
+
+\begin{verbatim}
+python example.py -d ../test/example -o ../test/example/account.pyp \
+    -a ../test/example/acl -k ../test/example/keys \
+    -p account_holder -m checkBalance
+python example.py -d ../test/example -o ../test/example/account.pyp \
+    -a ../test/example/acl -k ../test/example/keys \
+    -p adjuster -m checkBalance
+python example.py -d ../test/example -o ../test/example/account.pyp \
+    -a ../test/example/acl -k ../test/example/keys \
+    -p employer -m deposit 100
+\end{verbatim}
+
+\section{Command-Line Utility: spkitool.py}
+
+The spkitool.py utility supports several different commands.  The
+specific command to run is passed as an argument to spkitool.py.
+A typical usage would look like this:
+\begin{verbatim}
+% spkitool.py [generic options] command [command options]
+\end{verbatim}
+The options and commands are described in the next section.
+
+It may be helpful to think of spkitool.py as an analog to the GPG or
+PGP command-line tools.  It manages a collection of keys and
+certificates stored on your local system.
+
+You need to create a directory that spkitool.py will use to store keys
+and certificates.  The default directory is ~/.spki, but you can
+change this by setting the \envvar{SPKIHOME} environment variable or
+using the generic -d option to spkitool.py.
+
+Many of the spkitool commands require the use of a public-private key
+pair.  You should create a default key pair the first time you use
+spkitool.  The default key will be used for all commands that require
+a key, unless you specify a different key.  The easiest way to specify 
+a key is with a SPKI name, which can be created with the name command
+described below.
+
+\subsection{spkitool.py command reference}
+
+\begin{datadescni}{spkitool.py \optional{-v} \optional{-h \optional{\var{cmd}}}
+	\optional{-d \var{dir}} \var{command} \optional{command-options}}
+This script can be invoked to run any of the commands listed below.
+It supports several generic options that must be listed before the
+command.  Each command also supports command-specific options, which
+must be listed after the command name.
+
+The \programopt{-v} option causes verbose output while the command
+runs.
+
+The \programopt{-h} option prints help.  If \programopt{-h} is
+specified by itself, a list of all commands is printed.  If
+\programopt{-h} is followed by a command name, detailed help for that
+command is printed.  The name 'all' is used as an argument, detailed
+help is printed for each command.
+
+The \programopt{-d \var{dir}} specifies the location of the user's
+spkitool configuration directory.  
+\end{datadescni}
+
+The spkitool script supports the following commands:
+
+\begin{datadescni}{acl -s/-{}-subject \var{key} -p \var{permissions}
+	 \optional{-o output} \optional{-b/-{}-before \var{time}} 
+	\optional{-a/-{}-after \var{time}}}
+\datalineni{\quad \optional{-{}-test URI} \optional{-d/-{}-delegate}
+            \optional{-{}-db \var{acl}}}
+    Creates a certificate for an access control list (Entry).  The
+    subject can be a hash of a key or a name.  If the subject is a
+    name, the name is interpreted relative to the user's default key.
+
+    The permissions should be a text representation of a SPKI sexp.
+    This is a little clunky, but it's hard to come up with a general
+    interface for something that is essentially application-specific.
+
+    If the \programopt{-}\programopt{-db} option is used, the Entry is
+    added to the database.ACL file at the specified path.  If this
+    option is used, it overrides the \programopt{-o} option.  Will
+    create a new ACL if one does not exist.
+
+    The \programopt{-d}/\programopt{-}\programopt{-delegate} option allows
+    permissions to be delegated.  By default, delegation is disabled.
+
+    The before/after/test modifiers are the same as for the cert
+    command.  They affect the validity constraints.
+\end{datadescni}
+ 
+\begin{datadescni}{cert -s/-{}-subject -p/-{}-permission permission \optional{-i/-{}-issuer} \optional{-b/-{}-before time}} 
+\datalineni{\quad \optional{-a/-{}-after time} \optional{-t/-{}-test URI}
+	\optional{-d/-{}-delegate} \optional{-k/-{}-key}}
+
+    Create a new certificate.  The certificate has the following
+    parts: subject, issuer, validity, and permissions.  It may also
+    have a delegation tag.  Each of these parts can be specified using
+    a different option; each option has a short name and a long name.
+
+    Note: To create a name certificate, use the name command.
+
+    The options for the cert command are list below.  Each take a
+    single argument following the option name.
+
+    optional: \programopt{-}\programopt{-issuer} (\programopt{-i})
+
+    The hash or name of the key to use as issuer.  Will use the
+    default key as issuer otherwise.
+
+    required: \programopt{-}\programopt{-subject} (\programopt{-s})
+
+    The hash or name of the key that is the subject of the
+    certificate.
+
+    optional: \programopt{-}\programopt{-before} (\programopt{-b}) \\
+    optional: \programopt{-}\programopt{-after} (\programopt{-a})
+
+    These options limit the period of time for which the certificate
+    is valid.  The time format is YYYY-MM-DD_HH:MM:SS.  You can also
+    use the string "now" to indicate the current time.
+
+    optional: \programopt{-}\programopt{-test} (\programopt{-t})
+
+    Specify an online validity test for the certificate.  The argument
+    should be the URL for the test.  This optional currently has no
+    associated implementation; although it can be included in the
+    certificate, the test will not be performed.
+
+    required: \programopt{-}\programopt{-permission} (\programopt{-p})
+
+    Specify the permissions that are being granted to the subject
+    key.  The argument must be an S-expression in human-readable
+    form for the permissions.  The permissions will be wrapped in a
+    (tag ...) S-expression.
+
+    optional: \programopt{-}\programopt{-delegate} (\programopt{-d})
+
+    Allow subject to delegate permission.  Default is to disallow
+    delegation. 
+
+    optional: \programopt{-}\programopt{-key} (\programopt{-k})
+
+    Include the key of the issuer with the certificate.  By default,
+    the certificate does not include the key itself, only the hash of
+    the key. 
+\end{datadescni}
+
+\begin{datadescni}{create \optional{-b bits} \optional{-{}-unsafe}
+      \optional{-{}-replace} \optional{-{}-dup} \optional{-{}-default|name}}
+    Create a key pair with label as specified by user.  Add the key
+    pair to the user's key file and add the public key to the user's
+    ACL.  The user will be prompted for a pass phrase to encrypt the
+    private key.  Currently on the rsa-pkcs1-md5 algorithm is
+    supported.
+
+    Options:
+
+    \programopt{-}\programopt{-unsafe}: use the user's PID as pass
+phrase
+
+    \programopt{-}\programopt{-replace}: replace an existing default
+key
+
+    \programopt{-b NNNN}: number of bits for key pair (default 1024)
+
+    \programopt{-}\programopt{-dup}: create a name cert even if name is already used
+
+    Note: The SPKI protocol allows multiple keys to be bound to the
+    same name, which allows the creation of a group.  But multiple
+    keys with the same name presents a problem for naming private
+    keys, because the name no longer unambiguously refers to a single
+    key. 
+\end{datadescni}    
+
+\begin{datadescni}{export \optional{-o output} \optional{-{}-canonical} <hash-or-name>}
+    Export a public key from the store.  The key may be specified by
+    its hash or its name.  The \programopt{-o} flag can be used to
+    specify a file to place the key; if no file is specified, the key
+    will be printed on stdout.
+
+    Keys are output in base64 encoding by default.  Use the
+    \programopt{-}\programopt{-canonical} flag to specify the
+    canonical (binary) encoding instead. 
+\end{datadescni}
+
+\begin{datadescni}{import \optional{path}}
+
+    Load a new public key or certificate into the keystore.  The
+    object will be loaded from a file containing either the canonical
+    or base64 encoding of the S-expression.  If no path is specified,
+    the object will be read from stdin.
+
+    For a certificate to be useful in verifying a certificate chain,
+    it must be signed.  A public key, however, needs no signature.
+\end{datadescni}
+
+\begin{datadescni}{list \optional{-{}-public} \optional{-{}-private} \optional{-{}-name}}
+    List all the keys stored in the KeyStore and all the name
+    certificates issued by the private keys.  For private keys, the
+    hash of the corresponding public key is listed.  As a result, the
+    same hash should appear in the private and public lists.  
+
+    Specifying the options, limits the listing to only the specified
+    sections.
+\end{datadescni}
+    
+\begin{datadescni}{name  -n/-{}-name name -h/-{}-hash hash \optional{-i/-{}-issuer principal} \optional{-o output}}
+
+    Create a name certificate.  Can be used to associate a name with a
+    public key on the key server.
+
+    The hash designates the public key that the name will be bound
+    to.  The hash can either by the advanced form of a SPKI hash
+    object, or just the base64 encoded digest.  Thus, either of the
+    following is allowed: '(hash md5 |hTK6mv8Nbspy9jsljfb2DQ==|)' or
+    'hTK6mv8Nbspy9jsljfb2DQ=='.
+
+    By default, the issuer is the user's default key.  To use a
+    different key, the user should specify the name or hash of the key
+    with the \programopt{-}\programopt{-issuer} argument.
+
+    The \programopt{-o} option can be used to make a local copy of the
+    name cert. 
+
+    This command needs to be extended with validity handling.
+\end{datadescni}
+
+\begin{datadescni}{show \optional{-i input} \optional{-o output}}
+
+    Read in an arbitrary SPKI object and display it in human-readable
+    form.  The show command will read the object from stdin and
+    display it on stdout.  The source and destination can be changed
+    with the \programopt{-i} and \programopt{-o} arguments.
+\end{datadescni}
+    
+\begin{datadescni}{sign \optional{-s/-{}-signer name} \optional{-o output} file}
+
+    Create a digital signature for the contents of the specified
+    file.  By default, the signature is placed stored as file.sig, but
+    you can use the \programopt{-o} option to specify a different
+    output location. 
+
+    The signature is created using the default key, unless the
+    \programopt{-}\programopt{-signer} option is used to specify a
+    different key.  The \programopt{-}\programopt{-signer}
+    option will accept the name or hash of a key.
+\end{datadescni}
+    
+\begin{datadescni}{verify \optional{-i signaturefile} file}
+
+    Verify a digital signature of a file.  The default behavior is to
+    look for the signature in file.sig.  The \programopt{-i} option
+    can be used to specify a different path for the signature.
+\end{datadescni}
+    
+\section{Other command-line scripts}
+
+\subsection{pyarrowd.py command reference}
+
+\begin{datadescni}{pyarrowd.py \optional{-h host} \optional{-p port}}
+
+A Yarrow daemon, only supported on Solaris and Linux so far.
+
+Simple protocol for requesting random bytes over a socket.  The client
+requests random data by sending a 32-bit int in network byte-order.
+The server will return that many bytes of random data.  The return
+format is a 32-bit in in network byte order, specifying length of
+return value, followed by that many bytes of data.  The client can
+issue multiple requests on a single socket.
+
+The server runs on port 12000 by default.  The specific host and port
+can be set with the \programopt{-h host} and \programopt{-p port}
+options, respectively.
+
+The Yarrow daemon uses a few system utilities that should produce data
+that is somewhat hard to predict.  There has been little effort put
+into choosing the utilities or estimating the entropy they produce.
+These utilities are determined by the \member{fast_sources} and
+\member{slow_sources} global variables, which are only defined for
+Linux and Solaris.
+
+\end{datadescni}
+
+\section{Pisces Library Reference}
+
+\subsection{\module{pisces.algid} 
+	-- Constants for PKCS \#1 AlgorithmIdentifiers}
+\declaremodule{}{pisces.algid}
+\modulesynopsis{Constants for PKCS \#1 AlgorithmIdentifiers}
+
+This module implements the \class{AlgorithmIdentifer} objects required
+to implement PKCS \#1.  It defines one class,
+\class{AlgorithmIdentifier}, and several instances that are used as
+constants in other modules.
+
+\begin{classdesc}{AlgorithmIdentifier}{\optional{obj, \optional{params}}}
+\class{AlgorithmIdentifier} is a subclass of \class{pisces.asn1.ASN1Object}
+that represents the AlgorithmIdentifier structure defined by PKCS \#1
+and \#7.  In addition to the methods defined by \class{ASN1Object}, it
+has three public attributes: \member{oid}, the \class{pisces.asn1.OID}
+of the algorithm, \member{params}, the parameters optionally defined
+for the algorithm, and \member{name}, the name of algorithm.
+\member{params} and \member{name} may be None.
+
+The constructor can be called two ways.  It can be called with a
+single sequence that matches the following ASN.1 defintion:
+\begin{verbatim}
+AlgorithmIdentifier  ::=  SEQUENCE  {
+    algorithm               OBJECT IDENTIFIER,
+    parameters              ANY DEFINED BY algorithm OPTIONAL}
+\end{verbatim}
+It can also be called with the \var{algorithm} and \var{parameters}
+components as arguments.  \var{algorithm} must an OID.  If
+\var{parameters} is omitted, it is treated as \code{None}.
+\end{classdesc}
+
+The module defines the attributes listed in the table below, each of
+which is an instance of \class{pisces.asn1.OID}.
+
+\begin{tableiii}{l|l|l}{textrm}{attribute}{OID}{name}
+  \lineiii{oid_dsa}      {1.2.840.10040.4.1}    {dsa}
+  \lineiii{oid_dsa_sha1} {1.2.840.10040.4.3}    {dsaWithSha1}
+  \lineiii{oid_rsa}      {1.2.840.113549.1.1.1} {rsa}
+  \lineiii{oid_rsa_md2}  {1.2.840.113549.1.1.2} {md2withRSAEncryption}
+  \lineiii{oid_rsa_md5}  {1.2.840.113549.1.1.4} {md5withRSAEncryption}
+  \lineiii{oid_md2}      {1.2.840.113549.2.2}   {md2}
+  \lineiii{oid_md5}      {1.2.840.113549.2.5}   {md5}
+  \lineiii{oid_sha}      {1.3.14.3.2.26}        {sha}
+\end{tableiii}
+
+\subsection{\module{pisces.asn1}
+	-- Encode and decode ASN.1 BER format}
+\declaremodule{}{pisces.asn1}
+\modulesynopsis{Encode and decode ASN.1 BER format}
+
+This module provides a parser for {ASN.1} objects encoded using
+{BER}.  The parser produces \class{ASN1Object} instances that can be
+converted back to {BER} encoding using the \method{encode} method.
+
+\begin{funcdesc}{parse}{buf}
+Parse string \var{buf} and return an \class{ASN1Object} instance that
+it encodes.  Raises \exception{ValueError} if invalid data is passed
+to it.  \emph{Warning:} This code could be more robust; other
+exceptions may be raised for particular invalid inputs.
+\end{funcdesc}
+
+\begin{classdesc}{ASN1Object}{val}
+The \class{ASN1Object} class is the abstract base class of all the
+objects generated by \function{parse}.  The constructor takes a single
+argument \var{val}, a parsed ASN.1 object.
+
+Subclasses of \class{ASN1Object} define the following method and
+attribute: 
+
+\member{atomic}: True if the object is atomic; false if it is a
+container. 
+
+\begin{methoddesc}{encode}{\optional{io}}
+Returns a string containing the BER encoding of the ASN.1 object.  If
+a file-like object is passed as \var{io}, the encoding will be written
+to the file instead.
+\end{methoddesc}
+
+\end{classdesc}
+
+The following subclasses of \class{ASN1Object} are defined in this
+module.  Methods defined only for single subclasses are also described
+here.
+
+\begin{classdesc}{Sequence}{}
+\class{Sequence} implements the ASN.1 type SEQUENCE, an ordered
+collection of one or more types.  Instances can are also Python
+sequence objects.
+\end{classdesc}
+
+\begin{classdesc}{Set}{}
+\class{Set} implements the ASN.1 type SET, an unorderd collection of
+one or more types.  Instances can are also Python sequence objects,
+where the order depends on the specific order of elements in the
+original encoding.
+\end{classdesc}
+
+\begin{classdesc}{UTCTime}{}
+\class{UTCTime} implements the standard ASN.1 type for time expressed
+in GMT.  The X.509 standards note that UTCTime values shall be expressed
+Greenwich Mean Time (Zulu) and shall include seconds (i.e., times are
+YYMMDDHHMMSSZ), even where the number of seconds is zero.  Conforming
+systems shall interpret the year field (YY) as follows:
+
+Where YY is greater than or equal to 50, the year shall be inter-
+preted as 19YY; and
+
+Where YY is less than 50, the year shall be interpreted as 20YY.
+\end{classdesc}
+
+\class{UTCTime} instances can be compared to each other and support
+ordering in the natural way.
+
+\begin{classdesc}{Contextual}{}
+\class{Contextual} is a wrapper for ASN.1 types defined using CHOICE.
+For contextual encoding, it isn't possible to tell what the type of
+the contained object is without looking at the ASN.1 type declaration.
+This module is designed for parsing independently of the type
+declaration, which works for every case exception this one.
+
+In the case of contextual encoding, this object is returned.  When the
+decoded structure is actually used, it should be clear whether this
+is, e.g., an OPTIONAL integer type, some other tagged, known type, or
+an encoded CHOICE.  Clients should call the decode method when the
+encoding includes the full DER encoding.  Clients should call choose
+when the value doesn't have the appropriate tag/len info.
+
+\class{Contextual} has two extra methods:
+
+\begin{methoddesc}{decode}{}
+Return the decoded object.  This method should be called when the
+encoding includes the tag and length.
+\end{methoddesc}
+
+\begin{methoddesc}{choose}{tag}
+Return the decoded object, using \var{tag} as the ASN.1 tag.  This
+method should be called when the containing type declaration uses
+CHOICE and the tag is not included in the encoding.
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{Boolean}{}
+\class{Boolean} is the ASN.1 Boolean type.  Instances of this class
+implement \method{__nonzero__}, so they can be used in Python
+conditionals. 
+\end{classdesc}
+
+\begin{classdesc}{OID}{}
+An ASN.1 Object Identifier.  Can be compared to other \class{OID}
+objects and used as a dictionary key.
+\end{classdesc}
+
+Other ASN.1 types are represented using Python's builtin datatypes.
+This table summarizes the ASN.1 types supported.
+
+\begin{tableii}{l|l}{textrm}{ASN.1 type}{Python type}
+  \lineii{INTEGER}{int}
+  \lineii{BIT_STRING}{string}
+  \lineii{OCTET_STRING}{string}
+  \lineii{NULL}{None}
+  \lineii{PrintableString}{string}
+  \lineii{T61String}{string}
+  \lineii{IA5String}{string}
+\end{tableii}
+
+\begin{funcdesc}{display}{obj}
+Pretty-print an \class{ASN1Object} instance.
+\end{funcdesc}
+
+\begin{classdesc}{Displayer}{\optional{oids}}
+The \class{Displayer} class creates pretty-printers for ASN.1 objects
+that will print labels for certain well-known oids.  The constructor
+argument \var{oids} is a mapping from \class{OID} object to string
+names.
+\end{classdesc}
+
+\begin{funcdesc}{parseCfg}{io}
+Reads a configuration file from \var{io}, which must be a file-like
+object ready for reading.  Returns a dictionary mapping \class{OIDs}
+to strings that describe the \class{OIDs}.  This function is provided
+for compatibility with Peter Gutmann's \program{dumpasn1} program.  An
+example of the configuration file is available at
+\url{http://www.cs.auckland.ac.nz/~pgut001/dumpasn1.cfg}.
+\end{funcdesc}
+
+\subsection{\module{pisces.cryptrand}
+	-- Interface to cryptographic random number generators}
+\declaremodule{}{pisces.cryptrand}
+\modulesynopsis{Interface to cryptographic random number generators}
+
+This module provides a common interface to the various cryptographic
+random numbers that may be available on a particular system.
+The module defines one function \function{random} and one constant
+\constant{implementation}, which is a string that describes the
+implementation used for \function{random}.
+
+\begin{funcdesc}{random}{num}
+Return \var{num} bytes of random data.
+\end{funcdesc}
+
+The implementation depends on the random number generators available
+on a particular system.  On Linux systems, \filenq{/dev/random} is
+used.  This module can also use the Yarrow daemon provided with Pisces
+or the Entropy Gathering Daemon from gpg if it
+is installed in \filenq{'~/.gnupg/entropy}.
+
+\emph{WARNING:} If no cryptographic random number generator is
+available, Python's \module{whrandom} implementation will be used.
+The is \emph{not} a cryptographic random number generator.
+
+\subsection{\module{pisces.egdlib}
+	-- Interface to the Entropy Gathering Daemon}
+\declaremodule{}{pisces.egdlib}
+\modulesynopsis{Interface to the Entropy Gathering Daemon}
+
+{EGD} (Entropy Gathering Daemon) is a tool designed to be used by {GPG}
+({GNU} Privacy Guard) on systems that do not have a
+\filenq{/dev/random}.  It is a user-space program that culls entropy
+from system statistics reported by various commands like \program{w}
+or \program{vmstat}.  {EGD} is available from 
+\url{http://www.lothar.com/tech/crypto/}.
+
+This module implements an interface for request random data from EGD.
+For most purposes, it is better to use the interface provided by
+\module{pisces.cryptrand} which provides an abstraction layer on top
+of this and other modules.
+
+\begin{classdesc}{EGD}{path}
+The \class{EGD} class provides a high-level interface for
+communicating with an EGD daemon.  The constructor takes that path of
+the Unix-domain socket used by the daemon.
+
+\class{EGD} defines the following methods:
+
+\begin{methoddesc}{getAvailableEntropy}{}
+Returns the number of bits of entropy currently available.
+\end{methoddesc}
+
+\begin{methoddesc}{getRandomBytes}{num}
+Returns up to \var{num} bytes of random data.  It will return less
+than \var{num} bytes if sufficient entropy is not available.
+\end{methoddesc}
+
+\begin{methoddesc}{getRandomBytesSync}{num}
+Returns exactly \var{num} bytes of random data.  \emph{WARNING:} This
+method does not appear to behave correctly, perhaps because of a bug
+in EGD.
+\end{methoddesc}
+
+\begin{methoddesc}{getPID}{}
+Returns the daemon's process id.
+\end{methoddesc}
+
+\end{classdesc}
+
+\subsection{\module{pisces.hmac}
+	-- Keyed-hashing for message authentication}
+\declaremodule{}{pisces.hmac}
+\modulesynopsis{Keyed-hashing for message authentication}
+
+This module implements {HMAC}, a method for message authentication
+using cryptographic hash functions described in \rfc{2104}.  It is a
+slight improvement to an earlier version written by Barry Warsaw.
+
+\begin{classdesc}{HMAC}{hashmodule}
+Instances of the \class{HMAC} class implement HMAC for a specific hash
+function.  The constructor takes the \var{hashmodule} as an argument.
+It must be a module that follows conforms to the interface of the
+hashes in \module{Crypto.Hash}.  This requires that the module have a
+\member{digestsize} attribute and a \function{new} function.
+
+\class{HMAC} provides the following method:
+
+\begin{methoddesc}{hash}{key, block}
+Produce the HMAC hash for the given string, \var{block}.  \var{Key} is
+the shared secret authentication key, as a string.  For best results
+\rfc{2104} recommends that the length of key should be at least as large
+as the underlying hash's output block size, but this is not enforced.
+
+If the key length is greater than the hash algorithm's basic
+compression function's block size (typically 64 bytes), then it is
+hashed to get the used key value.  If it is less than this block
+size, it is padded by appending enough zero bytes to the key.
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{HMACSpecializer}{hashmodule, key}
+Instances of the \class{HMACSpecializer} class implement an HMAC for a
+particular hash module and key.  If many HMACs will be computed with
+the same key, it is more efficient to use this class than
+\class{HMAC}.  There is no other reason to use this class.
+
+\class{HMACSpecializer} provides the following method:
+
+\begin{methoddesc}{hash}{block}
+Produce the HMAC hash for the given string, \var{block}.  See
+\method{HMAC.hash} for details.
+\end{methoddesc}
+
+\end{classdesc}
+
+\subsection{\module{pisces.pkcs1} 
+	-- A PKCS \#1 wrapper for Crypto.PublicKey.RSA keys}
+\declaremodule{}{pisces.pkcs1}
+\modulesynopsis{A PKCS \#1 wrapper for Crypto.PublicKey.RSA keys}
+
+This module implements that PKCS \#1 RSA encryption standard.  It must
+be used in conjunction with \module{Crypto.PublicKey.RSA}, which
+provides the cryptographic primitives.
+
+The PKCS \#1 standard is available from RSA Labs.  As of April 10, 2000
+the url is \url{http://www.rsasecurity.com/rsalabs/pkcs/pkcs-1/}.
+
+This module defines several classes.  The primary interfaces are the
+\class{RSA_pkcs1} class and \function{getSignatureImpl()} function,
+which returns an appropriate subclass of \class{DigestWithRSA}.
+
+\begin{classdesc}{RSA_pkcs1}{key}
+The \class{RSA_pkcs1} class is a wrapper for
+\module{Crypto.PublicKey.RSA} key objects that implements the PKCS \#1
+standard.  Its encryption and decryption methods handle objects that
+are properly padded and encoded for interchange with other PKCS \#1
+implementations. 
+
+The constructor accepts either a key object generated by
+\module{Crypto.PublicKey.RSA} or a tuple of key components that can be
+used to construct one.
+
+\class{RSA_pkcs1} defines the following methods:
+
+\begin{methoddesc}{getPublicComponents}{}
+Returns the public components of the key, \var{e} and \var{n}.
+\end{methoddesc}
+
+\begin{methoddesc}{getPrivateComponents}{}
+Returns the public components of the key, \var{d}, \var{p} and \var{q}.
+\end{methoddesc}
+
+\begin{methoddesc}{encryptPublic}{plain}
+Returns the plaintext \var{plain} encrypted with the public key.
+Raises \exception{ValueError} if the plaintext is too long for the key.
+\end{methoddesc}
+
+\begin{methoddesc}{decryptPublic}{cipher}
+Returns the plaintext obtained by decrypting \var{cipher} with the
+public key.  Raises \exception{ValueError} if the ciphertext is too long for the key.
+\end{methoddesc}
+
+\begin{methoddesc}{encryptPrivate}{plain}
+Returns the plaintext \var{plain} encrypted with the private key.
+Raises \exception{ValueError} if the plaintext is too long for the key.
+\end{methoddesc}
+
+\begin{methoddesc}{decryptPrivate}{cipher}
+Returns the plaintext obtained by decrypting \var{cipher} with the
+private key.  Raises \exception{ValueError} if the ciphertext is too long for the key.
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{DigestWithRSA}{key}
+The \class{DigestWithRSA} is an abstract base class that defines
+\method{sign} and \method{verify} methods that perform digital
+signature operations as defined by PKCS \#1.  Subclasses of
+\class{DigestWithRSA} implement a \method{digest} method that is used
+to generate the approriate message digest of the signed object.
+
+Subclasses must also define two attributes that identify the hash
+algorithm: \member{_digAlgId}, a
+\class{pisces.algid.AlgorithmIdentifier}, and \member{oid}, a
+\class{pisces.asn1.OID}.
+
+The constructor takes an \class{RSA_pkcs1} instance.
+
+\class{DigestWithRSA} defines the following methods:
+
+\begin{methoddesc}{sign}{data}
+Returns a string representing the signature of \var{data}. Internally,
+encrypts a digest of \var{data} with the private key. 
+\end{methoddesc}
+
+\begin{methoddesc}{verify}{data, sig}
+Verify that the signature \var{sig} matches the original string
+\var{data}.  Returns 1 if the signature is correct and 0 if it is
+not. Raises a \exception{ValueError} if the hash algorithm used with
+the signature does not match the hash algorithm the instance supports.
+\end{methoddesc}
+
+\begin{methoddesc}{digest}{data}
+Returns a digest of \var{data} using the hash function defined for the
+instance.  Note that this method is defined in subclasses of
+\class{DigestWithRSA}. 
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{MD5withRSA}{key}
+A subclass of \class{DigestWithRSA} that supports the MD5 hash
+algorithm. 
+\end{classdesc}
+
+\begin{classdesc}{MD2withRSA}{key}
+A subclass of \class{DigestWithRSA} that supports the MD2 hash
+algorithm. 
+\end{classdesc}
+
+\begin{funcdesc}{getSignatureImpl}{algorithmId}
+Returns a subclass of \class{DigestWithRSA} that supports the hash
+algorithm described by \var{algorithmId}, which must be an instance of
+\class{pisces.asn1.OID}.  Currently, MD2 and MD5 are the only
+supported hash algorithms.
+\end{funcdesc}
+
+\subsection{\module{pisces.pwcrypt}
+	-- Support for password-based cryptography (PKCS \#5)}
+\declaremodule{}{pisces.pwcrypt}
+\modulesynopsis{Support for password-based cryptography (PKCS \#5)}
+
+This module supports the use of password-based cryptography for
+encryption and message authentication using key derivation
+functions.  This module is based on recommendations in PKCS \#5 v2.0:
+Password-Based Crypotgraphy, RSA Laboratories, March 25, 1999.
+The recommendations are available from
+\url{http://www.rsasecurity.com/rsalabs/pkcs/pkcs-5/index.html}.
+
+\emph{WARNING}: It is not very practical to use Python for generating
+keys from passphrases; it is merely convenient.  The key derivation
+process should take a long time, to thwart an attacker who attempts a
+dictionary attack on the password.  But it can't take so long that the
+user grows impatient waiting for the key to be generated.  The
+attacker could implement her brute force search in optimized C, which
+would be much faster than this Python implementation.  Thus, this
+module provides much less security-for-the-wait that an optimized C
+version would.
+
+\begin{classdesc}{KeyDerivationFactory}{keylen, saltlen,
+	\optional{iterations}, \optional{hash}, \optional{labels}}
+A \class{KeyDerivationFactory} instance will generate keys that are
+\var{keylen} bytes long with \var{saltlen} bytes of salt.  The
+optional arguments specify: the number of \var{iterations} of the the
+\var{F} function, the default value is 1000; the \var{hash} function
+to use, the default is SHA.  The \var{hash} argument must support the
+interface implemented by \module{Crypto.Hash} hashes.
+
+Labels are an optional feature.  The \var{labels} argument accepts a
+sequence of strings.  If several keys with the same generation
+parameters are going to be created, the salt should contain some text
+that identifies the particular use of the key.  These are the labels.
+When \method{createKey} is called, it will check to see if the label
+used is valid.
+
+The design of this class is explained carefully in the PKCS \#5
+document.  The implementation uses HMAC plus a hash function as its
+pseudorandom function. The default hash is SHA.
+
+\begin{methoddesc}{createKey}{password \optional{, label}}
+Create a new key generated from the string \var{password} and
+optionally the string \var{label}.  Returns the salt, the number of
+iterations of the \var{F} function, the name of the hash function, and
+the key itself.  Raises \exception{ValueError} if \var{label} is
+specified and does not match one of the labels specified in the
+constructor.
+\end{methoddesc}
+
+\begin{methoddesc}{recreateKey}{password, salt}
+Creates a key generated from the string \var{password} and the
+explicitly supplied \var{salt} string.  Returns only the key.  This
+method should only be used to recreate a key previously generated by
+\method{createKey}.
+\end{methoddesc}
+
+\end{classdesc}
+
+\subsection{\module{pisces.utils} 
+	-- Internal pisces utility functions}
+\declaremodule{}{pisces.utils}
+\modulesynopsis{Internal pisces utility functions}
+
+\begin{funcdesc}{loadModule}{name}
+Import the module \var{name} and return it.  If \var{name} is a module
+within a package, return the final module object and not the package.
+\end{funcdesc}
+
+\begin{funcdesc}{xor}{s1, s2}
+Return the bytewise-exclusive-or of two strings.
+\end{funcdesc}
+
+\subsection{\module{pisces.yarrow} 
+	-- Yarrow random number generator}
+\declaremodule{}{pisces.yarrow}
+\modulesynopsis{Yarrow random number generator}
+
+This module implements a Yarrow-160 cryptographic pseudorandom number
+generator for Unix.  It is based on a design described in the
+following paper: John Kelsey, Bruce Schneier, and Niels Ferguson:
+``Yarrow-160: Notes on the Design and Analysis of the Yarrow
+Cryptographic Pseudorandom Number Generator,''
+\url{http://www.counterpane.com/yarrow.html}.  The documentation here
+assumes you are familiar with the design described there.
+
+Counterpane also provides an implementation, Yarrow 0.8.71, for
+Windows developed by Ari Benbasat.  The implementation appears to
+diverge from the design document in numerous respects, e.g. entropy
+estimation and generating pseudorandom ouputs from the pool values.
+
+A note on the implementation: The Yarrow design paper uses 3DES in
+counter mode.  Counter mode is fairly unusual.  It is not implemented
+in the Python Crypto Toolkit or OpenSSL; it only merits a
+one-paragraph mention in Schneier's book Applied Cryptography.  The
+implementation here uses 3DES in ECB mode with a counter.  The counter
+is encrypted with the key, then XORed with the plaintext.
+
+\begin{classdesc}{EntroypSource}{}
+
+\class{EntropySource} instances track the amount of entropy available
+from a single source.  It is used internally by \class{EntropyPool}.
+
+The design document proposes three different methods for Entropy
+Estimation: It estimates the entropy using three different methods and
+returns the lowest result.
+
+This implementation, following Benbasat, uses two estimates: one
+provided by the programming who supplies the input and another
+generator from zlib.
+
+\begin{methoddesc}{addInput}{buf, estbits}
+Update the estimate to account for the entropy in \var{buf} with
+\var{estbits} bits of entropy.  Both the actual data and the
+user-supplied estimare are necessary to update the internal entropy
+estimate. 
+\end{methoddesc}
+
+\begin{methoddesc}{getEntropy}{}
+Return the minimum estimated entropy currently available.
+\end{methoddesc}
+
+\begin{methoddesc}{reset}{}
+Reset the estimates to zero.
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{EntroypPool}{threshold, count}
+
+The \class{EntropyPool} collects samples from entropy sources.  The
+design document described an Entropy Accumulator, which collects
+samples from entropy sources and puts them into two pools.  This class
+implements the pools.
+
+A pool contains the running hash of all inputs fed into it since the
+\method{accumulate} method was called.  The \method{accumulate} method is
+called by the \class{Yarrow} class during reseed operations.
+
+The pool keeps estimates about the entropy of each individual
+source, although the digest is over all sources.  Each souce must
+be initialized by calling \method{addSouce} and passing the source's name.
+The instance variable sources maps from names to \class{EntropySource}
+instances.
+
+The constructor takes two arguments, the \var{threshold} and a
+\var{count}.  A pool is ready to be used when at least \var{count} of
+its sources have an entropy greater than or equal to \var{threshold}.
+The \member{isReady} method returns true when this condition is met.
+
+\class{EntropyPool} instances are thread safe, because a typical use
+is to have multiple threads adding entropy to the pool.
+
+\begin{methoddesc}{addSource}{name}
+Prepare pool for accepting input from source named \var{source}.
+\end{methoddesc}
+
+\begin{methoddesc}{addInput}{source, buf, estbits}
+Update hash of pool \var{source} with \var{buf} containing
+\var{estbits} estimated entropy.
+
+If the source was not initialized via \method{addSource}, this method
+will raise a \exception{KeyError}.
+\end{methoddesc}
+
+\begin{methoddesc}{isReady}{}
+Returns true if there is enough entropy in the pool. Enough is defined
+by the threshold and count arguments to the constructor.
+\end{methoddesc}
+
+\begin{methoddesc}{accumulate}{}
+Return the current pool digest and reset the pool.
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{Yarrow}{}
+
+The \class{Yarrow} class generates random data and managed the fast
+and slow entropy pools for seeding the PRNG.  These functions are
+described as three seperate entities in the design document:
+``generating pseudorandom outputs,'' ``reseed mechanism,'' and
+``reseed control.''
+
+The main API for this class is three methods: \method{getOutput}, 
+\method{addSource}, and \method{addInput}.
+
+A client may also call \method{forceReseed} and \method{allowReseed}
+to cause a reseed to occur.  However, reseed control is implemented
+internally and should occur regularly even if the client does not call
+these methods.
+
+The reseed methods take an optional \var{ticks} argument that
+affects how long the reseed will take.  The class implements a
+default number, which should be sufficient, but the user can
+override it.
+
+The \class{Yarrow} class is not threadsafe.
+
+\begin{methoddesc}{getOuput}{num}
+Return \var{num} bytes of random data.
+\end{methoddesc}
+
+\begin{methoddesc}{addSource}{sourceName}
+Intialize a new entropy source named \var{sourceName}.
+\end{methoddesc}
+
+\begin{methoddesc}{addInput}{source, input, estbits}
+Add \var{input} string to \var{source} pool, estimating \var{estbits}
+of entropy.
+\end{methoddesc}
+
+\begin{methoddesc}{forceReseed}{\optional{ticks}}
+Force a reseed.
+\end{methoddesc}
+
+\begin{methoddesc}{allowReseed}{\optional{ticks}}
+Perform a reseed in enough entropy is available.
+\end{methoddesc}
+
+\begin{methoddesc}{reseed}{\optional{ticks}}
+Use current entropy to generate new seed.
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{ThreadedYarrow}{}
+This subclass of \class{Yarrow} adds locking on \method{addInput},
+\method{getOutput} and \method{allowReseed} calls.  This locking is
+sufficient to make the class thread-safe.
+\end{classdesc}
+
+\begin{classdesc}{EntropyGatherer}{jobs, yarrow}
+An \class{EntropyGatherer} runs a collection of system utilities
+periodically.  Each instance is a \class{threading.Thread} designed
+to be run via a \method{start} method.  One instance should be created
+for each collection of utilities that are run at the same period.
+
+The arguments are: \var{jobs}, a description of the system utilities
+to run, and \var{yarrow}, a \class{Yarrow} instance to feed the data
+to. 
+
+\end{classdesc}
+
+\begin{funcdesc}{pad64}{s}
+Returns a copy \var{s} padded to 64 bits.
+\end{funcdesc}
+
+\begin{funcdesc}{hash}{x}
+Returns the SHA digest of \var{x}.
+\end{funcdesc}
+
+\begin{funcdesc}{hash_ex}{m, k}
+Extend input \var{m} to \var{k} bytes using SHA digests.
+\end{funcdesc}
+
+\subsection{\module{pisces.ttls}
+	-- Trivial transport-layer security}
+\declaremodule{}{pisces.ttls}
+\modulesynopsis{Trivial transport-layer security}
+
+This package, which contains submodules \module{config} and
+\module{protocol}, implement a protocol loosely based on the TLS
+protocol (\rfc{2246}).  There is no reason to believe that this new
+protocol offers any of the security guarantees of the real TLS
+protocol.  It does use some of the same basic ideas, and it might be
+possible to show that it is secure.
+
+The protocol is intended as an example of how to define new SPKI-based
+applications.  It will be documented in a future release.
+
+\subsection{\module{pisces.spkilib}
+	-- SPKI package}
+\declaremodule{}{pisces.spkilib}
+\modulesynopsis{SPKI package}
+
+The SPKI implementation is a contained in the \module{pisces.spkilib}
+sub-package.  The core of the implementation, contained in 
+\module{pisces.spkilib.spki}, defines Python objects for each of the
+SPKI/SDSI 2.0 objects defined in the last draft of the structure
+document \cite{ellison99-structure}.
+
+\subsection{\module{pisces.spkilib.config}
+	-- Configuration and command-line argument handling}
+\declaremodule{}{pisces.spkilib.config}
+\modulesynopsis{Configuration and command-line argument handling}
+
+This module defines an \class{Options} class and several helper
+functions that are used by \program{spkitool.py} to process
+command-line arguments and establish the location of configuration
+files and the \class{pisces.spkilib.keystore.KeyStore}.  It can be
+used by other programs based on \module{pisces.spkilib} to perform the
+same functions.
+
+Further documentation is not yet available.
+
+\subsection{\module{pisces.spkilib.database}
+	-- Store keys and certificates in text file}
+\declaremodule{}{pisces.spkilib.}
+\modulesynopsis{Store keys and certificates in text file}
+
+This module defines a format for storing S-expressions in a text
+file.  The file contains one or more base64-encoded S-expressions.
+Comment lines begin with a \#.  The classes defined all include a
+human-readable description of the S-expression in a comment before the
+actual encoded object.  Each type of database defines some specific
+semantics for the object.
+
+\begin{classdesc}{AbstractDatabase}{path}
+
+The \class{AbstractDatabase} class is the parent of all the specific
+database types.  It implements two general methods and requires that
+subclasses implement three other that describe the specific kind of
+S-expressions that are supported.
+
+The constructor argument \var{path} specifies the file that contains
+the database.
+
+The two general methods are:
+
+\begin{methoddesc}{reload}{\optional{create}}
+Load the contents of the database file into memory.  If the optional
+\var{create} argument is non-zero, succeed if the file does not exist;
+otherwise, an \exception{IOError} will be raised if the file does not
+exist.
+\end{methoddesc}
+
+\begin{methoddesc}{rewrite}{}
+Save the current contents of the database into the database file.
+\end{methoddesc}
+
+The methods that must be implemented by subclasses are:
+
+\begin{methoddesc}{loadObject}{obj}
+Called for each S-expression in the file when \method{reload} is
+executed.
+\end{methoddesc}
+
+\begin{methoddesc}{getObjects}{}
+Called by \method{rewrite}.  This method should return a list of all
+objects to be written out.
+\end{methoddesc}
+
+\begin{methoddesc}{writeStorageHint}{obj, io}
+Called for each S-expression to be written out by \method{rewrite}.
+A hint for S-expression \var{obj} should be written to the file-like
+object \var{io}.
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{DebugDatabase}{path}
+
+This method loads in an arbitrary database, but is not capable of
+rewriting it.  It is useful for debugging a database.
+
+\end{classdesc}
+
+\begin{classdesc}{ACL}{path\optional{, create}}
+
+This class defines a file containing \class{pisces.spkilib.spki.Entry}
+objects.  Each \class{Entry} is written with two hints: the subject
+and the tag.
+
+This class defines the following additional methods:
+
+\begin{methoddesc}{add}{entry}
+Add a new \class{Entry} object to the database.
+\end{methoddesc}
+
+\begin{methoddesc}{lookup}{subject}
+Return all \class{Entry} objects that match \var{subject}.
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{CertificateDatabase}{path\optional{, create}}
+
+This class defines a file containing \class{pisces.spkilib.spki.Cert}
+objects, including name certs.  Each cert is written with two hints:
+the subject and issuer.
+
+This class defines the following additional methods:
+
+\begin{methoddesc}{lookupBySubject}{subject}
+Return all certs that match \var{subject}.
+\end{methoddesc}
+
+\begin{methoddesc}{lookupByIssuer}{issuer}
+Return all certs that match \var{issuer}.
+\end{methoddesc}
+
+\begin{methoddesc}{add}{cert}
+Add a new cert \var{cert} to the database.
+\end{methoddesc}
+
+\begin{methoddesc}{delete}{obj}
+Delete all certificates with issuer and subject fields that match
+\var{obj}. 
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{PrincipalDatabase}{path\optional{, create}}
+
+A \class{PrincipalDatabase} stores public keys.
+
+This class defines the following additional methods:
+
+\begin{methoddesc}{add}{key}
+Add the public key \var{key}.
+\end{methoddesc}
+
+\begin{methoddesc}{lookup}{p}
+Return the key corresponding to hash \var{p}.
+\end{methoddesc}
+
+\begin{methoddesc}{delete}{p}
+Delete a public key.  Accepts a single argument \var{p} that can be
+either a key or its hash.
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{PrivateKeyDatabase}{path\optional{, create}}
+
+This class stores private keys.  Unlike other database classes, it
+depends on the order of the objects in the database file being
+preserved.  It stores a collection of private keys and their
+associated public keys.  One of the keys is marked as the default
+key. 
+
+This class defines the following additional methods:
+
+\begin{methoddesc}{lookup}{hash}
+Return a private key for the principal \var{hash}.  The \var{hash} is
+of the public part of the key pair.
+\end{methoddesc}
+
+\begin{methoddesc}{setDefault}{hash}
+Make the private key for the principal \var{hash} the default key.
+\end{methoddesc}
+
+\begin{methoddesc}{getDefault}{}
+Return the hash of the public part of the default key.
+\end{methoddesc}
+
+\begin{methoddesc}{add}{pub, priv}
+Add the key pair with public part \var{pub} and private part
+\var{priv} to the database.
+\end{methoddesc}
+
+\begin{methoddesc}{listPublicKeys}{}
+Return a list of all the public keys.
+\end{methoddesc}
+
+\begin{methoddesc}{listPrivateKeys}{}
+Return a list of all the private keys.
+\end{methoddesc}
+
+\end{classdesc}
+
+\subsection{\module{pisces.spkilib.keystore}
+	-- Abstract storage interface for keys and certifications}
+\declaremodule{}{pisces.spkilib.keystore}
+\modulesynopsis{Abstract storage interface for keys and certifications}
+
+\begin{funcdesc}{getPrincipal}{obj}
+Return the principal associated with a SPKI object.  The
+implementation either returns the object directly, if it is a hash, or
+calls the object's \method{getPrincipal} method.
+\end{funcdesc}
+
+\begin{classdesc}{KeyStore}{path}
+
+A \class{KeyStore} provides a high-level interface for a collection of
+keys and certificates stored in files.  The constructor takes a
+\var{path} argument that specifies the directory where the files are
+located.  
+
+A \class{KeyStore} uses three files: \file{keys}, \file{private}, and
+\file{certs}.  Each file uses is read and written using
+\module{pisces.spkilib.database}.
+
+Each \class{KeyStore} has a default key that is used to create and
+resolve name certs.
+
+\begin{methoddesc}{close}{}
+Calls the \method{save} method if changes have been made since the
+last save. 
+\end{methoddesc}
+
+\begin{methoddesc}{save}{}
+Writes the contents of the \class{KeyStore} to files.
+\end{methoddesc}
+
+\begin{methoddesc}{setDefaultKey}{hash}
+Make key with has \var{hash} be the default key.  The \class{KeyStore}
+must already contain the private key.
+\end{methoddesc}
+
+\begin{methoddesc}{getDefaultKey}{}
+Return the hash of the default key.
+\end{methoddesc}
+
+\begin{methoddesc}{addPrivateKey}{key, pub, pword, \optional{bogus}}
+Add a private key \var{key} with corresponding public key \var{pub}.
+The key is encrypted using password \var{pword} and marked as bogus if
+the optional \var{bogus} argument is non-zero.  The key is encrypted
+using \function{pisces.spkilib.spki.encryptWithPassword}.  The public
+key is not added to the database.
+\end{methoddesc}
+
+\begin{methoddesc}{addPublicKey}{key}
+Add the public key \var{key}.
+\end{methoddesc}
+
+\begin{methoddesc}{addCert}{cert}
+Add the certificate \var{cert} to the database.  A name cert should be
+added using \method{addName}.
+\end{methoddesc}
+
+\begin{methoddesc}{addName}{cert}
+Add the name certificate \var{cert} to the database.
+\end{methoddesc}
+
+\begin{methoddesc}{lookupKey}{hash}
+Return the public key corresponding to \var{hash}.
+\end{methoddesc}
+
+\begin{methoddesc}{lookupPrivateKey}{hash}
+Return the encrypted private key corresponding to \var{hash}.  The
+hash is of the public key.
+\end{methoddesc}
+
+\begin{methoddesc}{lookupName}{name\optional{, namespace}}
+Return a list of certificates issued for \var{name}, which can be
+either an instance of \class{pisces.spkilib.spki.Name} or a simple
+string.  If \var{name} is a string, a public key or hash must be
+supplied as the optional \var{namespace} argument.
+\end{methoddesc}
+
+\begin{methoddesc}{lookupCertBySubject}{subj}
+Return all certificates with a subject matching \var{subj}.
+\end{methoddesc}
+
+\begin{methoddesc}{lookupCertByIssuer}{iss}
+Return all certificates with an issuer matching \var{iss}.  A
+certificate with a name in the issuer slot matches when the name is
+identical to \var{iss} or \var{iss} is the principal at the root of a
+fully qualified name.
+\end{methoddesc}
+
+\begin{methoddesc}{listPublicKeys}{}
+Return the hashes of all public keys in the \class{KeyStore}.
+\end{methoddesc}
+
+\begin{methoddesc}{listPrivateKeys}{}
+Return the hashes of all public keys corresponding to private keys in
+the \class{KeyStore}. 
+\end{methoddesc}
+
+\begin{methoddesc}{listCerts}{}
+Return a list of all certificates in the \class{KeyStore}.
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{MultiKeyStore}{\optional{readers, writers, both, private}}
+
+A \class{MultiKeyStore} instance provides a \class{KeyStore}-interface
+on top of several underlying \class{KeyStore} implementations.  It can
+be used to share a \class{KeyStore} among several users.
+
+The constructor accepts objects implementing the \class{KeyStore}
+interface as arguments.  It uses keyword arguments to indicate whether
+a particular object should be read-only or read-write and whether it
+should be used to store private keys.  The \var{readers} argument
+accepts a list of objects that will be used for lookups only.  The
+\var{writers} argument accepts a list of objects that will be used for
+adds only.  The \var{both} argument accepts a list of objects that are
+used for lookups and adds.  The \var{private} argument accepts a list
+of objects that can be used to store private keys; a \var{writer}
+object will not be used for private keys unless it is also in the
+\var{private} list.
+
+\end{classdesc}
+
+\subsection{\module{pisces.spkilib.sexp}
+	-- Support routines from S-expressions}
+\declaremodule{}{pisces.spkilib.sexp}
+\modulesynopsis{Support routines from S-expressions}
+
+This module defines public functions for manipulating
+S-expressions, and a collection of helper functions that are used by
+by other modules in  \module{pisces.spkilib} to create S-expressions
+for standard SPKI objects. 
+
+The SPKI structure draft \cite{ellison99-structure} defines a
+canonical S-expression as follows:
+
+   ``All SPKI structures communicated from one machine to another must be
+   in canonical form.  If canonical S-expressions need to be transmitted
+   over a 7-bit channel, there is a form defined for base64 encoding
+   them.
+
+   ``A canonical S-expression is formed from binary byte strings, each
+   prefixed by its length, plus the punctuation characters
+   \code{()[]}.  The length of a byte string is a non-negative ASCII
+   decimal number, with no unnecessary leading \code{0} digits,
+   terminated by \code{:}.  The canonical  form is a unique
+   representation of an S-expression and is used as the input to all
+   hash and signature functions.'' 
+
+\begin{funcdesc}{parse}{buf}
+Parse the S-expression \var{buf} encoded in canonical form or in
+base64.  Returns a \class{SExp} instance or raises
+\exception{ParseError}.  Can raise \exception{ParseError}.
+\end{funcdesc}
+
+\begin{funcdesc}{parseText}{buf}
+Parse a human-readable version of an S-expression \var{buf}.  The
+human-readable form is roughly equivalent to the advanced form
+described in the struction document \cite{ellison99-structure}, but
+has some significant shortcomings.  It is not possible to use
+\function{parseText} to parse an S-expression that includes multi-line
+base64 output.  It is most useful for parsing simple S-expressions
+entered by users on a command line.
+\end{funcdesc}
+
+\begin{funcdesc}{construct}{elts}
+Construct an S-expression from the Python sequence \var{elts}.  Each
+element of \var{elts} must be a string or another sequence.
+\end{funcdesc}
+
+\begin{classdesc}{SExp}{\optional{canon}, \optional{repr}}
+
+The \class{SExp} class represents S-expressions.  Instances behave
+like sequences, allowing you to access element \var{n} of the
+S-expression using \code{sx[n]}.
+
+The constructor takes takes a single keyword argument.  It must be
+either \var{canon}, a string containing the canonical representation
+of the S-expression, or \var{repr}, a Python sequence representing the
+S-expression.  These two constructor forms are equivalent to calling
+the functions \var{parse} and \var{construct} below.  User code will
+be clearer if these functions are called.
+
+The \method{__str__} method, called by \function{str} and
+\function{print}, converts the S-expression to a human-readable form.
+The pretty-printer is not ideal, but it is better than nothing.
+
+\begin{methoddesc}{encode_base64}{}
+Return a string containing the base64 encoding of the S-expression.
+\end{methoddesc}
+
+\begin{methoddesc}{encode_canonical}{}
+Return a string containing the canonical encoding of the S-expression.
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{excdesc}{ParseError}
+A \exception{ParseError} is raised when \function{parse} is called
+with invalid data.  The exception object contains three attributes: 
+\member{exp}, the data expected, \member{got}, the data actually
+found, and \member{ref}, the encoded data that contained the error.
+The \member{ref} attribute may be None.
+\end{excdesc}
+
+\subsection{\module{pisces.spkilib.sexpsocket}
+	-- Send and receive s-exps over sockets}
+\declaremodule{}{pisces.spkilib.sexpsocket}
+\modulesynopsis{Send and receive s-exps over sockets}
+
+This module defines a socket wrapper \class{SexpSocket} that supports
+sending and receiving S-expressions over a Python socket object.  It
+supports simple buffering.
+
+Further documentation is not yet available.
+
+\subsection{\module{pisces.spkilib.spki}
+	-- Core SPKI implementation}
+\declaremodule{}{pisces.spkilib.spki}
+\modulesynopsis{Core SPKI implementation}
+
+This module implements Python classes that correspond to SPKI object.
+The objects defined by SPKI are S-expressions consisting of an object
+name and zero or more ``parts.''  This module defines a Python class
+for each SPKI object, where the object name corresponds to the class
+name and the parts correspond to instance attributes.
+
+Each SPKI object is represented in Pisces by a subclass of
+\class{SPKIObject}.  These classes have attributes for each of the
+parts of the S-expression.  Some classes also have methods for performing
+operations using the data contained in the SPKI object;
+e.g. \code{public-key} objects have \method{encrypt} and
+\method{decrypt} methods.
+
+\begin{classdesc}{SPKIObject}{}
+
+This abstract base class defines the \method{sexp} method and several
+operators that rely on the S-expression of an object.
+
+The constructors for \class{SPKIObject} instances take a number of
+argument equal to the number of parts in the S-expression, i.e. the
+number of parts following the object name.
+
+\begin{methoddesc}{sexp}{}
+Returns a \class{pisces.spkilib.sexp.SExp} for the object.
+\end{methoddesc}
+
+The following methods use Python operator overloading.  They should
+not be called directly but provide support for Python builtin
+operations like \function{repr}, comparison, and use as a dictionary
+key. 
+
+\begin{methoddesc}{__repr__}{}
+Returns the advanced form of the S-expression.
+\end{methoddesc}
+
+\begin{methoddesc}{__cmp__}{other}
+\class{SPKIObject} instances are compared using the canonical
+S-expression encoding.
+\end{methoddesc}
+
+\begin{methoddesc}{__hash__}{}
+The hash of an object is that hash of the canonical encoding of its
+S-expression. 
+\end{methoddesc}
+
+\end{classdesc}
+
+The object names used by SPKI can not be used directly as Python class
+names because they contain hyphens.  They also clash with typical
+Python style which uses capital letters.  SPKI object names are
+converted to class names using the \function{name_to_impl} function.
+
+\begin{funcdesc}{name_to_impl}{name}
+Returns the class name corresponding to a SPKI object.  Names are
+translated as follows: The SPKI name is broken up into multiple
+components at each hyphen.  The first letter of each component is
+capitalized.  If the first character of the first component is a
+number, an underscore is prepended.  The SPKI name \code{*} is
+translated as \class{TagExpr}.
+
+For example, the SPKI name \code{rsa-pkcs1-md5} is translated as
+\function{RsaPkcs1Md5}.
+\end{funcdesc}
+
+In some cases, the name returned by \function{name_to_impl} refers to
+a factory function that will produce instances of the desired class.
+The factory functions are necessary when the class returned depends on
+some part of the S-expression other than the object name.
+
+There are several helper functions that convert from S-expressions to
+Python instances.  
+
+\begin{funcdesc}{parse}{buf}
+Parse the canonical S-expression \var{buf} and return a
+\class{SPKIObject} instance.  Uses \function{pisces.spkilib.sexp.parse}.
+\end{funcdesc}
+
+\begin{funcdesc}{parseText}{s}
+Parse the human-readable S-expression \var{s} and return a
+\class{SPKIObject} instance. Uses \function{pisces.spkilib.sexp.parseText}.
+\end{funcdesc}
+
+\begin{classdesc}{Evaluator}{*namespaces}
+An \class{Evaluator} instance is used to translate from S-expressions
+to Python objects.  It contains one or more namespaces that map from
+SPKI object names to factory functions and classes.  The optional
+\var{namespaces} arguments must support the mapping protocol.
+\end{classdesc}
+
+\begin{funcdesc}{eval}{s, \optional{tag}}
+Returns a \class{SPKIObject} corresponding to the
+\class{pisces.spkilib.sexp.SExp}.  It uses an \class{Evaluator}
+intialized with the current module's namespace.
+\end{funcdesc}
+
+The module defines the following utility functions:
+
+\begin{funcdesc}{isPrincipal}{obj}
+Return true if \var{obj} is a public key or hash.
+\end{funcdesc}
+
+\begin{funcdesc}{encryptWithPassword}{object, pw\optional{, bogus}}
+Return a \class{PasswordEncrypted} instance containing an encrypted
+copy of \var{object}.  The encryption is performed using the PBES2
+scheme defined by PKCS \#5 using \var{pw} as the password, a triple
+DES in CBC mode as the cipher.
+
+If the optional argument \var{bogus} is specified, the object is
+marked as using a bogus password.  This is useful only for testing
+purposes.
+\end{funcdesc}
+
+\begin{funcdesc}{getTime}{\optional{t}}
+Return a time in SPKI format.  If \var{t} is specified, it must be a
+numer representing the current Unix time, e.g. as returned by
+\function{time.time}.  If \var{t} is not specified, the current time
+is returned.
+\end{funcdesc}
+
+\begin{funcdesc}{checkTime}{t}
+Returns true if \var{t} is a syntactically valid SPKI time.
+\end{funcdesc}
+
+\begin{funcdesc}{getIssuerAndSubject}{obj\optional{warning}}
+Retrieve issuer and subject from \var{obj}, which may be a Sequence
+containing a cert.  This function will search through a sequence
+looking for a cert object or use a cert object passed directly.
+\end{funcdesc}
+
+\begin{funcdesc}{extractSignedCert}{seq}
+Extract a cert and its signature from a sequence.
+\end{funcdesc}
+
+\begin{funcdesc}{makePublicKey}{impl}
+Return a \class{PublicKey} SPKI object from \var{impl}, an instance of
+\class{pisces.pkcs1.RSA_pkcs1}.  By default, produces an
+\code{rsa-pkcs1-md5} key.
+\end{funcdesc}
+
+\begin{funcdesc}{makePrivateKey}{impl}
+Return a \class{PrivateKey} SPKI object from \var{impl}, an instance of
+\class{pisces.pkcs1.RSA_pkcs1}.   By default, produces an
+\code{rsa-pkcs1-md5} key. 
+\end{funcdesc}
+
+\begin{funcdesc}{setHashAlgorithm}{alg}
+Change the hash function used by \function{makePublicKey} and
+\function{makePrivateKey} to the algorithm identified by \var{alg}, a
+\class{pisces.asn1.OID}. 
+\end{funcdesc}
+
+\begin{funcdesc}{makeRSAKeyPair}{bits}
+Create a new \var{bits}-bit RSA key pair.  Return two values, the
+public and private components.  Uses \function{makePublicKey} and
+\function{makePrivateKey}.
+\end{funcdesc}
+
+\begin{classdesc}{RSAKeyMaker}{\optional{algid}}
+
+The functions \function{makePublicKey} and \function{makePrivateKey}
+are defined by a default instance of \class{RSAKeyMaker}.  This class,
+which is instantiated with the OID of a hash function, generates keys
+that use that hash function for signing.
+
+\begin{methoddesc}{makePublicKey}{impl}
+See the function \function{makePublicKey}.
+\end{methoddesc}
+
+\begin{methoddesc}{makePrivateKey}{impl}
+See the function \function{makePrivateKey}.
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{funcdesc}{makeCert}{issuer, subject, tag\optional{, propagate 
+	\optional{, valid}}}
+Create a SPKI \code{cert}.  The \var{issuer} and \var{subject} must be
+principals; the function will wrap them in \code{issuer} and
+\code{subject} S-expressions.  If the \var{propagate} keyword arg is
+true, a propagate entry will be added to the cert.  If the \var{valid}
+keyword argument is supplied, it should contain a sequence of validity
+constraints, e.g. \code{not-before}, \code{not-after}, and \code{online}.
+\end{funcdesc}
+
+\begin{funcdesc}{makeNameCert}{issuer, subject, name\optional{, valid}}
+Create a SPKI name \code{cert} binding the string \var{name} to
+\var{subject} in \var{issuer}'s namespace.  The \var{valid} keyword
+argument should contain one or more validity constraints.
+\end{funcdesc}
+
+\begin{funcdesc}{makeAclEntry}{subject, valid, propagate, permissions}
+Return a \class{Entry} object for an access control list.  An
+\class{Entry} is like a \class{Cert}, but without an issuer.
+\end{funcdesc}
+
+The rest of this section describes the Python classes that correspond
+to SPKI objects.
+
+Many of the SPKI objects defined in this module do not have methods
+associated with them.  They do define attributes, which are themselves
+SPKI objects or strings.  These objects include \class{Hash},
+\class{Signature}, \class{Do}, and \class{Name}.  Other objects are
+always contained by another object; e.g. \class{RSAPublicKey} is
+always used as a component of \class{PublicKey}.  The contained
+classes are not documented.
+
+\begin{classdesc}{PublicKey}{key}
+
+The implementation delegates all calls to the contained
+\class{RSAPublicKey} object, which in turn delegates to a
+\class{pisces.pkcs1.RSA_pkcs1} object.
+
+\begin{methoddesc}{verify}{obj, sig}
+Verify that the \class{Signature} \var{sig} matches \var{obj}.
+\end{methoddesc}
+
+\begin{methoddesc}{getPrincipal}{}
+Return the principal (hash) of the key.
+\end{methoddesc}
+
+\begin{methoddesc}{encrypt}{plain}
+Return a string containing \var{plain} encrypted with the key.
+\end{methoddesc}
+
+\begin{methoddesc}{decrypt}{cipher}
+Return a string containing the plain text recover from decrypting the
+string \var{cipher} with the key.
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{PrivateKey}{key}
+
+The implementation delegates all calls to the contained
+\class{RSAPrivateKey} object, which in turn delegates to a
+\class{pisces.pkcs1.RSA_pkcs1} object.
+
+\begin{methoddesc}{sign}{obj}
+Return a \class{Signature} object for the SPKI object or string
+\var{obj}. 
+\end{methoddesc}
+
+\begin{methoddesc}{getPrincipal}{}
+Return the principal (hash) of the public key.
+\end{methoddesc}
+
+\begin{methoddesc}{getPublicKey}{}
+Return the public key that corresponds to this private key.
+\end{methoddesc}
+
+\begin{methoddesc}{encrypt}{plain}
+Return a string containing \var{plain} encrypted with the key.
+\end{methoddesc}
+
+\begin{methoddesc}{decrypt}{cipher}
+Return a string containing the plain text recover from decrypting the
+string \var{cipher} with the key.
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{Sequence}{}
+
+Behaves like a Python sequence.
+
+\end{classdesc}
+
+\begin{classdesc}{Valid}{}
+
+subclasses \class{NotBefore}, \class{NotAfter}, \class{Online}
+
+\begin{methoddesc}{isValid}{}
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{Cert}{}
+
+\begin{methoddesc}{getTag}{}
+\end{methoddesc}
+
+\begin{methoddesc}{isValid}{}
+\end{methoddesc}
+
+\begin{methoddesc}{isNameCert}{}
+\end{methoddesc}
+
+\begin{methoddesc}{getSubject}{}
+\end{methoddesc}
+
+\begin{methoddesc}{getIssuer}{}
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{SignedCert}{cert, sig}
+
+\begin{methoddesc}{getSequence}{}
+\end{methoddesc}
+
+\begin{methoddesc}{verifySignature}{keydb}
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{Issuer}{}
+
+\begin{methoddesc}{isName}{}
+\end{methoddesc}
+
+\begin{methoddesc}{getPrincipal}{}
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{Subject}{}
+
+\begin{methoddesc}{isName}{}
+\end{methoddesc}
+
+\begin{methoddesc}{getPrincipal}{}
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{Entry}{}
+
+\begin{methoddesc}{getTag}{}
+\end{methoddesc}
+
+\begin{methoddesc}{isValid}{}
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{Keyholder}{}
+
+\begin{methoddesc}{getPrincipal}{}
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{Tag}{}
+
+supports __nonzero__, __cmp__, __and__
+
+\begin{methoddesc}{intersect}{atag}
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{TagExpr}{}
+
+note: realy _TagExpr
+
+subclasses \class{TagStar}, \class{TagSet}, \class{TagRange},
+\class{TagPrefix}
+
+\begin{methoddesc}{copy}{}
+\end{methoddesc}
+
+\begin{methoddesc}{contains}{}
+\end{methoddesc}
+
+\begin{methoddesc}{intersect}{}
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{TagSet}{}
+
+\begin{methoddesc}{add}{arg}
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{AppTag}{}
+
+\begin{methoddesc}{copy}{}
+\end{methoddesc}
+
+\end{classdesc}
+
+XXX need to define SPKI-style bnf for
+password-encrypted
+pbes2-hmac
+3des-cipher
+
+\begin{classdesc}{PasswordEncrypted}{}
+
+\begin{methoddesc}{getKey}{\optional{pw}}
+\end{methoddesc}
+
+\begin{methoddesc}{decrypt}{\optional{pw}}
+\end{methoddesc}
+
+\begin{methoddesc}{isBogus}{}
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{Pbes2Hmac}{}
+
+\begin{methoddesc}{getKey}{pw}
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{_3desCipher}{}
+
+\begin{methoddesc}{decrypt}{key}
+\end{methoddesc}
+
+\end{classdesc}
+
+\subsection{\module{pisces.spkilib.verify}
+	-- Certificate chain verification}
+\declaremodule{}{pisces.spkilib.verify}
+\modulesynopsis{Certificate chain verification}
+
+This module processes a collection of certificates to yield an
+authorization result.  The SPKI theory RFC \cite{ellison99-theory}
+describes a tuple-reduction process as an example.  The Pisces
+implementation uses a search mechanism that has the same semantics.
+
+This module is a little out of date.  It uses the
+\module{pisces.spkilib.database} interface instead of the higher-level
+\module{pisces.spkilib.keystore} interface.  It will be revised before
+the final version 1.0 release.
+
+\begin{classdesc}{Verifier}{acl, certs, keys}
+
+A \class{Verifier} uses an access control list \var{acl}, a collection
+of certificates \var{cert}, and a collection of public keys \var{keys}
+to make access control decisions.  Each argument should be a database
+from \module{pisces.spkilib.database}: \var{acl} is a \class{ACL},
+\var{cert} is a \class{CertificateDatabase}, and \var{keys} is a 
+\class{PrincipalDatabase}.
+
+\begin{methoddesc}{verify}{prin, perm\optional{, delegate}}
+Find a valid certificate chain from an ACL entry to the prinicipal
+\var{prin} that grants permission \var{perm}.
+
+This method searches through the collection of certificates to find a
+valid chain from an access control list entry to the principal making
+the request.  The return value is a sequence of certificates forming a
+valid chain.  The first entry in the sequence is a 
+\class{pisces.spkilib.spki.Entry} object.  Each subsequent element
+will be a certificate delegating some permissions from the previous
+element to the next element.  The last element will delegate
+permissions to the principal.
+
+There is a \var{delegate} argument, because there can not be more than
+one non-delegate-able certificate between a valid delegate-able
+certificate and the principal requesting permission.  That one
+certificate is the one that grants permissions to the principal, but
+doesn't allow the principal to delegate further.  The delegate flag
+should always be true when called recursively.
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{ReferenceMonitor}{acl, certs, keys}
+
+A \class{ReferenceMonitor} provides a simpler interface to a
+\class{Verifier}.  The constructor arguments for
+\class{ReferenceMonitor} are the same as for \class{Verifier}.
+
+\begin{methoddesc}{checkPermission}{caller, perm}
+Check to see if principal \var{caller} has permission \var{perm} by
+calling \method{Verifier.verify}.  Raises \exception{SecurityError} if
+the permission does not exist.  Returns None otherwise.
+\end{methoddesc}
+
+\end{classdesc}
+
+\begin{classdesc}{SecurityError}{}
+Raised by \class{ReferenceMonitor} when \method{checkPermission} fails.
+\end{classdesc}
+
+\appendix
+
+\section{Installation}
+
+You need to have the following software installed:
+
+% The {itemize} environment uses a bullet for each \item.  If you want the 
+% \item's numbered, use the {enumerate} environment instead.
+\begin{itemize}
+  \item  Python 1.5 or higher.
+
+You can download Python from \url{http://www.python.org/download}.
+
+  \item  distutils 0.8 or higher
+
+You can download distuils from
+\url{http://www.python.org/sigs/distutils-sig/download.html}.
+
+  \item  OpenSSL 0.9.5 or higher
+
+You can download OpenSSL from \url{http://www.openssl.org/source/}.
+This package is not used directly by Pisces.  Rather Pisces uses
+amkCrypto, which requires OpenSSL.
+
+  \item  amkCrypto-0.1.2 or higher
+
+You can download it from
+\url{ftp://starship.python.net/pub/crew/amk/crypto/}.
+
+\end{itemize}
+
+The top-level Pisces directory contains two scripts.  The first
+\program{test.py} will run some tests to make sure that the Pisces
+libraries are working and that all the other software packages that
+are required have been installed.  (The test framework will probably
+improve in future releases.)
+
+The other script is \program{setup.py}.  This is an install script
+written using distutils.  To install Pisces so that it is available
+for use from Python, run \code{./setup.py install}.
+
+\bibliography{manual}
+\bibliographystyle{plain}
+
+\end{document}

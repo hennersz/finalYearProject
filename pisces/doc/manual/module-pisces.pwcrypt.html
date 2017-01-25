@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>5.7 pisces.pwcrypt - Support for password-based cryptography (PKCS #5)</title>
+<META NAME="description" CONTENT="5.7 pisces.pwcrypt - Support for password-based cryptography (PKCS #5)">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="STYLESHEET" href="manual.css">
+<LINK REL="next" href="module-pisces.utils.html">
+<LINK REL="previous" href="module-pisces.pkcs1.html">
+<LINK REL="up" HREF="node8.html">
+<LINK REL="next" href="module-pisces.utils.html">
+</head>
+<body bgcolor="#ffffff" text="#000000" link="#0000bb"  vlink="#551a8b" alink="#ff0000">
+<div class='navigation'>
+<table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A href="module-pisces.utils.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node8.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A href="module-pisces.pkcs1.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A href="module-pisces.utils.html">5.8 pisces.utils - Internal</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node8.html">5. Pisces Library Reference</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A href="module-pisces.pkcs1.html">5.6 pisces.pkcs1 - A</A></span>
+<br><hr></div>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000670000000000000000">
+5.7 <tt class="module">pisces.pwcrypt</tt>
+	- Support for password-based cryptography (PKCS #5)</A>
+</H2>
+
+
+<P>
+This module supports the use of password-based cryptography for
+encryption and message authentication using key derivation
+functions.  This module is based on recommendations in PKCS #5 v2.0:
+Password-Based Crypotgraphy, RSA Laboratories, March 25, 1999.
+The recommendations are available from
+<a class="url" href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-5/index.html">http://www.rsasecurity.com/rsalabs/pkcs/pkcs-5/index.html</a>.
+
+<P>
+<i>WARNING</i>: It is not very practical to use Python for generating
+keys from passphrases; it is merely convenient.  The key derivation
+process should take a long time, to thwart an attacker who attempts a
+dictionary attack on the password.  But it can't take so long that the
+user grows impatient waiting for the key to be generated.  The
+attacker could implement her brute force search in optimized C, which
+would be much faster than this Python implementation.  Thus, this
+module provides much less security-for-the-wait that an optimized C
+version would.
+
+<P>
+<dl><dt><b><a name='l2h-48'><tt class='class'>KeyDerivationFactory</tt></a></b> (<var>keylen, saltlen,
+	</var><big>[</big><var>iterations</var><big>]</big><var>, </var><big>[</big><var>hash</var><big>]</big><var>, </var><big>[</big><var>labels</var><big>]</big>)
+<dd>
+A <tt class="class">KeyDerivationFactory</tt> instance will generate keys that are
+<var>keylen</var> bytes long with <var>saltlen</var> bytes of salt.  The
+optional arguments specify: the number of <var>iterations</var> of the the
+<var>F</var> function, the default value is 1000; the <var>hash</var> function
+to use, the default is SHA.  The <var>hash</var> argument must support the
+interface implemented by <tt class="module">Crypto.Hash</tt> hashes.
+
+<P>
+Labels are an optional feature.  The <var>labels</var> argument accepts a
+sequence of strings.  If several keys with the same generation
+parameters are going to be created, the salt should contain some text
+that identifies the particular use of the key.  These are the labels.
+When <tt class="method">createKey</tt> is called, it will check to see if the label
+used is valid.
+
+<P>
+The design of this class is explained carefully in the PKCS #5
+document.  The implementation uses HMAC plus a hash function as its
+pseudorandom function. The default hash is SHA.
+
+<P>
+<dl><dt><b><a name='l2h-49'><tt class='method'>createKey</tt></a></b> (<var>password </var><big>[</big><var>, label</var><big>]</big>)
+<dd>
+Create a new key generated from the string <var>password</var> and
+optionally the string <var>label</var>.  Returns the salt, the number of
+iterations of the <var>F</var> function, the name of the hash function, and
+the key itself.  Raises <tt class="exception">ValueError</tt> if <var>label</var> is
+specified and does not match one of the labels specified in the
+constructor.
+</dl>
+
+<P>
+<dl><dt><b><a name='l2h-50'><tt class='method'>recreateKey</tt></a></b> (<var>password, salt</var>)
+<dd>
+Creates a key generated from the string <var>password</var> and the
+explicitly supplied <var>salt</var> string.  Returns only the key.  This
+method should only be used to recreate a key previously generated by
+<tt class="method">createKey</tt>.
+</dl>
+
+<P>
+</dl>
+
+<P>
+<p>
+<div class='navigation'><hr><table align='center' width='100%' cellpadding='0' cellspacing='2'>
+<tr>
+<td><A href="module-pisces.utils.html"><img width=32 height=32 align=bottom border=0 alt="next"
+ src="next.gif"></A></td>
+<td><A HREF="node8.html"><img width=32 height=32 align=bottom border=0 alt="up"
+ src="up.gif"></A></td>
+<td><A href="module-pisces.pkcs1.html"><img width=32 height=32 align=bottom border=0 alt="previous"
+ src="previous.gif"></A></td>
+<td align=center bgcolor="#99CCFF" width="100%">
+ <b class=title>Pisces User Manual</b></td>
+<td><A href="contents.html"><img width=32 height=32 align=bottom border=0 alt="contents"
+ src="contents.gif"></A></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+<td><img width=32 height=32 align=bottom border=0 alt=""
+ src="blank.gif"></td>
+</tr></table><b class='navlabel'>Next:</b> <span class='sectref'><A href="module-pisces.utils.html">5.8 pisces.utils - Internal</A></span>
+<b class='navlabel'>Up:</b> <span class='sectref'><A HREF="node8.html">5. Pisces Library Reference</A></span>
+<b class='navlabel'>Previous:</b> <span class='sectref'><A href="module-pisces.pkcs1.html">5.6 pisces.pkcs1 - A</A></span>
+</div>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>
