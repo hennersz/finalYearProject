@@ -48,7 +48,7 @@ class ListStorage(object):
         for key in self.data:
             values = self.data[key]
             for value in values:
-                items.append(key, value[0], value[1])
+                items.append(( key, value[0], value[1] ))
         return iter(items)
 
     def iteritems(self):
@@ -56,5 +56,5 @@ class ListStorage(object):
         for key in self.data:
             values = self.data[key]
             for value in values:
-                items.append(key, value[1])
+                items.append(( key, value[1] ))
         return iter(items)
