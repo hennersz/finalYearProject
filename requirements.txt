@@ -6,3 +6,4 @@ gnupg
 pycrypto
 ./pisces
 mock
+pytest-twisted

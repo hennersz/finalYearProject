@@ -40,35 +40,36 @@ Due to the nature of distributed systems to adequately test and evaluate one you
 \subsection{Implementation}
 So far I have implemented the DHT using a python library for kademlia. I have created my own storage module for the DHT such that if more than one item is inserted with the same key a list of values are stored for that key rather than overwriting the old value. This allows multiple certificates to be stored for one public key for example. I have then created a wrapper around the DHT server object that sets up the connection and automatically deserialses the data extracted from the DHT. 
 \subsection{Testing}
-For testing I am using the pytest library. I have written unit tests for the modules completed so far. I use tox to manage running the tests and handling the python virtual environment.
+For testing I am using the pytest library. I have written unit tests for the modules completed so far. I use tox to manage running the tests and handling the python virtual environment. I also run the travis CI system.
 \section{Remaining Work}
 \subsection{Implementation}
 \subsubsection{Certificate Module}
 \begin{itemize}[noitemsep]
-  \item Create certificates
-  \item Insert certificates
-  \item Retrieve and parse certificates
+  \item Create certificates - 1 week
+  \item Insert certificates - 1 week
+  \item Retrieve and parse certificates - 1 week
 \end{itemize}
 \subsubsection{Key Module}
 \begin{itemize}[noitemsep]
-  \item Create keys
-  \item Insert keys
-  \item Retrieve and parse keys
+  \item Create keys - 1 week
+  \item Add GPG support - 2 weeks
+  \item Insert keys - 1 week
+  \item Retrieve and parse keys - 1 week
 \end{itemize}
 \subsubsection{Verification Module}
 \begin{itemize}[noitemsep]
-  \item Find key identities
-  \item Verify a specific identity for a Key
-  \item Verify using web of trust
-  \item Retrieve and verify certificate chain
+  \item Find key identities - 2 weeks
+  \item Verify a specific identity for a Key - 3 weeks
+  \item Verify using web of trust - 3 weeks
+  \item Retrieve and verify certificate chain - 4 weeks
 \end{itemize}
 \subsubsection{Control Module}
 \begin{itemize}[noitemsep]
-  \item Local socket listening for connections
-  \item Syntax for commands
-  \item Interface to verification and key modules
+  \item Local socket listening for connections - 2 weeks
+  \item Syntax for commands - 3 weeks
+  \item Interface to verification and key modules - 3 weeks
 \end{itemize}
 \subsection{Evaluation}
-To evaluate the project I am going to test both the performance and security of the system. For the performance evaluation I will test the time it takes to verify the identity of a key on local networks and across the Internet, identify any bottlenecks an suggest ways to improve it. For the security evaluation I will assess the feasibility and potential damage of attacks on the system such as if attackers control nodes in the DHT.
+To evaluate the project I am going to test both the performance and security of the system. For the performance evaluation I will test the time it takes to verify the identity of a key on local networks and across the Internet, identify any bottlenecks an suggest ways to improve it. For the security evaluation I will assess the feasibility and potential damage of attacks on the system such as if attackers control nodes in the DHT. I expect to complete the evaluation within the next 8 weeks.
 
 \end{document}

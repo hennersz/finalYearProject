@@ -7,20 +7,16 @@ class DHTServer(object):
     def __init__(self, dht):
         self.dht = dht
 
-    def set(self, key, value, callback=None):
-        #callback takes 1 argument - result of set operation
-        if callback is None:
-            return self.dht.set(key, value)
-        else:
-            return self.dht.set(key, value).addCallback(callback)
+    def set(self, key, value):
+        return self.dht.set(key, value)
 
     @inlineCallbacks
     def get(self, key):
-        #callback function takes 1 argument - the result of the get operation
         response = yield self.dht.get(key)
         if response is not None:
-            returnValue(json.loads(response))
+            try:
+                returnValue(json.loads(response))
+            except ValueError:
+                returnValue(None)
         else:
             returnValue(None)
-
-    
