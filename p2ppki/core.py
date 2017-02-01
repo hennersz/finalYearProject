@@ -35,11 +35,13 @@ def done(found, server):
     print(value)
 
     #return server.set("a key", "a value").addCallback(get, server)
+
+@inlineCallbacks
 def initServer(localPort, remoteHost,remotePort):
     server = Server(storage=ListStorage())
     server.listen(localPort)
-    server.bootstrap([(remoteHost, remotePort)]).addCallback(done, server)
-
+    server.bootstrap([(remoteHost, remotePort)])
+    returnValue(server)
 @inlineCallbacks
 def init():
     server = yield initServer(8469, "127.0.0.1",8468)
@@ -51,6 +53,6 @@ def init():
 
 if(__name__ == "__main__"):
     log.startLogging(sys.stdout)
-    initServer(8469, "127.0.0.1", 8468)
+    init()
 
     reactor.run()
