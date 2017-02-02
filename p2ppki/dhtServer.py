@@ -7,8 +7,10 @@ class DHTServer(object):
     def __init__(self, dht):
         self.dht = dht
 
+    @inlineCallbacks
     def set(self, key, value):
-        return self.dht.set(key, value)
+        success = yield self.dht.set(key, value)
+        returnValue(success)
 
     @inlineCallbacks
     def get(self, key):
