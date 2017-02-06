@@ -54,8 +54,6 @@ class ControlProtocol(LineReceiver):
         self.sendLine("Supported commands: %s"% (str(self.supportedCommands)))
 
 
-
-
 class ControlFactory(Factory):
     def __init__(self, dht):
         self.dht = dht

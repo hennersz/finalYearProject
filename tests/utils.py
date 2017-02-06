@@ -7,9 +7,11 @@ import json
 class FakeDHT(object):
     def __init__(self):
         self.data = {
-                'key 1': None,
-                'key 2': json.dumps(['a', 2]),
-                'key 3': 'a string that is not json'
+                'key 1': None,#No data
+                'key 2': json.dumps(['a', 2]),#Data to be parsed by dhtServer
+                'key 3': 'a string that is not json',#Non json string for dhtServer to fail to parse
+                'key4': ['a', 2],#Data for control protocol
+                'key5': None#No data for control protocol
                 }
 
     def set(self, key, value):
