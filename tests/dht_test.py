@@ -4,7 +4,6 @@
 from context import p2ppki
 from utils import FakeDHT
 from p2ppki.dhtServer import DHTServer
-from twisted.internet.defer import inlineCallbacks
 import mock
 import pytest
 
@@ -15,10 +14,11 @@ def test_set(mock_set):
 
     dht.set('a key', 'a value')
 
-    #check set is called
+    # check set is called
     mock_set.assert_called_with('a key', 'a value')
-    #check specific instance of dht was called
+    # check specific instance of dht was called
     dht.dht.set.assert_called_with('a key', 'a value')
+
 
 @pytest.inlineCallbacks
 def test_get():

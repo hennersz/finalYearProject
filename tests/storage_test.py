@@ -6,12 +6,14 @@ from p2ppki.storage import ListStorage
 import mock
 import json
 
+
 def test_singleInsert():
-   store = ListStorage()
-   store.__setitem__('a key', 'a value')
-   data = json.loads(store.get('a key'))
-   assert len(data) == 1
-   assert data[0] == 'a value'
+    store = ListStorage()
+    store.__setitem__('a key', 'a value')
+    data = json.loads(store.get('a key'))
+    assert len(data) == 1
+    assert data[0] == 'a value'
+
 
 def test_multiInsert():
     store = ListStorage()
@@ -21,6 +23,7 @@ def test_multiInsert():
     assert len(data) == 2
     assert data[0] == 'a value'
     assert data[1] == 'b value'
+
 
 @mock.patch('p2ppki.storage.time')
 def test_overwrite(mock_time):
@@ -34,17 +37,19 @@ def test_overwrite(mock_time):
     store.__setitem__('a key', 'a value')
     assert store.data['a key'][0][0] == 10
 
+
 def test_iterator():
     store = ListStorage()
 
-    store.__setitem__('a key', 'a value');
-    store.__setitem__('a key', 'b value');
-    store.__setitem__('b key', 'a value');
+    store.__setitem__('a key', 'a value')
+    store.__setitem__('a key', 'b value')
+    store.__setitem__('b key', 'a value')
 
     values = list(store.iteritems())
     assert ('a key', 'a value') in values
     assert ('a key', 'b value') in values
     assert ('b key', 'a value') in values
+
 
 @mock.patch('p2ppki.storage.time')
 def test_iterItemsOlderThan(mock_time):

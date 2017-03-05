@@ -1,7 +1,6 @@
-from twisted.python import log
 from twisted.internet.defer import inlineCallbacks, returnValue
 import json
-import sys, time
+
 
 class DHTServer(object):
     def __init__(self, dht):
