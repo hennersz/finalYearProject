@@ -50,18 +50,19 @@ def test_handleSet(protocol, transport):
     transport.clear()
 
     protocol.lineReceived('SET key value')
-    assert transport.value() == 'Setting value value for key key in DHT\
-                                \r\nSuccess!\r\n'
+    assert transport.value() == 'Setting value value for key key in DHT'\
+                                '\r\nSuccess!\r\n'
     transport.clear()
 
     protocol.lineReceived('SET fail value')
-    assert transport.value() == 'Setting value value for key fail in DHT\
-                                \r\nFaliure :(\r\n'
+    assert transport.value() == 'Setting value value for key fail in DHT'\
+                                '\r\nFaliure :(\r\n'
 
 
 def test_handleUnknown(protocol, transport):
     transport.clear()  # clear connect message
 
     protocol.lineReceived('an unknown command')
-    assert transport.value() == 'Unknown command: an\
-                                \r\nSupported commands: [\'GET\', \'SET\']\r\n'
+    assert transport.value() == 'Unknown command: an'\
+                                '\r\nSupported commands: [\'GET\', \'SET\']'\
+                                '\r\n'
