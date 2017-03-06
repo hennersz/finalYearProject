@@ -55,6 +55,12 @@ class GuardedBankAccount:
         self.guard.checkPermission(caller, 'setBalance')
         self.account.setBalance(amount)
 
+    def checkTrust(self, caller):
+        self.guard.checkPermission(caller, 'trust')
+
+    def checkCA(self, caller):
+        self.guard.checkPermission(caller, 'ca')
+
 class Args(Options):
     """Each of the following arguments must be specified:
 

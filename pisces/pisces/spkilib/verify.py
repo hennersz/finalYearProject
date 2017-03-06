@@ -80,7 +80,7 @@ class Verifier:
         issuer = cert.issuer.getPrincipal()
         if not cert.isValid():
             return None
-        chain = self.verify(issuer, perm, 1)
+        chain = self.verify(issuer, perm, delegate)
         if chain:
             if self.VERBOSE:
                 print "name verification okay"
@@ -88,12 +88,13 @@ class Verifier:
         return None
     
     def verifyCert(self, cert, perm, delegate):
+        if self.VERBOSE:
+            print "Propogate: ", cert.propagate
         issuer = cert.issuer.getPrincipal()
         if not cert.isValid():
             print "cert is invalid"
             return None
-        if not (cert.subject.isName() \
-                or (not delegate or cert.propagate)):
+        if not (not delegate or cert.propagate):
             print "bad name or delegate"
             return None
         chain = self.verify(issuer, perm & cert.tag, 1)

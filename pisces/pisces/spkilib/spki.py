@@ -1036,10 +1036,10 @@ def encryptWithPassword(object, pw, bogus=None):
     kdf = pwcrypt.KeyDerivationFactory(16, 8) # 16-byte key, 8-byte salt
     salt, iters, hash, key = kdf.createKey(pw)
     iv = cryptrand.random(8)
-    cipher = DES3.new(key, DES3.CBC, iv)
+    cipher = DES3.new(key, DES3.MODE_CBC, iv)
     ct = cipher.encrypt(pad(object.sexp().encode_canonical()))
     
-    c = _3desCipher('CBC', iv, ct)
+    c = _3desCipher('MODE_CBC', iv, ct)
     k = Pbes2Hmac(salt, str(iters), hash, str(len(key)))
     return PasswordEncrypted(object.sexp()[0], # it's name,
                              k, c, (bogus is None and None or "bogus"))
