@@ -547,11 +547,11 @@ class _import:
         if l > 1:
             raise ValueError, "must specify single input file"
         if l == 1:
-            self.input = args[1]
+            self.input = args[0]
 
     def run(self):
         buf = load(self.input)
-        obj = spki.parse(load(self.input))
+        obj = spki.parseText(load(self.input))
         if spki.isa(obj, spki.PublicKey):
             self.saveKey(obj)
         elif spki.isa(obj, spki.Sequence):

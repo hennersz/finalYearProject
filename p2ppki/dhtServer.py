@@ -16,7 +16,8 @@ class DHTServer(object):
         response = yield self.dht.get(key)
         if response is not None:
             try:
-                returnValue(json.loads(response))
+                returnValue(response)
+                # returnValue(json.loads(response))
             except ValueError:
                 returnValue(None)
         else:

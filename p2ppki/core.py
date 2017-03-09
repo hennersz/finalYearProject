@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, returnValue
@@ -30,7 +29,7 @@ def init():
     dht = DHTServer(server)
     keyStore = keystore.KeyStore('/Users/henrymortimer/.p2ppki')
     certs = CertManager(dht, keyStore)
-    certs.trust('me', 'Alice')
+    certs.trust('Alice', 'me')
     returnValue(ControlServer(8007, dht))
 
 

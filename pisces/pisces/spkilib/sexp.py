@@ -93,6 +93,7 @@ def parse(buf):
     """Return an SExp instance representing the canonical s-exp buf"""
     return SExp(canon=buf)
 
+
 def construct(*elts):
     """Return an SExp constructed from a Python sequence"""
     conv = []
