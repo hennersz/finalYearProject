@@ -59,7 +59,7 @@ def parseHashOrName(buf, keyStore):
     else:
         return o
 
-    # It wasnt a hash, try as name
+    # It wasn't a hash, try as name
     base = getDefaultKey(keyStore)
     return spki.FullyQualifiedName(base, (buf,))
 
@@ -108,8 +108,55 @@ def getCertSubjectHash(cert, keystore):
                 return sexp.str_to_b64(getHash(name, keystore).value)
             except ValueError:
                 continue
+        raise ValueError("Unbound spki name: %s" % name)
     else:
         return sexp.str_to_b64(getHash(name, keystore).value)
+
+
+def hashToB64(h):
+    """Converts a hash object to its base 64 representation
+    """
+    return sexp.str_to_b64(h.value)
+
+
+class VerifyError(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
+
+
+def verifyCertSig(certSeq, keyStore):
+    """Verifies that the signature on the certificate is valid
+    """
+    key = None
+    cert = None
+    sig = None
+    for elt in certSeq:
+        if spki.isa(elt, spki.PublicKey):
+            if key is not None:
+                raise VerifyError('More than 1 key found')
+            key = elt
+        elif spki.isa(elt, spki.Cert):
+            if cert is not None:
+                raise VerifyError('multiple certificates found')
+            cert = elt
+        elif spki.isa(elt, spki.Signature):
+            if sig is not None:
+                raise VerifyError('multiple signatures found')
+            sig = elt
+    if key:
+        keyStore.addPublicKey(key)
+        if key.getPrincipal() != sig.principal:
+            raise VerifyError('Key and signature principal do not match')
+    else:
+        key = keyStore.lookupKey(sig.principal)
+    if key is None:
+        raise VerifyError("could not find key to verify signature")
+    if not key.verify(cert, sig):
+        raise VerifyError("could not verify signature for cert")
+    return spki.Sequence([cert, sig])
 
 
 class CertManager():
@@ -151,11 +198,21 @@ class CertManager():
 
     @inlineCallbacks
     def storeCert(self, certificate):
-        issuer, subject = spki.getIssuerAndSubject(certificate)
-        name = subject.getPrincipal().names
-        h = sexp.str_to_b64(getHash(name, self.keystore).value)
+        h = getCertSubjectHash(certificate)
         key = str(h) + '-certificates'
-        # yield self.dht.set(key, str(certificate.sexp().encode_canonical()))
-        # cert = yield self.dht.get(key)
-        # c = spki.parse(cert[0])
-        # print c
+        self.dht.set(key, str(certificate.sexp().encode_canonical()))
+
+    @inlineCallbacks
+    def getCertificates(self, keyHash):
+        key = hashToB64(keyHash) + -'certificates'
+        certs = yield self.dht.get(key)
+        verifiedCerts = []
+        for cert in certs:
+            try:
+                c = spki.parse(cert)
+                v = verifyCertSig(c, self.keystore)
+                verifiedCerts.append(v)
+            except (sexp.ParseError, VerifyError):
+                # Ignore data we cant parse or verify
+                continue
+        returnValue(verifiedCerts)

@@ -1,5 +1,4 @@
 from twisted.internet.defer import inlineCallbacks, returnValue
-import json
 
 
 class DHTServer(object):
@@ -15,10 +14,6 @@ class DHTServer(object):
     def get(self, key):
         response = yield self.dht.get(key)
         if response is not None:
-            try:
-                returnValue(response)
-                # returnValue(json.loads(response))
-            except ValueError:
-                returnValue(None)
+            returnValue(response)
         else:
             returnValue(None)

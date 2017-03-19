@@ -551,7 +551,7 @@ class _import:
 
     def run(self):
         buf = load(self.input)
-        obj = spki.parseText(load(self.input))
+        obj = spki.parse(load(self.input))
         if spki.isa(obj, spki.PublicKey):
             self.saveKey(obj)
         elif spki.isa(obj, spki.Sequence):
