@@ -9,15 +9,9 @@ class FakeDHT(object):
     def __init__(self):
         self.data = {
                 # No data
-                'key 1': None,
+                'key1': None,
                 # Data to be parsed by dhtServer
-                'key 2': json.dumps(['a', 2]),
-                # Non json string for dhtServer to fail to parse
-                'key 3': 'a string that is not json',
-                # Data for control protocol
-                'key4': ['a', 2],
-                # No data for control protocol
-                'key5': None
+                'key2': ['a', 2],
                 }
 
     def set(self, key, value):

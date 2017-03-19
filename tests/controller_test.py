@@ -34,12 +34,12 @@ def test_hendleGet(protocol, transport):
     assert transport.value() == 'GET usage: GET <key>\r\n'
     transport.clear()
 
-    protocol.lineReceived('GET key4')
+    protocol.lineReceived('GET key2')
     assert transport.value() == 'Found data: [\'a\', 2]\r\n'
     transport.clear()
 
-    protocol.lineReceived('GET key5')
-    assert transport.value() == 'No data for key: key5\r\n'
+    protocol.lineReceived('GET key1')
+    assert transport.value() == 'No data for key: key1\r\n'
 
 
 def test_handleSet(protocol, transport):

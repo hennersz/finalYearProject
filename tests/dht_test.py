@@ -23,9 +23,7 @@ def test_set(mock_set):
 @pytest.inlineCallbacks
 def test_get():
     dht = DHTServer(FakeDHT())
-    res = yield dht.get('key 1')
+    res = yield dht.get('key1')
     assert res is None
-    res = yield dht.get('key 2')
+    res = yield dht.get('key2')
     assert res == ['a', 2]
-    res = yield dht.get('key 3')
-    assert res is None
