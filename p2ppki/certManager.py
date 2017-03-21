@@ -25,6 +25,10 @@ def getDefaultKey(keyStore, returnHash=True):
     """Gets the default key from a keystore
     """
     privKeyHash = keyStore.getDefaultKey()
+
+    if privKeyHash is None:
+        raise ValueError('No default key set')
+
     key = keyStore.lookupKey(privKeyHash)
     if returnHash:
         return key.getPrincipal()
@@ -87,7 +91,7 @@ def loadPrivateKey(keystore, hash=None):
     """
 
     if hash is None:
-        enc = getDefaultKey(keystore)
+        enc = getDefaultKey(keystore, returnHash=False)
     else:
         enc = keystore.lookupPrivateKey(hash)
 
