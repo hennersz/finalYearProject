@@ -114,7 +114,7 @@ def getCertSubjectHash(cert, keystore):
                 continue
         raise ValueError("Unbound spki name: %s" % name)
     else:
-        return sexp.str_to_b64(getHash(name, keystore).value)
+        return sexp.str_to_b64(subject.getPrincipal().value)
 
 
 def hashToB64(h):
@@ -183,7 +183,24 @@ class CertManager():
 
         c = spki.makeCert(i, s, spki.Tag(perm))
         seq = spki.Sequence(c, privkey.sign(c))
-        self.storeCert(seq)
+        self.keystore.addCert(seq)
+        self.keystore.save()
+
+    def addCA(self, subject, issuer=None):
+        if issuer is None:
+            i = getDefaultKey(self.keystore)
+        else:
+            i = getHash(issuer, self.keystore)
+
+        s = parseHashOrName(subject, self.keystore)
+
+        enc_privkey = self.keystore.lookupPrivateKey(i)
+        privkey = enc_privkey.decrypt()
+
+        perm = spki.eval(sexp.parseText('(* set CAVerified)'))
+
+        c = spki.makeCert(i, s, spki.Tag(perm), 1)
+        seq = spki.Sequence(c, privkey.sign(c))
         self.keystore.addCert(seq)
         self.keystore.save()
 
@@ -194,9 +211,11 @@ class CertManager():
             i = getHash(issuer, self.keystore)
 
         private = loadPrivateKey(self.keystore, i)
+        pub = private.getPublicKey()
         n = spki.makeNameCert(i, subjectHash, name)
         sig = private.sign(n)
-        namecert = spki.Sequence(n, sig)
+        namecert = spki.Sequence(pub, n, sig)
+        self.storeCert(namecert)
         self.keystore.addCert(namecert)
         self.keystore.save()
 
@@ -208,7 +227,7 @@ class CertManager():
 
     @inlineCallbacks
     def getCertificates(self, keyHash):
-        key = hashToB64(keyHash) + -'certificates'
+        key = hashToB64(keyHash) + '-certificates'
         certs = yield self.dht.get(key)
         verifiedCerts = []
         for cert in certs:

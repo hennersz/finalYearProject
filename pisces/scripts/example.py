@@ -120,6 +120,8 @@ class Args(Options):
             self.__args = tuple(values)
 
     def getAccount(self):
+        if self.__object is None:
+            return
 	f = open(self.__object, "rb")
 	acct = pickle.load(f)
 	f.close()
