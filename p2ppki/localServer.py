@@ -4,12 +4,11 @@ from twisted.internet.protocol import Factory
 from twisted.internet.endpoints import TCP4ServerEndpoint
 from twisted.internet.defer import inlineCallbacks
 
+from distutils.util import strtobool
+
 
 class ControlProtocol(LineReceiver):
-
-    def __init__(self, dht):
-        self.dht = dht
-        self.supportedCommands = ['GET', 'SET']
+    self.supportedCommands = ['GET', 'SET']
 
     def connectionMade(self):
         self.sendLine("Connected")
@@ -25,6 +24,34 @@ class ControlProtocol(LineReceiver):
             self.handleSet(args)
         else:
             self.handleUnknown(data[0])
+
+    def handleList(self, args):
+        usage = "LIST usage: LIST [True|False]"
+        if len(args) > 1:
+            self.sendLine(usage)
+            return
+        elif len(args) == 1:
+            try:
+                listPriv = strtobool(args[0])
+            except ValueError:
+                self.sendLine(usage)
+                return
+        else:
+            listPriv = False
+
+        pub, priv = self.factory.keys.listLocalKeys(listPriv)
+        if pub is not None:
+            self.sendLine("Public:")
+            for key in pub:
+                self.sendLine(str(key.getPrincipal()))
+
+        if priv is not None:
+            self.sendLine("Private")
+            for key in priv:
+                self.sendLine(str(key))
+
+        if pub is None and priv is None:
+            self.sendLine("No keys found")
 
     @inlineCallbacks
     def handleGet(self, args):
@@ -56,11 +83,13 @@ class ControlProtocol(LineReceiver):
 
 
 class ControlFactory(Factory):
-    def __init__(self, dht):
-        self.dht = dht
+    protocol = ControlProtocol
 
-    def buildProtocol(self, addr):
-        return ControlProtocol(self.dht)
+    def __init__(self, dht, keys, certs, verifier):
+        self.dht = dht
+        self.keys = keys
+        self.certs = certs
+        self.verifier = verifiier
 
 
 class ControlServer(object):

@@ -30,4 +30,9 @@ class KeyManager():
                 continue
 
     def listLocalKeys(self, private=False):
-        
+        pubs = self.keystore.listPublicKeys()
+        if private:
+            privs = self.keystore.listPrivateKeys()
+        else:
+            privs = None
+        return (pubs, privs)
