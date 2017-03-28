@@ -8,7 +8,7 @@ from distutils.util import strtobool
 
 
 class ControlProtocol(LineReceiver):
-    self.supportedCommands = ['GET', 'SET']
+    supportedCommands = ['GET', 'SET']
 
     def connectionMade(self):
         self.sendLine("Connected")
@@ -22,6 +22,8 @@ class ControlProtocol(LineReceiver):
             self.handleGet(args)
         elif command == 'SET':
             self.handleSet(args)
+        elif command == 'LIST':
+            self.handleList(args)
         else:
             self.handleUnknown(data[0])
 
@@ -58,7 +60,7 @@ class ControlProtocol(LineReceiver):
         if(len(args) != 1):
             self.sendLine("GET usage: GET <key>")
         else:
-            value = yield self.dht.get(args[0])
+            value = yield self.factory.dht.get(args[0])
             if value is not None:
                 self.sendLine("Found data: %s" % (str(value)))
             else:
@@ -71,7 +73,7 @@ class ControlProtocol(LineReceiver):
         else:
             self.sendLine("Setting value %s for key %s in DHT" %
                           (args[1], args[0]))
-            success = yield self.dht.set(args[0], args[1])
+            success = yield self.factory.dht.set(args[0], args[1])
             if success:
                 self.sendLine("Success!")
             else:
@@ -89,10 +91,10 @@ class ControlFactory(Factory):
         self.dht = dht
         self.keys = keys
         self.certs = certs
-        self.verifier = verifiier
+        self.verifier = verifier
 
 
 class ControlServer(object):
-    def __init__(self, port, dht):
+    def __init__(self, port, dht, keys, certs, verifier):
         endpoint = TCP4ServerEndpoint(reactor, port)
-        endpoint.listen(ControlFactory(dht))
+        endpoint.listen(ControlFactory(dht, keys, certs, verifier))

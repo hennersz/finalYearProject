@@ -5,6 +5,7 @@ import ConfigParser
 from distutils.util import strtobool
 from os import path
 
+
 class Config(dict):
 
     def __init__(self, loc='~/.p2ppki/config.cfg'):
@@ -21,6 +22,8 @@ class Config(dict):
             self['dataDir'] = self.parser.get('settings', 'datadir')
             self['searchDepth'] = self.parser.getint('settings', 'searchdepth')
             self['verbose'] = self.parser.getboolean('settings', 'verbose')
+            self['localPort'] = self.parser.getint('settings', 'localPort')
+            
         except:
             print 'Invalid config file, please see example'
 
