@@ -3,14 +3,25 @@
 
 from context import p2ppki
 from utils import FakeDHT
+from pisces.spkilib import keystore
 from p2ppki.localServer import ControlFactory
+from p2ppki.certManager import CertManager
+from p2ppki.keyManager import KeyManager
+from p2ppki.verifier import Verifier
 from twisted.test import proto_helpers
+from os import path
 import pytest
 
 
 @pytest.fixture
 def protocol():
-    factory = ControlFactory(FakeDHT())
+    dht = FakeDHT()
+    keyStore = keystore.KeyStore('./')
+    keys = KeyManager(dht, keyStore)
+    certs = CertManager(dht, keyStore)
+    aclDir = path.join('./', 'acl')
+    verifier = Verifier(certs, keyStore, aclDir, 10)
+    factory = ControlFactory(FakeDHT(), keys, certs, verifier)
     proto = factory.buildProtocol(('127.0.0.1', 0))
     return proto
 

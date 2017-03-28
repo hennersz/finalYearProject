@@ -32,10 +32,10 @@ def getCertFromSeq(seq):
 
 class Verifier:
 
-    def __init__(self, certManager, keyStore, aclPath, depth):
+    def __init__(self, certManager, keyStore, aclDir, depth):
         self.certManager = certManager
         self.keyStore = keyStore
-        self.acl = database.ACL(aclPath)
+        self.acl = database.ACL(aclDir, create=1)
         self.verifier = verify.ReferenceMonitor(self.acl, self.keyStore, True)
         self.maxDepth = depth
 

@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from twisted.internet import defer
-import json
 
 
 class FakeDHT(object):

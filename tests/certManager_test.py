@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from context import p2ppki
-from p2ppki.certManager import getDefaultKey, getPassword, resolveName,\
+from p2ppki.utils import getDefaultKey, getPassword, resolveName,\
                                 parseHashOrName, getHash
 from pisces.spkilib import keystore, spki
 from pisces.spkilib.spki import PublicKey
@@ -12,11 +12,10 @@ import mock
 
 
 pub, priv = spki.makeRSAKeyPair(1024)
-priv.
 hashString = '(hash md5 |C/qB18lYxADHAPKUdKjRtA==|)'
 
 
-@mock.patch('p2ppki.certManager.getpass.getpass')
+@mock.patch('p2ppki.utils.getpass.getpass')
 def test_getPassword(mock_getpass):
     mock_getpass.side_effect = ['password', 'password']
     assert getPassword('prompt') == 'password'
@@ -69,7 +68,7 @@ def test_resolveName():
     assert resolveName('name', mock_keystore).getPrincipal() == pub.getPrincipal()
 
 
-@mock.patch('p2ppki.certManager.getDefaultKey')
+@mock.patch('p2ppki.utils.getDefaultKey')
 def test_parseHashOrName(mock_getDefaultKey):
     mock_keystore = mock.create_autospec(keystore.KeyStore)
 
@@ -78,15 +77,15 @@ def test_parseHashOrName(mock_getDefaultKey):
     assert str_to_b64(res.value) == 'C/qB18lYxADHAPKUdKjRtA=='
 
     mock_getDefaultKey.return_value = pub.getPrincipal()
-    
+
     res = parseHashOrName('name', mock_keystore)
     assert res.principal == pub.getPrincipal()
     assert len(res.names) == 1
     assert res.names[0] == 'name'
 
 
-@mock.patch('p2ppki.certManager.getDefaultKey')
-@mock.patch('p2ppki.certManager.resolveName')
+@mock.patch('p2ppki.utils.getDefaultKey')
+@mock.patch('p2ppki.utils.resolveName')
 def test_getHash(mock_resolveName, mock_getDefaultKey):
     mock_keystore = mock.create_autospec(keystore.KeyStore)
 
