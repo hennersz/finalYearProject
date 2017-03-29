@@ -11,10 +11,18 @@ class KeyManager():
         self.dht = dht
         self.keystore = keyStore
 
-    def insertKey(self, key):
-        h = sexp.str_to_b64(key.getPrincipal().value)
-        key = h + '-key'
-        self.dht.set(key, str(key.sexp().encode_canonical()))
+    @inlineCallbacks
+    def insertKey(self, keyHash):
+
+        h = sexp.str_to_b64(keyHash.value)
+        k = h + '-key'
+
+        key = self.keystore.lookupKey(keyHash)
+        if key is None:
+            raise ValueError("No key corresponding to hash: %s" % h)
+
+        ret = yield self.dht.set(k, str(key.sexp().encode_canonical()))
+        returnValue(ret)
 
     @inlineCallbacks
     def getKey(self, keyHash):
@@ -25,9 +33,11 @@ class KeyManager():
                 k = spki.parse(key)
                 if k.getPrincipal() == keyHash:
                     returnValue(k)
+                    break
             except sexp.ParseError:
                 # ignore invalid data from dht
                 continue
+        returnValue(None)
 
     def listLocalKeys(self, private=False):
         pubs = self.keystore.listPublicKeys()

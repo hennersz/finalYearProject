@@ -1,14 +1,18 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from twisted.internet import reactor
 from twisted.protocols.basic import LineReceiver
 from twisted.internet.protocol import Factory
 from twisted.internet.endpoints import TCP4ServerEndpoint
-from twisted.internet.defer import inlineCallbacks
+from twisted.internet.defer import inlineCallbacks, returnValue
 
 from distutils.util import strtobool
+from utils import parseKeyIdInput
 
 
 class ControlProtocol(LineReceiver):
-    supportedCommands = ['GET', 'SET']
+    supportedCommands = ['GET', 'SET', 'LIST', 'NAME', 'TRUST']
 
     def connectionMade(self):
         self.sendLine("Connected")
@@ -57,27 +61,150 @@ class ControlProtocol(LineReceiver):
 
     @inlineCallbacks
     def handleGet(self, args):
-        if(len(args) != 1):
-            self.sendLine("GET usage: GET <key>")
+        usage = "GET usage: GET [KEY|CERT]"
+        if(len(args) < 2):
+            self.sendLine(usage)
+            returnValue(None)
+
+        cmd = args[0].upper()
+
+        if cmd == 'KEY':
+            self.getKey(args[1:])
         else:
-            value = yield self.factory.dht.get(args[0])
-            if value is not None:
-                self.sendLine("Found data: %s" % (str(value)))
-            else:
-                self.sendLine("No data for key: %s" % (args[0]))
+            self.sendLine(usage)
 
     @inlineCallbacks
     def handleSet(self, args):
-        if(len(args) != 2):
-            self.sendLine("SET usage: SET <key> <value>")
+        usage = "SET usage: SET [KEY|CERT] <args>"
+        if(len(args) < 2):
+            self.sendLine(usage)
+            returnValue(None)
+
+        cmd = args[0].upper()
+
+        if cmd == 'KEY':
+            self.setKey(args[1:])
         else:
-            self.sendLine("Setting value %s for key %s in DHT" %
-                          (args[1], args[0]))
-            success = yield self.factory.dht.set(args[0], args[1])
-            if success:
-                self.sendLine("Success!")
-            else:
-                self.sendLine("Faliure :(")
+            self.sendLine(usage)
+
+    @inlineCallbacks
+    def setKey(self, args):
+        usage = "SET KEY usage: SET KEY <keyId>"
+
+        if len(args) != 1:
+            self.sendLine(usage)
+            returnValue(None)
+
+        try:
+            keyHash = parseKeyIdInput(args[0], self.factory.keystore)
+        except (NameError, ValueError), e:
+            self.sendLine(str(e))
+            returnValue(None)
+
+        try:
+            ret = yield self.factory.keys.insertKey(keyHash)
+        except ValueError, e:
+            self.sendLine(str(e))
+
+        if ret:
+            self.sendLine("Successfully set key in dht")
+        else:
+            self.sendLine("Failed to set key in dht")
+
+    @inlineCallbacks
+    def getKey(self, args):
+        usage = "GET KEY <keyHash>"
+
+        if len(args) != 1:
+            self.sendLine(usage)
+            returnValue(None)
+
+        try:
+            keyHash = parseKeyIdInput(args[0],
+                                      self.factory.keystore,
+                                      parseName=False)
+        except ValueError, e:
+            self.sendLine(str(e))
+            returnValue(None)
+
+        key = yield self.factory.keys.getKey(keyHash)
+
+        if key is None:
+            self.sendLine("No key found for hash %s" % args[0])
+        else:
+            self.factory.keystore.addPublicKey(key)
+            self.factory.keystore.save()
+            self.sendLine("Successfully retrieved key for hash %s" % args[0])
+
+    @inlineCallbacks
+    def getCerts(self, args):
+        usage = "GET CERTS <subjectId>"
+
+        if len(args) != 1:
+            self.sendLine(usage)
+            returnValue(None)
+
+        try:
+            keyHash = parseKeyIdInput(args[0], self.factory.keystore)
+        except (NameError, ValueError), e:
+            self.sendLine(str(e))
+            returnValue(None)
+
+        certs = yield self.factory.certs.getCertificates(keyHash)
+        if certs == []:
+            self.sendLine("No certificates found for %s" % args[0])
+            returnValue(None)
+
+        self.sendLine("Found %d certificates" % len(certs))
+        for cert in certs:
+            self.keystore.addCert(cert)
+
+    @inlineCallbacks
+    def name(self, args):
+        usage = "NAME <subjectHash> <name> [issuerId]"
+
+        if len(args) < 2:
+            self.sendLine(usage)
+            returnValue(None)
+        elif len(args) > 3:
+            self.sendLine(usage)
+            returnValue(None)
+
+        try:
+            subjHash = parseKeyIdInput(args[0],
+                                       self.factory.keystore,
+                                       parseName=False)
+        except ValueError, e:
+            self.sendLine(str(e))
+            returnValue(None)
+
+        if len(args) == 3:
+            try:
+                issuerHash = parseKeyIdInput(args[2], self.factory.keystore)
+            except ValueError, e:
+                self.sendLine(str(e))
+                returnValue(None)
+        else:
+            issuerHash = None
+
+        ret = yield self.factory.certs.name(subjHash, args[1], issuerHash)
+        if ret:
+            self.sendLine("Successful")
+        else:
+            self.sendLine("Failed")
+
+    def trust(self, args):
+        usage = "TRUST <subjectId>"
+
+        if len(args) != 1:
+            self.sendLine(usage)
+            returnValue(None)
+
+        try:
+            issuerHash = parseKeyIdInput(args[0], self.factory.keystore)
+        except ValueError, e:
+            self.sendLine(str(e))
+            returnValue(None)
 
     def handleUnknown(self, command):
         self.sendLine("Unknown command: %s" % (command))
@@ -87,11 +214,12 @@ class ControlProtocol(LineReceiver):
 class ControlFactory(Factory):
     protocol = ControlProtocol
 
-    def __init__(self, dht, keys, certs, verifier):
+    def __init__(self, dht, keys, certs, verifier, keystore):
         self.dht = dht
         self.keys = keys
         self.certs = certs
         self.verifier = verifier
+        self.keystore = keystore
 
 
 class ControlServer(object):

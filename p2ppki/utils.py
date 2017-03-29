@@ -21,7 +21,7 @@ def getPassword(prompt):
     return first
 
 
-def parseKeyIdInput(buf, keystore):
+def parseKeyIdInput(buf, keystore, parseName=True):
     """Parses a string into a spki.Hash object
 
     String  could be a sexp, a base 64 encoded version of the hash or a name
@@ -51,6 +51,9 @@ def parseKeyIdInput(buf, keystore):
         else:
             return p
 
+    if not parseName:
+        raise ValueError("Unable to parse %s to hash" % buf)
+
     ns = keystore.getDefaultKey()
     if ns is None:
         raise ValueError('No default key specified')
@@ -64,6 +67,8 @@ def parseKeyIdInput(buf, keystore):
                 subj = elt.getSubject().getPrincipal()
                 matches.append(subj)
     l = len(matches)
+    if l == 0:
+        raise NameError('No key bound to name: %s' % buf)
     if l != 1:
         raise NameError('Ambiguous name: %s matches %d keys' % (buf, l))
 

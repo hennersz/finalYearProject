@@ -3,7 +3,7 @@
 
 from pisces.spkilib import spki, sexp
 from twisted.internet.defer import inlineCallbacks, returnValue
-from utils import getDefaultKey, parseHashOrName, getHash, loadPrivateKey,\
+from utils import getDefaultKey, loadPrivateKey,\
                   hashToB64, getCertSubjectHash
 
 
@@ -54,60 +54,55 @@ class CertManager():
 
     def trust(self, subject, issuer=None):
         if issuer is None:
-            i = getDefaultKey(self.keystore)
-        else:
-            i = getHash(issuer, self.keystore)
+            issuer = getDefaultKey(self.keystore)
 
-        s = parseHashOrName(subject, self.keystore)
-
-        enc_privkey = self.keystore.lookupPrivateKey(i)
+        enc_privkey = self.keystore.lookupPrivateKey(issuer)
         privkey = enc_privkey.decrypt()
 
         perm = spki.eval(sexp.parseText('(* set Trusted)'))
 
-        c = spki.makeCert(i, s, spki.Tag(perm))
+        c = spki.makeCert(issuer, subject, spki.Tag(perm))
         seq = spki.Sequence(c, privkey.sign(c))
         self.keystore.addCert(seq)
         self.keystore.save()
 
     def addCA(self, subject, issuer=None):
         if issuer is None:
-            i = getDefaultKey(self.keystore)
-        else:
-            i = getHash(issuer, self.keystore)
+            issuer = getDefaultKey(self.keystore)
 
-        s = parseHashOrName(subject, self.keystore)
-
-        enc_privkey = self.keystore.lookupPrivateKey(i)
+        enc_privkey = self.keystore.lookupPrivateKey(issuer)
         privkey = enc_privkey.decrypt()
 
         perm = spki.eval(sexp.parseText('(* set CAVerified)'))
 
-        c = spki.makeCert(i, s, spki.Tag(perm), 1)
+        c = spki.makeCert(issuer, subject, spki.Tag(perm), 1)
         seq = spki.Sequence(c, privkey.sign(c))
         self.keystore.addCert(seq)
         self.keystore.save()
 
-    def name(self, subjectHash, name, issuer=None):
+    @inlineCallbacks
+    def name(self, subject, name, issuer=None):
         if issuer is None:
-            i = getDefaultKey(self.keystore)
-        else:
-            i = getHash(issuer, self.keystore)
+            issuer = getDefaultKey(self.keystore)
 
-        private = loadPrivateKey(self.keystore, i)
+        private = loadPrivateKey(self.keystore, issuer)
         pub = private.getPublicKey()
-        n = spki.makeNameCert(i, subjectHash, name)
+
+        n = spki.makeNameCert(issuer, subject, name)
         sig = private.sign(n)
         namecert = spki.Sequence(pub, n, sig)
-        self.storeCert(namecert)
+
+        ret = yield self.storeCert(namecert)
         self.keystore.addCert(namecert)
         self.keystore.save()
+        returnValue(ret)
 
     @inlineCallbacks
     def storeCert(self, certificate):
         h = getCertSubjectHash(certificate)
         key = str(h) + '-certificates'
-        self.dht.set(key, str(certificate.sexp().encode_canonical()))
+        ret = yield self.dht.set(key, str(certificate.sexp().encode_canonical()))
+        returnValue(ret)
 
     @inlineCallbacks
     def getCertificates(self, keyHash):
