@@ -31,7 +31,7 @@ class ListStorage(object):
         result = []
         for item in self.data[key]:
             result.append(item[1])
-        return result
+        return json.dumps(result)
 
     def get(self, key, default=None):
         if key in self.data:

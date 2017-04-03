@@ -44,7 +44,7 @@ def verifyCertSig(certSeq, keyStore):
         raise VerifyError("could not find key to verify signature")
     if not key.verify(cert, sig):
         raise VerifyError("could not verify signature for cert")
-    return spki.Sequence([cert, sig])
+    return spki.Sequence(cert, sig)
 
 
 class CertManager():
@@ -99,7 +99,7 @@ class CertManager():
 
     @inlineCallbacks
     def storeCert(self, certificate):
-        h = getCertSubjectHash(certificate)
+        h = getCertSubjectHash(certificate, self.keystore)
         key = str(h) + '-certificates'
         ret = yield self.dht.set(key, str(certificate.sexp().encode_canonical()))
         returnValue(ret)
@@ -107,7 +107,12 @@ class CertManager():
     @inlineCallbacks
     def getCertificates(self, keyHash):
         key = hashToB64(keyHash) + '-certificates'
+
         certs = yield self.dht.get(key)
+        
+        if certs is None:
+            returnValue(None)
+
         verifiedCerts = []
         for cert in certs:
             try:

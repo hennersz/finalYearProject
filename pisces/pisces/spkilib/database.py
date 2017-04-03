@@ -144,8 +144,8 @@ class CertificateDatabase(AbstractDatabase):
             print sexp.pprint(obj.sexp())
             return
 
-        sexp = obj.sexp().encode_canonical()
-        if self.identity.has_key(sexp):
+        sexpr = obj.sexp().encode_canonical()
+        if self.identity.has_key(sexpr):
             print "Warning: Duplicate certificate ignored."
             return
 

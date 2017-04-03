@@ -46,7 +46,7 @@ def init(conf):
     verifier = Verifier(certs, keyStore, aclDir, conf["searchDepth"])
 
     # Return value so it doesn't get garbage collected
-    returnValue(ControlServer(8007, dht, keys, certs, verifier))
+    returnValue(ControlServer(8007, dht, keys, certs, verifier, keyStore))
 
 
 if(__name__ == "__main__"):

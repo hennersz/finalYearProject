@@ -12,7 +12,7 @@ from utils import parseKeyIdInput
 
 
 class ControlProtocol(LineReceiver):
-    supportedCommands = ['GET', 'SET', 'LIST', 'NAME', 'TRUST']
+    supportedCommands = ['GET', 'SET', 'LIST', 'NAME', 'TRUST', 'IDENTIFY']
 
     def connectionMade(self):
         self.sendLine("Connected")
@@ -28,6 +28,12 @@ class ControlProtocol(LineReceiver):
             self.handleSet(args)
         elif command == 'LIST':
             self.handleList(args)
+        elif command == 'NAME':
+            self.name(args)
+        elif command == 'TRUST':
+            self.trust(args)
+        elif command == 'IDENTIFY':
+            self.identify(args)
         else:
             self.handleUnknown(data[0])
 
@@ -59,31 +65,33 @@ class ControlProtocol(LineReceiver):
         if pub is None and priv is None:
             self.sendLine("No keys found")
 
-    @inlineCallbacks
     def handleGet(self, args):
-        usage = "GET usage: GET [KEY|CERT]"
+        usage = "GET usage: GET [KEY|CERTS]"
         if(len(args) < 2):
             self.sendLine(usage)
-            returnValue(None)
+            return None
 
         cmd = args[0].upper()
 
         if cmd == 'KEY':
             self.getKey(args[1:])
+        elif cmd == 'CERTS':
+            self.getCerts(args[1:])
         else:
             self.sendLine(usage)
 
-    @inlineCallbacks
     def handleSet(self, args):
-        usage = "SET usage: SET [KEY|CERT] <args>"
+        usage = "SET usage: SET [KEY|CERTS] <args>"
         if(len(args) < 2):
             self.sendLine(usage)
-            returnValue(None)
+            return None
 
         cmd = args[0].upper()
 
         if cmd == 'KEY':
             self.setKey(args[1:])
+        elif cmd == 'CERTS':
+            self.setCerts(args[1:])
         else:
             self.sendLine(usage)
 
@@ -105,6 +113,7 @@ class ControlProtocol(LineReceiver):
             ret = yield self.factory.keys.insertKey(keyHash)
         except ValueError, e:
             self.sendLine(str(e))
+            returnValue(None)
 
         if ret:
             self.sendLine("Successfully set key in dht")
@@ -151,13 +160,39 @@ class ControlProtocol(LineReceiver):
             returnValue(None)
 
         certs = yield self.factory.certs.getCertificates(keyHash)
-        if certs == []:
+        if certs == [] or certs is None:
             self.sendLine("No certificates found for %s" % args[0])
             returnValue(None)
 
         self.sendLine("Found %d certificates" % len(certs))
         for cert in certs:
-            self.keystore.addCert(cert)
+            self.factory.keystore.addCert(cert)
+        returnValue(None)
+
+    @inlineCallbacks
+    def setCerts(self, args):
+        usage = "SET CERTS <subjId>"
+
+        if len(args) != 1:
+            self.sendLine(usage)
+            returnValue(None)
+
+        try:
+            keyHash = parseKeyIdInput(args[0], self.factory.keystore)
+        except (NameError, ValueError), e:
+            self.sendLine(str(e))
+            returnValue(None)
+
+        certs = self.factory.keystore.lookupCertBySubject(keyHash)
+
+        if certs == []:
+            self.sendLine("No certs found for %s" % args[0])
+            returnValue(None)
+
+        for cert in certs:
+            res = yield self.factory.certs.storeCert(cert)
+            if not res:
+                self.sendLine("A certificate failed to insert")
 
     @inlineCallbacks
     def name(self, args):
@@ -181,7 +216,7 @@ class ControlProtocol(LineReceiver):
         if len(args) == 3:
             try:
                 issuerHash = parseKeyIdInput(args[2], self.factory.keystore)
-            except ValueError, e:
+            except (NameError, ValueError), e:
                 self.sendLine(str(e))
                 returnValue(None)
         else:
@@ -198,13 +233,41 @@ class ControlProtocol(LineReceiver):
 
         if len(args) != 1:
             self.sendLine(usage)
+            return
+
+        try:
+            subjHash = parseKeyIdInput(args[0], self.factory.keystore)
+        except (NameError, ValueError), e:
+            self.sendLine(str(e))
+            return
+
+        self.factory.certs.trust(subjHash)
+        self.sendLine("Done!")
+
+    @inlineCallbacks
+    def identify(self, args):
+        usage = "IDENTIFY <keyHash>"
+
+        if len(args) != 1:
+            self.sendLine(usage)
             returnValue(None)
 
         try:
-            issuerHash = parseKeyIdInput(args[0], self.factory.keystore)
+            subjHash = parseKeyIdInput(args[0],
+                                       self.factory.keystore,
+                                       parseName=False)
         except ValueError, e:
             self.sendLine(str(e))
             returnValue(None)
+
+        names = yield self.factory.verifier.identify(subjHash)
+
+        if names == []:
+            self.sendLine("Could not identify hash %s" % args[0])
+            returnValue(None)
+        self.sendLine("Found these names:")
+        for name in names:
+            self.sendLine(name)
 
     def handleUnknown(self, command):
         self.sendLine("Unknown command: %s" % (command))
@@ -223,6 +286,6 @@ class ControlFactory(Factory):
 
 
 class ControlServer(object):
-    def __init__(self, port, dht, keys, certs, verifier):
+    def __init__(self, port, dht, keys, certs, verifier, keystore):
         endpoint = TCP4ServerEndpoint(reactor, port)
-        endpoint.listen(ControlFactory(dht, keys, certs, verifier))
+        endpoint.listen(ControlFactory(dht, keys, certs, verifier, keystore))

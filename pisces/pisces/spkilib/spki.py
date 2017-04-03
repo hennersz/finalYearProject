@@ -154,7 +154,6 @@ class VerifyError(ValueError):
 def isPrincipal(obj):
     return isinstance(obj, PublicKey) or isinstance(obj, Hash)
 
-#
 # classes for SPKI objects
 
 class SPKIObject:

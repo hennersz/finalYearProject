@@ -65,7 +65,8 @@ def parseKeyIdInput(buf, keystore, parseName=True):
         for elt in seq:
             if isinstance(elt, spki.Cert) and elt.isNameCert():
                 subj = elt.getSubject().getPrincipal()
-                matches.append(subj)
+                if subj not in matches:
+                    matches.append(subj)
     l = len(matches)
     if l == 0:
         raise NameError('No key bound to name: %s' % buf)

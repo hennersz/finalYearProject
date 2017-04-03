@@ -1,0 +1,3 @@
+SET KEY Dave
+GET CERTS
+LIST

@@ -32,10 +32,13 @@ def getCertFromSeq(seq):
 
 class Verifier:
 
-    def __init__(self, certManager, keyStore, aclDir, depth):
+    def __init__(self, certManager, keyStore, acl, depth):
         self.certManager = certManager
         self.keyStore = keyStore
-        self.acl = database.ACL(aclDir, create=1)
+        if isinstance(acl, str):
+            self.acl = database.ACL(acl, create=1)
+        else:
+            self.acl = acl
         self.verifier = verify.ReferenceMonitor(self.acl, self.keyStore, True)
         self.maxDepth = depth
 
@@ -52,14 +55,11 @@ class Verifier:
                 self.verifier.checkPermission(issuer, 'CATrusted')
             except verify.SecurityError:
                 i = getCertFromSeq(seq).getIssuer().getPrincipal()
-                r = yield findChain(i, depth+1)
+                r = yield self.findChain(i, depth+1)
                 res = res or r
         returnValue(res)
 
-    @inlineCallbacks
-    def identifiy(self, keyHash):
-        """keyHash must be a spki.Hash object
-        """
+    def checkLocalNames(self, keyHash):
         certs = self.keyStore.lookupCertBySubject(keyHash)
         validNames = []
         for cert in certs:
@@ -73,47 +73,68 @@ class Verifier:
                 name = cert.getIssuer().getPrincipal()
                 for n in name.names:
                     validNames.append(n)
+        return validNames
 
-        if validNames == []:
-            newCerts = yield self.certManager.getCertificates(keyHash)
-            nameCerts = filterNameCerts(newCerts)
-            untrustedIssuers = []
+    @inlineCallbacks
+    def checkTrusted(self, keyHash):
+        newCerts = yield self.certManager.getCertificates(keyHash)
+        nameCerts = filterNameCerts(newCerts)
+        untrustedIssuers = []
+        validNames = []
 
-            for seq in nameCerts:
-                c = getCertFromSeq(seq)
+        for seq in nameCerts:
+            c = getCertFromSeq(seq)
 
-                #  Slightly unintuitive but name certs should have a
-                #  FullyQualifiedName object as the issuer principal
-                #  where the principle is the hash of the issuer
-                #  and names is a list of names asigned to the key
-                i = c.getIssuer().getPrincipal().getPrincipal()
+            #  Slightly unintuitive but name certs should have a
+            #  FullyQualifiedName object as the issuer principal
+            #  where the principle is the hash of the issuer
+            #  and names is a list of names asigned to the key
+            i = c.getIssuer().getPrincipal().getPrincipal()
+            try:
+                self.verifier.checkPermission(i, 'Trusted')
+            except verify.SecurityError:
                 try:
-                    self.verifier.checkPermission(i, 'Trusted')
-                except verify.SecurityError:
-                    try:
-                        self.verifier.checkPermission(i, 'CATrusted')
-                    except:
-                        untrustedIssuers.append((i, seq))
-                    else:
-                        self.keyStore.addCert(seq)
-                        name = c.getIssuer().getPrincipal()
-                        for n in name.names:
-                            validNames.append(n)
+                    self.verifier.checkPermission(i, 'CATrusted')
+                except:
+                    untrustedIssuers.append((i, seq))
                 else:
                     self.keyStore.addCert(seq)
                     name = c.getIssuer().getPrincipal()
                     for n in name.names:
                         validNames.append(n)
+            else:
+                self.keyStore.addCert(seq)
+                name = c.getIssuer().getPrincipal()
+                for n in name.names:
+                    validNames.append(n)
+
+        returnValue((validNames, untrustedIssuers))
+
+    @inlineCallbacks
+    def checkCA(self, untrustedIssuers):
+        validNames = []
+        for issuer in untrustedIssuers:
+            found = yield self.findChain(issuer[0], 1)
+            if found:
+                c = getCertFromSeq(issuer[1])
+                self.keyStore.addCert(issuer[1])
+                name = c.getIssuer().getPrincipal()
+                for n in name.names:
+                    validNames.append(n)
+
+        returnValue(validNames)
+
+    @inlineCallbacks
+    def identify(self, keyHash):
+        """keyHash must be a spki.Hash object
+        """
+        validNames = self.checkLocalNames(keyHash)
 
         if validNames == []:
-            for issuer in untrustedIssuers:
-                found = yield self.findChain(issuer[0], 1)
-                if found:
-                    c = getCertFromSeq(issuer[1])
-                    self.keyStore.addCert(issuer[1])
-                    name = c.getIssuer().getPrincipal()
-                    for n in name.names:
-                        validNames.append(n)
+            validNames, untrustedIssuers = yield self.checkTrusted(keyHash)
+
+        if validNames == []:
+            validNames = self.checkCA(untrustedIssuers)
 
         self.keyStore.save()
 

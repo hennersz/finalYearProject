@@ -28,6 +28,10 @@ class KeyManager():
     def getKey(self, keyHash):
         key = sexp.str_to_b64(keyHash.value) + '-key'
         keys = yield self.dht.get(key)
+
+        if keys is None:
+            returnValue(None)
+
         for key in keys:
             try:
                 k = spki.parse(key)
