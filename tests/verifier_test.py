@@ -13,7 +13,7 @@ import pytest
 
 @pytest.fixture(scope='module')
 def keys():
-    return genNKeys(10)
+    return genNKeys(20)
 
 
 @pytest.fixture(scope='module')
@@ -47,9 +47,10 @@ def certs(keys, ks):
     n = makeNameCert(trusted[1], named[0], 'Alice')
     l = makeNameCert(mainKey[1], localName[0], 'Bob')
     c = makeNameCert(keys[9][1], caNamed[0], 'charlie')
-    chain = makeCertChain(keys[5:], mainKey[1])
+    chain1 = makeCertChain(keys[5:10], mainKey[1])
+    chain2 = makeCertChain(keys[10:], mainKey[1])
     ks.addCert(l)
-    return [n, c] + chain
+    return [n, c] + chain1 + chain2
 
 
 @pytest.fixture(scope='module')
@@ -83,6 +84,10 @@ def test_chain(ver, keys):
     h = keys[9][0].getPrincipal()
     res = yield ver.findChain(h, 1)
     assert res
+    h = keys[19][0].getPrincipal()
+    res = yield ver.findChain(h, 1)
+    assert not res
+
 
 
 @pytest.inlineCallbacks
