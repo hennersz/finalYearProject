@@ -57,6 +57,8 @@ class Verifier:
                 i = getCertFromSeq(seq).getIssuer().getPrincipal()
                 r = yield self.findChain(i, depth+1)
                 res = res or r
+            else:
+                returnValue(True)
         returnValue(res)
 
     def checkLocalNames(self, keyHash):
@@ -89,7 +91,7 @@ class Verifier:
             #  FullyQualifiedName object as the issuer principal
             #  where the principle is the hash of the issuer
             #  and names is a list of names asigned to the key
-            i = c.getIssuer().getPrincipal().getPrincipal()
+            i = c.getIssuer().getPrincipal().principal
             try:
                 self.verifier.checkPermission(i, 'Trusted')
             except verify.SecurityError:

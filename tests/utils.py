@@ -3,7 +3,8 @@
 
 from twisted.internet import defer
 from pisces.spkilib import spki, sexp
-from context.p2ppki.utils import hashToB64, getCertSubjectHash
+from context import p2ppki
+from p2ppki.utils import hashToB64, getCertSubjectHash
 import base64
 import json
 import os
@@ -29,7 +30,7 @@ def saveKey(pub, priv, keystore):
 
 
 def makeNameCert(issuer, subject, name):
-    n = spki.makeNameCert(issuer.getPrincipal(), subject.getPrincipal, name)
+    n = spki.makeNameCert(issuer.getPrincipal(), subject.getPrincipal(), name)
     sig = issuer.sign(n)
     seq = spki.Sequence(n, sig, issuer.getPublicKey())
     return seq
@@ -37,7 +38,7 @@ def makeNameCert(issuer, subject, name):
 
 def makeTrustCert(issuer, subject):
     perm = spki.eval(sexp.parseText('(* set Trusted)'))
-    c = spki.makeCert(issuer.getPrincipal(), subject.getPrincipal(), perm)
+    c = spki.makeCert(issuer.getPrincipal(), subject.getPrincipal(), spki.Tag(perm))
     sig = issuer.sign(c)
     seq = spki.Sequence(c, sig, issuer.getPublicKey())
     return seq
@@ -45,7 +46,7 @@ def makeTrustCert(issuer, subject):
 
 def makeCACert(issuer, subject, intermediate):
     perm = spki.eval(sexp.parseText('(* set CATrusted)'))
-    c = spki.makeCert(issuer.getPrincipal(), subject.getPrincipal(), perm,
+    c = spki.makeCert(issuer.getPrincipal(), subject.getPrincipal(), spki.Tag(perm),
                       intermediate)
     sig = issuer.sign(c)
     seq = spki.Sequence(c, sig, issuer.getPublicKey())
@@ -55,8 +56,16 @@ def makeCACert(issuer, subject, intermediate):
 def initACL(acl, keystore):
     key = keystore.getDefaultKey()
     perm = spki.eval(sexp.parseText('(*)'))
-    c = spki.makeAclEntry(key.getPrincipal(), [], 1, perm)
+    c = spki.makeAclEntry(key, [], 1, perm)
     acl.add(c)
+
+
+def makeCertChain(keys, root):
+    chain = []
+    chain.append(makeCACert(root, keys[0][0], 1))
+    for i in range(len(keys)-1):
+        chain.append(makeCACert(keys[i][1], keys[i+1][0], i != (len(keys)-2)))
+    return chain
 
 
 class FakeDHT(object):
@@ -72,12 +81,12 @@ class FakeDHT(object):
 
         for key in keys:
             k = hashToB64(key.getPrincipal())
-            self.data[k+'-key'] = str(key.sexp().encode_canonical())
+            self.data[k+'-key'] = [str(key.sexp().encode_canonical())]
 
         for cert in certs:
             h = getCertSubjectHash(cert, keystore)
             k = str(h) + '-certificates'
-            self.data[k] = str(cert.sexp().encode_canonical())
+            self.data[k] = [str(cert.sexp().encode_canonical())]
 
     def set(self, key, value):
         """Imitates kademlia DHT server set function
