@@ -2,6 +2,8 @@
 branch = True
 source = p2ppki/
 omit = pisces/*
+       pisces/pisces/*
+       pisces/pisces/spkilib/*
 
 [report]
 exclude_lines =
