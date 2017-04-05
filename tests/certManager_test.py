@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from context import p2ppki
 from p2ppki.utils import getDefaultKey, getPassword, resolveName,\
                                 parseHashOrName, getHash
 from pisces.spkilib import keystore, spki

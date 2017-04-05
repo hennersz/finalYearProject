@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from context import p2ppki
 from utils import FakeDHT, genNKeys,  saveKey,\
                   makeNameCert, makeTrustCert, makeCertChain, initACL,\
                   InMemACL, InMemKeyStore
-from pisces.spkilib import keystore, database
 from p2ppki.certManager import CertManager
 from p2ppki.verifier import Verifier
 

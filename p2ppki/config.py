@@ -24,7 +24,7 @@ class Config(dict):
             self['verbose'] = self.parser.getboolean('settings', 'verbose')
             self['localPort'] = self.parser.getint('settings', 'localPort')
             self['remotePort'] = self.parser.getint('settings', 'remotePort')
-            
+
         except:
             print 'Invalid config file, please see example'
 

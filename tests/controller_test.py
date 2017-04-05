@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from context import p2ppki
 from utils import FakeDHT
 from pisces.spkilib import keystore
 from p2ppki.localServer import ControlFactory

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from context import p2ppki
 from p2ppki.storage import ListStorage
 import mock
 import json
