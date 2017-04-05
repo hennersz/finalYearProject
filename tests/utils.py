@@ -3,7 +3,6 @@
 
 from twisted.internet import defer
 from pisces.spkilib import spki, sexp, database, keystore
-from context import p2ppki
 from p2ppki.utils import hashToB64, getCertSubjectHash
 import base64
 import json
