@@ -136,7 +136,7 @@ class Verifier:
             validNames, untrustedIssuers = yield self.checkTrusted(keyHash)
 
         if validNames == []:
-            validNames = self.checkCA(untrustedIssuers)
+            validNames = yield self.checkCA(untrustedIssuers)
 
         self.keyStore.save()
 

@@ -3,7 +3,8 @@
 
 from context import p2ppki
 from utils import FakeDHT, genNKeys,  saveKey,\
-                  makeNameCert, makeTrustCert, makeCertChain, initACL
+                  makeNameCert, makeTrustCert, makeCertChain, initACL,\
+                  InMemACL, InMemKeyStore
 from pisces.spkilib import keystore, database
 from p2ppki.certManager import CertManager
 from p2ppki.verifier import Verifier
@@ -18,7 +19,7 @@ def keys():
 
 @pytest.fixture(scope='module')
 def ks(keys):
-    keyStore = keystore.KeyStore('./')
+    keyStore = InMemKeyStore()
     mainKey = keys[0]
     trusted = keys[1]
     saveKey(mainKey[0], mainKey[1], keyStore)
@@ -30,7 +31,7 @@ def ks(keys):
 
 @pytest.fixture(scope='module')
 def acl(ks):
-    acl = database.ACL('./', create=1)
+    acl = InMemACL()
     initACL(acl, ks)
     return acl
 
@@ -78,21 +79,46 @@ def test_trusted(ver, keys):
     assert len(names) == 1
     assert names[0] == 'Alice'
 
+    h = keys[4][0].getPrincipal()
+    _, untrusted = yield ver.checkTrusted(h)
+    assert len(untrusted) == 1
+    assert untrusted[0][0] == keys[9][1].getPrincipal()
+
 
 @pytest.inlineCallbacks
 def test_chain(ver, keys):
+    # Check valid chain is correctly found
     h = keys[9][0].getPrincipal()
     res = yield ver.findChain(h, 1)
     assert res
+
+    # Check long chain fails to verify
     h = keys[19][0].getPrincipal()
     res = yield ver.findChain(h, 1)
     assert not res
 
 
-
 @pytest.inlineCallbacks
 def test_identify(ver, keys):
+    # Check it finds a local name
+    h = keys[2][0].getPrincipal()
+    names = yield ver.identify(h)
+    assert len(names) == 1
+    assert names[0] == 'Alice'
+
+    # Check it finds a name issued by someone trusted
+    h = keys[3][0].getPrincipal()
+    names = yield ver.identify(h)
+    assert len(names) == 1
+    assert names[0] == 'Bob'
+
+    # Check it finds a name issued from a certificate chain
     h = keys[4][0].getPrincipal()
     names = yield ver.identify(h)
     assert len(names) == 1
     assert names[0] == 'charlie'
+
+    # Check an empty list is returned when no names are found
+    h = keys[5][0].getPrincipal()
+    names = yield ver.identify(h)
+    assert len(names) == 0

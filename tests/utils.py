@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from twisted.internet import defer
-from pisces.spkilib import spki, sexp
+from pisces.spkilib import spki, sexp, database, keystore
 from context import p2ppki
 from p2ppki.utils import hashToB64, getCertSubjectHash
 import base64
@@ -120,3 +120,60 @@ class FakeDHT(object):
         # defer.succeed will return instantly and
         # doenst need to touch rector event loop
         return defer.succeed(self.data[key])
+
+
+class InMemACL(database.ACL):
+    def __init__(self):
+        self.entries = {}
+
+    def reload(self):
+        pass
+
+    def rewrite(self):
+        pass
+
+
+class InMemCertificateDatabase(database.CertificateDatabase):
+    def __init__(self):
+        self.byIssuer = {}
+        self.bySubject = {}
+        self.identity = {}
+
+    def reload(self):
+        pass
+
+    def rewrite(self):
+        pass
+
+
+class InMemePrincipalDataBase(database.PrincipalDatabase):
+    def __init__(self):
+        self.principals = {}
+
+    def reload(self):
+        pass
+
+    def rewrite(self):
+        pass
+
+
+class InMemePrivateKeyDatabase(database.PrivateKeyDatabase):
+    def __init__(self):
+        self.keys = {}
+        self.default = None
+        self.loadState = self.LOAD_PUB
+
+    def reload(self):
+        pass
+
+    def rewrite(self):
+        pass
+
+
+class InMemKeyStore(keystore.KeyStore):
+    def __init__(self):
+        self.keys = InMemePrincipalDataBase()
+        self.private = InMemePrivateKeyDatabase()
+        self.certs = InMemCertificateDatabase()
+        self.default = None
+        self.needSave = 0
