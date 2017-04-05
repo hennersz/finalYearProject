@@ -49,7 +49,7 @@ def init(conf):
     returnValue(ControlServer(8007, dht, keys, certs, verifier, keyStore))
 
 
-if(__name__ == "__main__"):
+if __name__ == "__main__":
     conf = Config('~/.p2ppki/config.cfg')
     init(conf)
     reactor.run()
