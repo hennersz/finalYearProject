@@ -1,9 +1,5 @@
-tox>=2.5.0
-pytest>=3.0.4
+tox
 twisted
 kademlia
-gnupg
 pycrypto
 git+https://github.com/hennersz/pisces.git
-mock
-pytest-twisted
