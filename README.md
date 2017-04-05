@@ -4,7 +4,7 @@
 
 A peer to peer public key distribution system using the kademlia DHT and SPKI certificates
 
-## Requirements
+## Requirements
 Python 2.7
 
 pip
