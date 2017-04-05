@@ -4,6 +4,6 @@ twisted
 kademlia
 gnupg
 pycrypto
-./pisces
+git+https://github.com/hennersz/pisces.git
 mock
 pytest-twisted
