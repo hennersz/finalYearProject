@@ -128,7 +128,11 @@ class FakeDHT(object):
         """
         # defer.succeed will return instantly and
         # doenst need to touch rector event loop
-        return defer.succeed(self.data[key])
+        try:
+            val = self.data[key]
+        except KeyError:
+            val = None
+        return defer.succeed(val)
 
 
 class InMemACL(database.ACL):

@@ -3,8 +3,11 @@
 
 from helpers import createKeystore, makeTrustCert, InMemKeyStore, FakeDHT
 from p2ppki.backend.certManager import verifyCertSig, VerifyError, CertManager
+from p2ppki.utils import hashToB64
 from pisces.spkilib import spki
+from twisted.internet import defer
 import pytest
+import mock
 
 
 @pytest.fixture()
@@ -86,8 +89,85 @@ def test_trust(ks):
     assert isinstance(seq[0], spki.Cert)
     assert isinstance(verifyCertSig(seq, keystore), spki.Sequence)
     assert seq[0].getTag().contains('Trusted')
-    
+
     c.trust(key2[0].getPrincipal())
     assert(len(keystore.lookupCertByIssuer(default[0].getPrincipal())) == 1)
 
 
+@pytest.inlineCallbacks
+def test_addCA(ks):
+    keystore = ks[0]
+    keys = ks[1]
+    default = keys[0]
+    key1 = keys[1]
+    key2 = keys[2]
+    dht = FakeDHT()
+
+    c = CertManager(dht, keystore)
+    res = yield c.addCA(key2[0].getPrincipal(), 1, key1[0].getPrincipal())
+    assert res
+    assert(len(keystore.lookupCertBySubject(key2[0].getPrincipal())) == 1)
+    assert(len(keystore.lookupCertByIssuer(key1[0].getPrincipal())) == 1)
+
+    seq = keystore.lookupCertByIssuer(key1[0].getPrincipal())[0]
+    assert isinstance(seq[0], spki.Cert)
+    assert isinstance(verifyCertSig(seq, keystore), spki.Sequence)
+    assert seq[0].getTag().contains('CATrusted')
+    assert seq[0].propagate
+
+    res = yield c.addCA(key2[0].getPrincipal(), 1)
+    assert res
+    assert(len(keystore.lookupCertByIssuer(default[0].getPrincipal())) == 1)
+
+
+@pytest.inlineCallbacks
+def test_name(ks):
+    keystore = ks[0]
+    keys = ks[1]
+    default = keys[0]
+    key1 = keys[1]
+    key2 = keys[2]
+    dht = FakeDHT()
+
+    c = CertManager(dht, keystore)
+    res = yield c.name(key2[0].getPrincipal(), 'Alice', key1[0].getPrincipal())
+    assert res
+    assert(len(keystore.lookupCertBySubject(key2[0].getPrincipal())) == 1)
+    assert(len(keystore.lookupCertByIssuer(key1[0].getPrincipal())) == 1)
+    seq = keystore.lookupCertByIssuer(key1[0].getPrincipal())[0]
+    assert isinstance(seq[1], spki.Cert)
+    assert isinstance(verifyCertSig(seq, keystore), spki.Sequence)
+    assert seq[1].isNameCert()
+
+    res = yield c.name(key2[0].getPrincipal(), 'Alice')
+    assert res
+    assert(len(keystore.lookupCertByIssuer(default[0].getPrincipal())) == 1)
+
+
+@pytest.inlineCallbacks
+def test_storeCert(ks):
+    keystore = ks[0]
+    keys = ks[1]
+    dht = mock.create_autospec(FakeDHT)
+    dht.set.return_value = defer.succeed(True)
+
+    c = CertManager(dht, keystore)
+
+    seq = makeTrustCert(keys[0][1], keys[1][0])
+
+    res = yield c.storeCert(seq)
+    dht.set.assert_called_with(
+            hashToB64(keys[1][0].getPrincipal())+'-certificates',
+            str(seq.sexp().encode_canonical()))
+    assert res
+
+
+@pytest.inlineCallbacks
+def test_getCertificates(ks):
+    keystore = ks[0]
+    keys = ks[1]
+    dht = FakeDHT()
+
+    c = CertManager(dht, keystore)
+    res = yield c.getCertificates(keys[0][0].getPrincipal())
+    assert res is None
