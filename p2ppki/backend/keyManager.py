@@ -14,7 +14,6 @@ class KeyManager():
 
     @inlineCallbacks
     def insertKey(self, keyHash):
-
         h = hashToB64(keyHash)
         k = h + '-key'
 
