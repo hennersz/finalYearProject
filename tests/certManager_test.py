@@ -166,7 +166,24 @@ def test_storeCert(ks):
 def test_getCertificates(ks):
     keystore = ks[0]
     keys = ks[1]
-    dht = FakeDHT()
+    
+    seqA = makeTrustCert(keys[0][1], keys[1][0])
+    seqB = makeTrustCert(keys[2][1], keys[3][0])
+
+    certs = [seqA, seqB]
+
+    for elt in seqA:
+        if isinstance(elt, spki.Cert):
+            certA = elt
+
+    for elt in seqB:
+        if isinstance(elt, spki.Signature):
+            sigB = elt
+
+    seqC = spki.Sequence(certA, sigB)
+    certs.append(seqC)
+
+    dht = FakeDHT([], certs, keystore)
 
     c = CertManager(dht, keystore)
     res = yield c.getCertificates(keys[0][0].getPrincipal())
