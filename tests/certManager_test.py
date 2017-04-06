@@ -18,31 +18,39 @@ def test_verifyCertSig(ks):
     keystore = ks[0]
     keys = ks[1]
 
-    certA = makeTrustCert(keys[0][1], keys[1][0])
-    certB = makeTrustCert(keys[2][1], keys[3][0])
+    seqA = makeTrustCert(keys[0][1], keys[1][0])
+    seqB = makeTrustCert(keys[2][1], keys[3][0])
 
-    for elt in certB:
+    for elt in seqA:
         if isinstance(elt, spki.PublicKey):
-            key = elt
+            keyA = elt
         if isinstance(elt, spki.Cert):
-            cert = elt
+            certA = elt
         if isinstance(elt, spki.Signature):
-            sig = elt
+            sigA = elt
 
-    res = verifyCertSig(certA, keystore)
+    for elt in seqB:
+        if isinstance(elt, spki.PublicKey):
+            keyB = elt
+        if isinstance(elt, spki.Cert):
+            certB = elt
+        if isinstance(elt, spki.Signature):
+            sigB = elt
+
+    res = verifyCertSig(seqA, keystore)
     assert isinstance(res, spki.Sequence)
     
-    c = copy.copy(certA)
-    c.append(key)
+    c = copy.copy(seqA)
+    c.append(keyB)
     with pytest.raises(VerifyError):
         verifyCertSig(c, keystore)
         
-    c = copy.copy(certA)
-    c.append(cert)
+    c = copy.copy(seqA)
+    c.append(certB)
     with pytest.raises(VerifyError):
         verifyCertSig(c, keystore)
 
-    c = copy.copy(certA)
-    c.append(sig)
+    c = copy.copy(seqA)
+    c.append(sigB)
     with pytest.raises(VerifyError):
         verifyCertSig(c, keystore)
