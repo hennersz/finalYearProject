@@ -166,7 +166,7 @@ def test_storeCert(ks):
 def test_getCertificates(ks):
     keystore = ks[0]
     keys = ks[1]
-    
+
     seqA = makeTrustCert(keys[0][1], keys[1][0])
     seqB = makeTrustCert(keys[2][1], keys[3][0])
 

@@ -6,8 +6,8 @@ from distutils.util import strtobool
 from os import path
 
 
-def fullPath(path):
-    return path.expanduser(path.expandvars(path))
+def fullPath(p):
+    return path.expanduser(path.expandvars(p))
 
 
 class Config(dict):
