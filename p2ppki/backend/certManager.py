@@ -56,29 +56,32 @@ class CertManager():
         if issuer is None:
             issuer = getDefaultKey(self.keystore)
 
-        enc_privkey = self.keystore.lookupPrivateKey(issuer)
-        privkey = enc_privkey.decrypt()
+        privkey = loadPrivateKey(self.keystore, issuer)
 
         perm = spki.eval(sexp.parseText('(* set Trusted)'))
 
         c = spki.makeCert(issuer, subject, spki.Tag(perm))
-        seq = spki.Sequence(c, privkey.sign(c))
+        seq = spki.Sequence(c, privkey.sign(c), privkey.getPublicKey())
+
         self.keystore.addCert(seq)
         self.keystore.save()
 
-    def addCA(self, subject, issuer=None):
+    @inlineCallbacks
+    def addCA(self, subject, delegate, issuer=None):
         if issuer is None:
             issuer = getDefaultKey(self.keystore)
 
-        enc_privkey = self.keystore.lookupPrivateKey(issuer)
-        privkey = enc_privkey.decrypt()
+        privkey = loadPrivateKey(self.keystore, issuer)
 
-        perm = spki.eval(sexp.parseText('(* set CAVerified)'))
+        perm = spki.eval(sexp.parseText('(* set CATrusted)'))
 
-        c = spki.makeCert(issuer, subject, spki.Tag(perm), 1)
-        seq = spki.Sequence(c, privkey.sign(c))
+        c = spki.makeCert(issuer, subject, spki.Tag(perm), delegate)
+        seq = spki.Sequence(c, privkey.sign(c), privkey.getPublicKey())
+
+        ret = yield self.storeCert(seq)
         self.keystore.addCert(seq)
         self.keystore.save()
+        returnValue(ret)
 
     @inlineCallbacks
     def name(self, subject, name, issuer=None):

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from helpers import createKeystore, makeTrustCert, InMemKeyStore
-from p2ppki.backend.certManager import verifyCertSig, VerifyError
+from helpers import createKeystore, makeTrustCert, InMemKeyStore, FakeDHT
+from p2ppki.backend.certManager import verifyCertSig, VerifyError, CertManager
 from pisces.spkilib import spki
 import pytest
 
@@ -67,3 +67,27 @@ def test_verifyCertSig(ks):
     with pytest.raises(VerifyError) as e:
         verifyCertSig(c, InMemKeyStore())
     assert 'could not find key to verify signature' in str(e.value)
+
+
+def test_trust(ks):
+    keystore = ks[0]
+    keys = ks[1]
+    default = keys[0]
+    key1 = keys[1]
+    key2 = keys[2]
+    dht = FakeDHT()
+
+    c = CertManager(dht, keystore)
+    c.trust(key2[0].getPrincipal(), key1[0].getPrincipal())
+    assert(len(keystore.lookupCertBySubject(key2[0].getPrincipal())) == 1)
+    assert(len(keystore.lookupCertByIssuer(key1[0].getPrincipal())) == 1)
+
+    seq = keystore.lookupCertByIssuer(key1[0].getPrincipal())[0]
+    assert isinstance(seq[0], spki.Cert)
+    assert isinstance(verifyCertSig(seq, keystore), spki.Sequence)
+    assert seq[0].getTag().contains('Trusted')
+    
+    c.trust(key2[0].getPrincipal())
+    assert(len(keystore.lookupCertByIssuer(default[0].getPrincipal())) == 1)
+
+
