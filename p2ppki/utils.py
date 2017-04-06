@@ -104,8 +104,6 @@ def loadPrivateKey(keystore, hash=None):
 
     if hash is None:
         hash = getDefaultKey(keystore)
-        if hash is None:
-            raise ValueError('No default key set')
 
     enc = keystore.lookupPrivateKey(hash)
 

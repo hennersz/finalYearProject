@@ -55,6 +55,9 @@ def test_parseKeyIdInput(ks):
     cert = makeNameCert(defaultKey[1], otherKey[0], 'Alice')
     keystore.addCert(cert)
 
+    cert = makeNameCert(defaultKey[1], otherKey[0], 'Alice')
+    keystore.addCert(cert)
+
     cert = makeNameCert(defaultKey[1], ks[1][2][0], 'Charlie')
     keystore.addCert(cert)
 
@@ -74,13 +77,19 @@ def test_parseKeyIdInput(ks):
     assert res == otherKey[0].getPrincipal()
 
     with pytest.raises(ValueError):
-        parseKeyIdInput('oiwoenvwoivn', keystore, parseName=False)
+        parseKeyIdInput('oiwoenvwoivnmcielddqi===', keystore, parseName=False)
 
+    # Test Name not found
     with pytest.raises(NameError):
         parseKeyIdInput('Bob', keystore)
 
+    # Test name assigned to multiple keys
     with pytest.raises(NameError):
         parseKeyIdInput('Charlie', keystore)
+
+    # Test name that is an sexp but not a hash
+    with pytest.raises(NameError):
+        parseKeyIdInput('(Tag (*))', keystore)
 
 
 @mock.patch('p2ppki.utils.getPassword')
