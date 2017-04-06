@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from p2ppki.storage import ListStorage
+from p2ppki.backend.storage import ListStorage
 import mock
 import json
 
@@ -24,7 +24,7 @@ def test_multiInsert():
     assert data[1] == 'b value'
 
 
-@mock.patch('p2ppki.storage.time')
+@mock.patch('p2ppki.backend.storage.time')
 def test_overwrite(mock_time):
     store = ListStorage()
 
@@ -50,7 +50,7 @@ def test_iterator():
     assert ('b key', 'a value') in values
 
 
-@mock.patch('p2ppki.storage.time')
+@mock.patch('p2ppki.backend.storage.time')
 def test_iterItemsOlderThan(mock_time):
     store = ListStorage()
 

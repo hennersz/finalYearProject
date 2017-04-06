@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from utils import FakeDHT
-from p2ppki.dhtServer import DHTServer
+from helpers import FakeDHT
+from p2ppki.backend.dhtServer import DHTServer
 import mock
 import pytest
 import base64

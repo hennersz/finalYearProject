@@ -92,50 +92,6 @@ def getDefaultKey(keyStore, returnHash=True):
         return key
 
 
-def resolveName(name, keyStore):
-    """Convert a name in the local namespace to a key
-
-    The return value is an object with a getPrincipal method.
-
-    Based on the pisces spkitool function but without global variables
-    """
-    nameCerts = keyStore.lookupName(name)
-
-    if not nameCerts:
-        raise ValueError("unbound SPKI name: %s" % name)
-    cert = spki.extractSignedCert(nameCerts[0])
-
-    return cert.getSubject()
-
-
-def parseHashOrName(buf, keyStore):
-    """Try parsing into a hash or a name
-    """
-
-    try:
-        o = spki.parseText(buf)
-    except sexp.ParseError:
-        pass
-    else:
-        return o
-
-    # It wasn't a hash, try as name
-    base = getDefaultKey(keyStore)
-    return spki.FullyQualifiedName(base, (buf,))
-
-
-def getHash(issuer, keyStore):
-    """Gets a hash object for issuer from a hash string
-    or name
-    """
-    # could be a hash or a name
-    obj = parseHashOrName(issuer, keyStore)
-    if isinstance(obj, spki.Name):
-        return resolveName(obj, keyStore).getPrincipal()
-    else:
-        return obj
-
-
 def loadPrivateKey(keystore, hash=None):
     """Loads a private key object from the keystore
     given a hash value.
@@ -147,16 +103,17 @@ def loadPrivateKey(keystore, hash=None):
     """
 
     if hash is None:
-        enc = getDefaultKey(keystore, returnHash=False)
-        if enc is None:
+        hash = getDefaultKey(keystore)
+        if hash is None:
             raise ValueError('No default key set')
-    else:
-        enc = keystore.lookupPrivateKey(hash)
+
+    enc = keystore.lookupPrivateKey(hash)
 
     if enc.isBogus():
         return enc.decrypt()
 
     pw = getPassword('Enter password for private key %s: ' % hash)
+    print pw
     return enc.decrypt(pw)
 
 
@@ -167,12 +124,12 @@ def getCertSubjectHash(cert, keystore):
         for name in names:
             try:
                 #  Gets hash object for name then converts to base 64 string
-                return hashToB64(getHash(name, keystore))
-            except ValueError:
+                return parseKeyIdInput(name, keystore)
+            except (ValueError, NameError):
                 continue
         raise ValueError("Unbound spki name: %s" % name)
     else:
-        return hashToB64(subject.getPrincipal())
+        return subject.getPrincipal()
 
 
 def hashToB64(h):

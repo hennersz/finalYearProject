@@ -3,7 +3,7 @@
 
 from pisces.spkilib import spki, sexp
 from twisted.internet.defer import inlineCallbacks, returnValue
-from utils import getDefaultKey, loadPrivateKey,\
+from ..utils import getDefaultKey, loadPrivateKey,\
                   hashToB64, getCertSubjectHash
 
 
@@ -100,7 +100,7 @@ class CertManager():
     @inlineCallbacks
     def storeCert(self, certificate):
         h = getCertSubjectHash(certificate, self.keystore)
-        key = str(h) + '-certificates'
+        key = hashToB64(h) + '-certificates'
         ret = yield self.dht.set(key, str(certificate.sexp().encode_canonical()))
         returnValue(ret)
 

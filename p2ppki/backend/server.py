@@ -35,7 +35,7 @@ def init(conf):
     log.startLogging(logFile, setStdout=0)
 
     # Create DHT Server
-    server = yield initServer(8469, "127.0.0.1", 8468)
+    server = yield initServer(conf['serverPort'], conf['bootStrapServer'], 8468)
     dht = DHTServer(server)
 
     # Create key and cert management objects
@@ -46,10 +46,10 @@ def init(conf):
     verifier = Verifier(certs, keyStore, aclDir, conf["searchDepth"])
 
     # Return value so it doesn't get garbage collected
-    returnValue(ControlServer(8007, dht, keys, certs, verifier, keyStore))
+    returnValue(ControlServer(conf['localPort'], dht, keys, certs, verifier, keyStore))
 
 
-if __name__ == "__main__":
+def runServer():
     conf = Config('~/.p2ppki/config.cfg')
     init(conf)
     reactor.run()

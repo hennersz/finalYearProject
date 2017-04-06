@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from utils import FakeDHT
+from helpers import FakeDHT
 from pisces.spkilib import keystore
-from p2ppki.localServer import ControlFactory
-from p2ppki.certManager import CertManager
-from p2ppki.keyManager import KeyManager
-from p2ppki.verifier import Verifier
+from p2ppki.backend.localServer import ControlFactory
+from p2ppki.backend.certManager import CertManager
+from p2ppki.backend.keyManager import KeyManager
+from p2ppki.backend.verifier import Verifier
 from twisted.test import proto_helpers
 from os import path
 import pytest

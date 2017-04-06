@@ -67,6 +67,16 @@ def makeCertChain(keys, root):
     return chain
 
 
+def createKeystore():
+    ks = InMemKeyStore()
+    keys = genNKeys(5)
+    for key in keys:
+        saveKey(key[0], key[1], ks)
+    default = keys[0]
+    ks.setDefaultKey(default[0].getPrincipal())
+    return (ks, keys)
+
+
 class FakeDHT(object):
     def __init__(self, keys=[], certs=[], keystore=None):
         self.data = {
@@ -84,7 +94,7 @@ class FakeDHT(object):
 
         for cert in certs:
             h = getCertSubjectHash(cert, keystore)
-            k = str(h) + '-certificates'
+            k = hashToB64(h) + '-certificates'
             self.data[k] = [str(cert.sexp().encode_canonical())]
 
     def set(self, key, value):

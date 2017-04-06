@@ -8,7 +8,7 @@ from twisted.internet.endpoints import TCP4ServerEndpoint
 from twisted.internet.defer import inlineCallbacks, returnValue
 
 from distutils.util import strtobool
-from utils import parseKeyIdInput
+from ..utils import parseKeyIdInput
 
 
 class ControlProtocol(LineReceiver):

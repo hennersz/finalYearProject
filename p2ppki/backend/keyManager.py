@@ -3,6 +3,7 @@
 
 from pisces.spkilib import sexp, spki
 from twisted.internet.defer import inlineCallbacks, returnValue
+from ..utils import hashToB64
 
 
 class KeyManager():
@@ -14,7 +15,7 @@ class KeyManager():
     @inlineCallbacks
     def insertKey(self, keyHash):
 
-        h = sexp.str_to_b64(keyHash.value)
+        h = hashToB64(keyHash)
         k = h + '-key'
 
         key = self.keystore.lookupKey(keyHash)
@@ -26,7 +27,7 @@ class KeyManager():
 
     @inlineCallbacks
     def getKey(self, keyHash):
-        key = sexp.str_to_b64(keyHash.value) + '-key'
+        key = hashToB64(keyHash) + '-key'
         keys = yield self.dht.get(key)
 
         if keys is None:

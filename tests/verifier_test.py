@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from utils import FakeDHT, genNKeys,  saveKey,\
+from helpers import FakeDHT, genNKeys,  saveKey,\
                   makeNameCert, makeTrustCert, makeCertChain, initACL,\
                   InMemACL, InMemKeyStore
-from p2ppki.certManager import CertManager
-from p2ppki.verifier import Verifier
+from p2ppki.backend.certManager import CertManager
+from p2ppki.backend.verifier import Verifier
 
 import pytest
 
