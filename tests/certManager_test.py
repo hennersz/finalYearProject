@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from helpers import createKeystore, makeTrustCert
+from helpers import createKeystore, makeTrustCert, InMemKeyStore
 from p2ppki.backend.certManager import verifyCertSig, VerifyError
 from pisces.spkilib import spki
-import copy
 import pytest
-import mock
 
 
 @pytest.fixture()
@@ -39,18 +37,33 @@ def test_verifyCertSig(ks):
 
     res = verifyCertSig(seqA, keystore)
     assert isinstance(res, spki.Sequence)
-    
-    c = copy.copy(seqA)
-    c.append(keyB)
-    with pytest.raises(VerifyError):
-        verifyCertSig(c, keystore)
-        
-    c = copy.copy(seqA)
-    c.append(certB)
-    with pytest.raises(VerifyError):
-        verifyCertSig(c, keystore)
 
-    c = copy.copy(seqA)
-    c.append(sigB)
-    with pytest.raises(VerifyError):
+    c = spki.Sequence(keyA, certA, sigA, keyB)
+    with pytest.raises(VerifyError) as e:
         verifyCertSig(c, keystore)
+    assert 'More than 1 key found' in str(e.value)
+
+    c = spki.Sequence(keyA, certA, sigA, certB)
+    with pytest.raises(VerifyError) as e:
+        verifyCertSig(c, keystore)
+    assert 'multiple certificates found' in str(e.value)
+
+    c = spki.Sequence(keyA, certA, sigA, sigB)
+    with pytest.raises(VerifyError) as e:
+        verifyCertSig(c, keystore)
+    assert 'multiple signatures found' in str(e.value)
+
+    c = spki.Sequence(keyA, certB, sigB)
+    with pytest.raises(VerifyError) as e:
+        verifyCertSig(c, keystore)
+    assert 'Key and signature principal do not match' in str(e.value)
+
+    c = spki.Sequence(certA, sigB)
+    with pytest.raises(VerifyError) as e:
+        verifyCertSig(c, keystore)
+    assert 'could not verify signature for cert' in str(e.value)
+
+    c = spki.Sequence(certA, sigA)
+    with pytest.raises(VerifyError) as e:
+        verifyCertSig(c, InMemKeyStore())
+    assert 'could not find key to verify signature' in str(e.value)
