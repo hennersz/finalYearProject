@@ -4,7 +4,7 @@
 from twisted.internet import defer
 from p2ppki.backend.keyManager import KeyManager
 from p2ppki.utils import hashToB64
-from helpers import FakeDHT, createKeystore
+from helpers import FakeDHT, createKeystore, InMemKeyStore
 from pisces.spkilib import spki
 import mock
 import pytest
@@ -29,6 +29,12 @@ def test_insert(ks):
     value = str(keys[0][0].sexp().encode_canonical())
     dht.set.assert_called_with(key, value)
     assert res
+
+    pub, priv = spki.makeRSAKeyPair(1024)
+
+    with pytest.raises(ValueError) as e:
+        res = yield k.insertKey(pub.getPrincipal())
+    assert 'No key corresponding to hash' in str(e.value)
 
 
 @pytest.inlineCallbacks
