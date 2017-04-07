@@ -8,7 +8,7 @@ import argparse
 import sys
 
 
-def getArgs():
+def getArgs(args=sys.argv):
     parser = argparse.ArgumentParser(description="reads commands from a file\
             and sends them to a local tcp socket")
 
@@ -26,7 +26,7 @@ def getArgs():
                         type=int,
                         default=8007
                         )
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     return args
 
 
@@ -50,7 +50,7 @@ class CMDRunnerFactory(ClientFactory):
     def startedConnecting(self, connector):
         print 'Connecting...'
 
-    def buildProtocol(self, addr):
+    def buildProtocol(self):
         print 'Connected'
         p = CMDRunner()
         p.factory = self
