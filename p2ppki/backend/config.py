@@ -13,16 +13,19 @@ def fullPath(p):
 class Config(dict):
 
     def __init__(self, loc='~/.p2ppki/config.cfg'):
-        self.loc = path.expanduser(loc)
+        if isinstance(loc, str):
+            self.loc = open(fullPath(loc), 'r')
+        else:
+            self.loc = loc
         self.parser = ConfigParser.ConfigParser()
         self.parseConfig()
 
     def parseConfig(self):
-        if self.parser.read(self.loc) == []:
-            self.genConfig()
-            return
 
         try:
+            if self.parser.readfp(self.loc) == []:
+                self.genConfig()
+                return
             self['dataDir'] = fullPath(self.parser.get('settings', 'datadir'))
             self['searchDepth'] = self.parser.getint('settings', 'searchdepth')
             self['verbose'] = self.parser.getboolean('settings', 'verbose')
