@@ -65,8 +65,12 @@ class CMDRunnerFactory(ClientFactory):
         reactor.stop()
 
 
-if __name__ == '__main__':
+def run(args):
     args = getArgs()
     lines = args.file.readlines()
     reactor.connectTCP(args.domain, args.port, CMDRunnerFactory(lines))
     reactor.run()
+
+
+if __name__ == '__main__':
+    run(sys.argv[1:])
