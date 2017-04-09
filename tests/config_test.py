@@ -6,8 +6,8 @@ import mock
 import StringIO
 
 
-@mock.patch('p2ppki.backend.config.path.expandvars')
-@mock.patch('p2ppki.backend.config.path.expanduser')
+@mock.patch('p2ppki.config.path.expandvars')
+@mock.patch('p2ppki.config.path.expanduser')
 def test_fullPath(mock_user, mock_vars):
     mock_vars.return_value = '/another/path'
     fullPath('/path/to/somewhere')
@@ -15,7 +15,7 @@ def test_fullPath(mock_user, mock_vars):
     mock_user.assert_called_with('/another/path')
 
 
-@mock.patch('p2ppki.backend.config.open')
+@mock.patch('p2ppki.config.open')
 def test_Config(mock_open):
     mock_open.return_value = StringIO.StringIO('[settings]\n\
 datadir = /Users/henrymortimer/.p2ppki\n\

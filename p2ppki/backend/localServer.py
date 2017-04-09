@@ -275,9 +275,9 @@ class ControlProtocol(LineReceiver):
             self.sendLine(name)
 
     def stopServer(self):
+        print 'Stopping..'
         reactor.stop()
         self.factory.keystore.close()
-        sys.exit(1)
 
     def handleUnknown(self, command):
         self.sendLine("Unknown command: %s" % (command))

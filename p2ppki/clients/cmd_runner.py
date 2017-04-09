@@ -26,7 +26,7 @@ class CMDRunnerFactory(ClientFactory):
     def startedConnecting(self, connector):
         print 'Connecting...'
 
-    def buildProtocol(self):
+    def buildProtocol(self, addr):
         print 'Connected'
         p = CMDRunner()
         p.factory = self

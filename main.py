@@ -1,21 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from backend.server import runServer
-from clients import cmd_runner, cmdline
+from p2ppki.backend.server import runServer
+from p2ppki.clients import cmd_runner, cmdline
 from twisted.internet import reactor
 from twisted.internet.protocol import Protocol
 from twisted.internet.endpoints import TCP4ClientEndpoint, connectProtocol
-from config import Config
+from p2ppki.config import Config
 import argparse
 import daemon
 
 
 class Stop(Protocol):
     def stop(self):
-        self.transport.write('STOP\n')
+        self.transport.write('STOP\r\n')
         self.transport.loseConnection()
         reactor.stop()
+        print 'stopped'
 
 
 def connected(p):

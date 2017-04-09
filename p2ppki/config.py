@@ -4,6 +4,7 @@
 import ConfigParser
 from distutils.util import strtobool
 from os import path
+import sys
 
 
 def fullPath(p):
@@ -31,9 +32,10 @@ class Config(dict):
             self['verbose'] = self.parser.getboolean('settings', 'verbose')
             self['localPort'] = self.parser.getint('settings', 'localPort')
             self['serverPort'] = self.parser.getint('settings', 'serverPort')
-            self['bootStrapServer'] = self.parser.get('setting', 'bootStrapServer')
+            self['bootStrapServer'] = self.parser.get('settings', 'bootStrapServer')
         except:
             print 'Invalid config file, please see example'
+            sys.exit(-1)
 
     def genConfig(self):
         print 'No config file found, please create one'

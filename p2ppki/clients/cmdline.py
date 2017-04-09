@@ -8,10 +8,12 @@ from ..config import Config
 
 class CMDLine(Protocol):
     def sendMessage(self, msg):
-        self.transport.write(msg + '\n')
+        self.transport.write(msg + '\r\n')
 
     def dataReceived(self, data):
-        if data != 'Connected':
+        if data == 'Connected\r\n':
+            self.sendMessage(self.factory.msg)
+        else:
             print data
             self.transport.loseConnection()
 
@@ -20,9 +22,9 @@ class CMDLineFactory(ClientFactory):
     def __init__(self, msg):
         self.msg = msg
 
-    def buildProtocol(self):
+    def buildProtocol(self, addr):
         p = CMDLine()
-        p.sendMessage(self.msg)
+        p.factory = self
         return p
 
     def clientConnectionLost(self, connector, reason):

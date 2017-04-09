@@ -9,7 +9,7 @@ import pytest
 @pytest.fixture
 def protocol():
     factory = CMDRunnerFactory(['cmd1', 'cmd2', 'cmd3'])
-    proto = factory.buildProtocol()
+    proto = factory.buildProtocol(None)
     return proto
 
 
