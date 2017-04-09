@@ -14,7 +14,7 @@ from localServer import ControlServer
 from certManager import CertManager
 from keyManager import KeyManager
 from verifier import Verifier
-from config import Config
+from ..config import Config
 
 from os import path
 
@@ -32,7 +32,7 @@ def init(conf):
     # Setup logger
     logPath = path.join(conf['dataDir'], 'logs/server.log')
     logFile = DailyLogFile.fromFullPath(logPath)
-    log.startLogging(logFile, setStdout=0)
+    log.startLogging(logFile)
 
     # Create DHT Server
     server = yield initServer(conf['serverPort'], conf['bootStrapServer'], 8468)

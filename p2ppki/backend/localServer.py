@@ -10,9 +10,12 @@ from twisted.internet.defer import inlineCallbacks, returnValue
 from distutils.util import strtobool
 from ..utils import parseKeyIdInput
 
+import sys
+
 
 class ControlProtocol(LineReceiver):
-    supportedCommands = ['GET', 'SET', 'LIST', 'NAME', 'TRUST', 'IDENTIFY']
+    supportedCommands = ['GET', 'SET', 'LIST', 'NAME',
+                         'TRUST', 'IDENTIFY', 'STOP']
 
     def connectionMade(self):
         self.sendLine("Connected")
@@ -34,6 +37,8 @@ class ControlProtocol(LineReceiver):
             self.trust(args)
         elif command == 'IDENTIFY':
             self.identify(args)
+        elif command == 'STOP':
+            self.stopServer()
         else:
             self.handleUnknown(data[0])
 
@@ -268,6 +273,11 @@ class ControlProtocol(LineReceiver):
         self.sendLine("Found these names:")
         for name in names:
             self.sendLine(name)
+
+    def stopServer(self):
+        reactor.stop()
+        self.factory.keystore.close()
+        sys.exit(1)
 
     def handleUnknown(self, command):
         self.sendLine("Unknown command: %s" % (command))

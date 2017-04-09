@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from p2ppki.backend.config import fullPath, Config
+from p2ppki.config import fullPath, Config
 import mock
 import StringIO
 

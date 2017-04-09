@@ -19,7 +19,9 @@ def filterCerts(certs):
     for seq in certs:
         for elt in seq:
             if isinstance(elt, spki.Cert) and not elt.isNameCert():
-                filtered.append(seq)
+                t = elt.getTag()
+                if t.contains('CATrusted'):
+                    filtered.append(seq)
     return filtered
 
 

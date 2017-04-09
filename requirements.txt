@@ -3,3 +3,4 @@ twisted
 kademlia
 pycrypto
 git+https://github.com/hennersz/pisces.git
+python-daemon

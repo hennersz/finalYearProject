@@ -3,28 +3,7 @@
 
 from twisted.internet.protocol import Protocol, ClientFactory
 from twisted.internet import reactor
-import argparse
-import sys
-
-
-def getArgs(args=sys.argv):
-    parser = argparse.ArgumentParser(description="reads a command\
-            and sends them to a local tcp socket")
-
-    parser.add_argument('-d', '--domain',
-                        nargs='?',
-                        type=str,
-                        default='localhost')
-    parser.add_argument('-p', '--port',
-                        nargs='?',
-                        type=int,
-                        default=8007
-                        )
-    parser.add_argument('message',
-                        type=str)
-
-    args = parser.parse_args(args)
-    return args
+from ..config import Config
 
 
 class CMDLine(Protocol):
@@ -54,11 +33,7 @@ class CMDLineFactory(ClientFactory):
         reactor.stop()
 
 
-def run(args):
-    a = getArgs(args)
-    reactor.connectTCP(a.domain, a.port, CMDLineFactory(a.message))
+def run(message):
+    conf = Config()
+    reactor.connectTCP('localhost', conf['localPort'], CMDLineFactory(message))
     reactor.run()
-
-
-if __name__ == '__main__':
-    run(sys.argv[1:])
