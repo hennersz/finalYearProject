@@ -8,7 +8,6 @@ from twisted.internet.protocol import Protocol
 from twisted.internet.endpoints import TCP4ClientEndpoint, connectProtocol
 from p2ppki.config import Config
 import argparse
-import daemon
 
 
 class Stop(Protocol):
@@ -38,8 +37,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.cmd == 'startServer':
-        with daemon.DaemonContext():
-            runServer()
+        runServer()
     elif args.cmd == 'stopServer':
         conf = Config()
         point = TCP4ClientEndpoint(reactor, 'localhost', conf['localPort'])

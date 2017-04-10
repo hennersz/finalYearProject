@@ -8,14 +8,12 @@ from twisted.internet.endpoints import TCP4ServerEndpoint
 from twisted.internet.defer import inlineCallbacks, returnValue
 
 from distutils.util import strtobool
-from ..utils import parseKeyIdInput
-
-import sys
+from ..utils import parseKeyIdInput, hashToB64
 
 
 class ControlProtocol(LineReceiver):
     supportedCommands = ['GET', 'SET', 'LIST', 'NAME',
-                         'TRUST', 'IDENTIFY', 'STOP']
+                         'TRUST', 'TRUSTCA', 'IDENTIFY', 'STOP']
 
     def connectionMade(self):
         self.sendLine("Connected")
@@ -137,14 +135,19 @@ class ControlProtocol(LineReceiver):
             keyHash = parseKeyIdInput(args[0],
                                       self.factory.keystore,
                                       parseName=False)
-        except ValueError, e:
-            self.sendLine(str(e))
-            returnValue(None)
+        except ValueError:
+            keyHash = args[0]
 
         key = yield self.factory.keys.getKey(keyHash)
 
         if key is None:
             self.sendLine("No key found for hash %s" % args[0])
+        elif isinstance(key, list):
+            self.sendLine('Found %d keys, for %s. They should be identified before use' % (len(key), keyHash))
+            for k in key:
+                self.sendLine('Found %s' % hashToB64(k.getPrincipal()))
+                self.factory.keystore.addPublicKey(k)
+            self.factory.keystore.save()
         else:
             self.factory.keystore.addPublicKey(key)
             self.factory.keystore.save()
@@ -233,6 +236,7 @@ class ControlProtocol(LineReceiver):
         else:
             self.sendLine("Failed")
 
+    @inlineCallbacks
     def trust(self, args):
         usage = "TRUST <subjectId>"
 
@@ -246,7 +250,36 @@ class ControlProtocol(LineReceiver):
             self.sendLine(str(e))
             return
 
-        self.factory.certs.trust(subjHash)
+        yield self.factory.certs.trust(subjHash)
+        self.sendLine("Done!")
+
+    @inlineCallbacks
+    def trustCA(self, args):
+        usage = "TRUSTCA [delegate] <subjectId>"
+
+        if len(args) < 1:
+            self.sendLine(usage)
+            return
+        elif len(args) > 2:
+            self.sendLine(usage)
+            return
+
+        try:
+            subjHash = parseKeyIdInput(args[-1], self.factory.keystore)
+        except (NameError, ValueError), e:
+            self.sendLine(str(e))
+            return
+
+        if len(args) == 2:
+            try:
+                delegate = strtobool(args[0])
+            except ValueError:
+                self.sendLine(usage)
+                return
+        else:
+            delegate = False
+
+        yield self.factory.certs.addCA(subjHash, delegate)
         self.sendLine("Done!")
 
     @inlineCallbacks
