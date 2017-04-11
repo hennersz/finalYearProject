@@ -8,19 +8,22 @@ from twisted.internet.protocol import Protocol
 from twisted.internet.endpoints import TCP4ClientEndpoint, connectProtocol
 from p2ppki.config import Config
 import argparse
-import sys
+import time
+
+import socket
 
 
 class Stop(Protocol):
-    def stop(self):
+    def dataReceived(self, data):
+        print data
+        if data == 'Stopping\r\n':
+            print 'stopped'
+        else:
+            self.stopServer()
+
+    def stopServer(self):
         self.transport.write('STOP\r\n')
-        self.transport.loseConnection()
         reactor.stop()
-        print 'stopped'
-
-
-def connected(p):
-    p.stop()
 
 
 if __name__ == '__main__':
@@ -38,16 +41,16 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.cmd == 'startServer':
-        try:
-            runServer()
-        except SystemExit:
-            sys.exit()
+        runServer()
     elif args.cmd == 'stopServer':
         conf = Config()
-        point = TCP4ClientEndpoint(reactor, 'localhost', conf['localPort'])
-        d = connectProtocol(point, Stop())
-        d.addCallback(connected)
-        reactor.run()
+        # point = TCP4ClientEndpoint(reactor, 'localhost', conf['localPort'])
+        # d = connectProtocol(point, Stop())
+        # reactor.run()
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect(('127.0.0.1', 8007))
+        s.sendall('STOP\r\n')
+        s.close()
     elif args.cmd == 'runFile':
         cmd_runner.run(args.file)
     elif args.cmd == 'runCommand':

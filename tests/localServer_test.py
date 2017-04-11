@@ -20,7 +20,7 @@ def protocol():
     certs = CertManager(dht, keyStore)
     aclDir = path.join('./', 'acl')
     verifier = Verifier(certs, keyStore, aclDir, 10)
-    factory = ControlFactory(FakeDHT(), keys, certs, verifier, keyStore)
+    factory = ControlFactory(FakeDHT(), keys, certs, verifier, keyStore, None)
     proto = factory.buildProtocol(('127.0.0.1', 0))
     return proto
 

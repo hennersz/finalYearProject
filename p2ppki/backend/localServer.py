@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from twisted.internet import reactor
 from twisted.protocols.basic import LineReceiver
 from twisted.internet.protocol import Factory
 from twisted.internet.endpoints import TCP4ServerEndpoint
@@ -9,7 +8,6 @@ from twisted.internet.defer import inlineCallbacks, returnValue
 
 from distutils.util import strtobool
 from ..utils import parseKeyIdInput, hashToB64
-import sys
 
 
 class ControlProtocol(LineReceiver):
@@ -317,10 +315,8 @@ class ControlProtocol(LineReceiver):
             self.sendLine(name)
 
     def stopServer(self):
-        print 'Stopping..'
         self.factory.keystore.close()
-        reactor.stop()
-        sys.exit()
+        self.factory.reactor.stop()
 
     def handleUnknown(self, command):
         self.sendLine("Unknown command: %s" % (command))
@@ -330,15 +326,16 @@ class ControlProtocol(LineReceiver):
 class ControlFactory(Factory):
     protocol = ControlProtocol
 
-    def __init__(self, dht, keys, certs, verifier, keystore):
+    def __init__(self, dht, keys, certs, verifier, keystore, reactor):
         self.dht = dht
         self.keys = keys
         self.certs = certs
         self.verifier = verifier
         self.keystore = keystore
+        self.reactor = reactor
 
 
 class ControlServer(object):
-    def __init__(self, port, dht, keys, certs, verifier, keystore):
+    def __init__(self, port, dht, keys, certs, verifier, keystore, reactor):
         endpoint = TCP4ServerEndpoint(reactor, port)
-        endpoint.listen(ControlFactory(dht, keys, certs, verifier, keystore))
+        endpoint.listen(ControlFactory(dht, keys, certs, verifier, keystore, reactor))

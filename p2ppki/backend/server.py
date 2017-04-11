@@ -46,7 +46,7 @@ def init(conf):
     verifier = Verifier(certs, keyStore, aclDir, conf["searchDepth"])
 
     # Return value so it doesn't get garbage collected
-    returnValue(ControlServer(conf['localPort'], dht, keys, certs, verifier, keyStore))
+    returnValue(ControlServer(conf['localPort'], dht, keys, certs, verifier, keyStore, reactor))
 
 
 def runServer():
