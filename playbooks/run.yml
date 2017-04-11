@@ -10,6 +10,3 @@
   tasks: 
     - name: Run the program
       shell: . ~/p2ppki/ENV/bin/activate && nohup python ~/p2ppki/main.py startServer &
-
-    - name: Run commands
-      shell: . ~/p2ppki/ENV/bin/activate && python ~/p2ppki/main.py runFile ~/.p2ppki/cmds.txt

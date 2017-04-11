@@ -281,7 +281,7 @@ class ControlProtocol(LineReceiver):
 
         if len(args) == 3:
             try:
-                issuerHash = parseKeyIdInput(args[0], self.factory.keystore)
+                issuerHash = parseKeyIdInput(args[2], self.factory.keystore)
             except (NameError, ValueError), e:
                 self.sendLine(str(e))
                 returnValue(None)
