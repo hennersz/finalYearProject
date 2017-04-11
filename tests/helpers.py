@@ -23,7 +23,7 @@ def genNKeys(n):
 
 
 def saveKey(pub, priv, keystore):
-    pword = str(os.getuid())
+    pword = str(1)
     keystore.addPrivateKey(priv, pub, pword, 1)
     keystore.addPublicKey(pub)
 
