@@ -9,6 +9,7 @@ from twisted.internet.defer import inlineCallbacks, returnValue
 
 from distutils.util import strtobool
 from ..utils import parseKeyIdInput, hashToB64
+import sys
 
 
 class ControlProtocol(LineReceiver):
@@ -33,6 +34,8 @@ class ControlProtocol(LineReceiver):
             self.name(args)
         elif command == 'TRUST':
             self.trust(args)
+        elif command == 'TRUSTCA':
+            self.trustCA(args)
         elif command == 'IDENTIFY':
             self.identify(args)
         elif command == 'STOP':
@@ -242,44 +245,50 @@ class ControlProtocol(LineReceiver):
 
         if len(args) != 1:
             self.sendLine(usage)
-            return
+            returnValue(None)
 
         try:
             subjHash = parseKeyIdInput(args[0], self.factory.keystore)
         except (NameError, ValueError), e:
             self.sendLine(str(e))
-            return
+            returnValue(None)
 
         yield self.factory.certs.trust(subjHash)
         self.sendLine("Done!")
 
     @inlineCallbacks
     def trustCA(self, args):
-        usage = "TRUSTCA [delegate] <subjectId>"
+        usage = "TRUSTCA  <subjectId> <delegate> [issuerId]"
 
-        if len(args) < 1:
+        if len(args) < 2:
             self.sendLine(usage)
-            return
-        elif len(args) > 2:
+            returnValue(None)
+        elif len(args) > 3:
             self.sendLine(usage)
-            return
+            returnValue(None)
 
         try:
-            subjHash = parseKeyIdInput(args[-1], self.factory.keystore)
+            subjHash = parseKeyIdInput(args[0], self.factory.keystore)
         except (NameError, ValueError), e:
             self.sendLine(str(e))
-            return
+            returnValue(None)
 
-        if len(args) == 2:
+        try:
+            delegate = strtobool(args[1])
+        except ValueError:
+            self.sendLine(usage)
+            returnValue(None)
+
+        if len(args) == 3:
             try:
-                delegate = strtobool(args[0])
-            except ValueError:
-                self.sendLine(usage)
-                return
+                issuerHash = parseKeyIdInput(args[0], self.factory.keystore)
+            except (NameError, ValueError), e:
+                self.sendLine(str(e))
+                returnValue(None)
         else:
-            delegate = False
+            issuerHash = None
 
-        yield self.factory.certs.addCA(subjHash, delegate)
+        yield self.factory.certs.addCA(subjHash, delegate, issuerHash)
         self.sendLine("Done!")
 
     @inlineCallbacks
@@ -309,8 +318,9 @@ class ControlProtocol(LineReceiver):
 
     def stopServer(self):
         print 'Stopping..'
-        reactor.stop()
         self.factory.keystore.close()
+        reactor.stop()
+        sys.exit(1)
 
     def handleUnknown(self, command):
         self.sendLine("Unknown command: %s" % (command))

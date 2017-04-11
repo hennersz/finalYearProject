@@ -8,7 +8,7 @@ import pytest
 
 @pytest.fixture
 def protocol():
-    factory = CMDRunnerFactory(['cmd1', 'cmd2', 'cmd3'])
+    factory = CMDRunnerFactory(['cmd1\n', 'cmd2\n', 'cmd3\n'])
     proto = factory.buildProtocol(None)
     return proto
 
@@ -22,15 +22,15 @@ def transport(protocol):
 
 def test_runner(protocol, transport):
     protocol.dataReceived('connected')
-    assert transport.value() == 'cmd1'
+    assert transport.value() == 'cmd1\r\n'
     transport.clear()
 
     protocol.dataReceived('more')
-    assert transport.value() == 'cmd2'
+    assert transport.value() == 'cmd2\r\n'
     transport.clear()
 
     protocol.dataReceived('more')
-    assert transport.value() == 'cmd3'
+    assert transport.value() == 'cmd3\r\n'
     transport.clear()
 
     protocol.dataReceived('more')

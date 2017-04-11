@@ -8,11 +8,11 @@ from ..config import Config
 
 class CMDRunner(Protocol):
     def sendMessage(self, msg):
-        self.transport.write(msg)
+        self.transport.write(msg + '\r\n')
 
     def dataReceived(self, data):
         try:
-            msg = self.factory.lines.next()
+            msg = self.factory.lines.next()[:-1]
         except StopIteration:
             self.transport.loseConnection()
         else:

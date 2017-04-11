@@ -1,0 +1,14 @@
+set key 6RBYDy/gGWaW8qLWMfVaKQ==
+name gxOQQsXkNRDzzIYWCX9YpQ== alice@domain.com
+set key alice@domain.com
+set key e6gMYpuJs95TcwvYMtSNuA==
+set key rO2SBN26rKBFq4Tem9S3bg==
+set key sbC21z5+DecwQ2eSasDcqQ==
+set key 82k4bN0M7y6n6BskVHfwHg==
+set key +6ld0p3o1x/uQuAoAsjwLQ==
+set key n1+ITCrG0JC415EnH8/nrQ==
+trustca e6gMYpuJs95TcwvYMtSNuA== True
+trustca rO2SBN26rKBFq4Tem9S3bg== True e6gMYpuJs95TcwvYMtSNuA==
+trustca sbC21z5+DecwQ2eSasDcqQ== True rO2SBN26rKBFq4Tem9S3bg==
+get key 4BGF05oGpO8mYhRB3XVYGg==
+trustca 4BGF05oGpO8mYhRB3XVYGg== False sbC21z5+DecwQ2eSasDcqQ==

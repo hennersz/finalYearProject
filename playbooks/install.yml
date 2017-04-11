@@ -20,5 +20,5 @@
         virtualenv_python: python2.7
     - name: Make main file executable
       file: 
-        path: ~/p2ppki/p2ppki/core.py
+        path: ~/p2ppki/main.py
         mode: 0751
