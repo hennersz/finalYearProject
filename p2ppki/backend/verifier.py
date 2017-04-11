@@ -48,9 +48,23 @@ class Verifier:
     def findChain(self, issuer, depth):
         if depth > self.maxDepth:
             returnValue(False)
+        try:
+            self.verifier.checkPermission(issuer, 'CATrusted')
+        except verify.SecurityError:
+            pass
+        else:
+            returnValue(True)
+
         certs = yield self.certManager.getCertificates(issuer)
+        if certs is None:
+            returnValue(False)
+
         certs = filterCerts(certs)
+        if certs is None:
+            returnValue(False)
+
         res = False
+
         for seq in certs:
             self.keyStore.addCert(seq)
             try:
@@ -94,6 +108,8 @@ class Verifier:
             #  where the principle is the hash of the issuer
             #  and names is a list of names asigned to the key
             i = c.getIssuer().getPrincipal().principal
+            if not isinstance(i, spki.Hash):
+                continue
             try:
                 self.verifier.checkPermission(i, 'Trusted')
             except verify.SecurityError:
