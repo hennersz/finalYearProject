@@ -10,3 +10,8 @@
   tasks: 
     - name: Run the program
       shell: . ~/p2ppki/ENV/bin/activate && nohup python ~/p2ppki/main.py startServer &
+
+    - name: Store Keys    
+      shell: . ~/p2ppki/ENV/bin/activate && python ~/p2ppki/main.py runFile ~/.p2ppki/storeKeys.txt
+    - name: Create Certs    
+      shell: . ~/p2ppki/ENV/bin/activate && python ~/p2ppki/main.py runFile ~/.p2ppki/createCerts.txt
