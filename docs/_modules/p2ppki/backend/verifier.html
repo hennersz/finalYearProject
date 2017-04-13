@@ -1,0 +1,367 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>p2ppki.backend.verifier &#8212; p2ppki 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for p2ppki.backend.verifier</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: verifier</span>
+<span class="sd">    :platform: UNIX</span>
+<span class="sd">    :synopsis: Attempts to find valid names for a public key from the dht.</span>
+
+<span class="sd">.. moduleauthor:: Henry Mortimer &lt;henry@morti.net&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">pisces.spkilib</span> <span class="k">import</span> <span class="n">verify</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">spki</span>
+<span class="kn">from</span> <span class="nn">twisted.internet.defer</span> <span class="k">import</span> <span class="n">inlineCallbacks</span><span class="p">,</span> <span class="n">returnValue</span>
+
+
+<div class="viewcode-block" id="filterNameCerts"><a class="viewcode-back" href="../../../verifier.html#p2ppki.backend.verifier.filterNameCerts">[docs]</a><span class="k">def</span> <span class="nf">filterNameCerts</span><span class="p">(</span><span class="n">certs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filters a list of spki.Sequence</span>
+<span class="sd">    objects to remove any non namecert</span>
+<span class="sd">    objects.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        certs: [spki.Sequence]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        [spki.Sequence]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">nameCerts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">certs</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">elt</span> <span class="ow">in</span> <span class="n">seq</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elt</span><span class="p">,</span> <span class="n">spki</span><span class="o">.</span><span class="n">Cert</span><span class="p">)</span> <span class="ow">and</span> <span class="n">elt</span><span class="o">.</span><span class="n">isNameCert</span><span class="p">():</span>
+                <span class="n">nameCerts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">nameCerts</span></div>
+
+
+<div class="viewcode-block" id="filterCerts"><a class="viewcode-back" href="../../../verifier.html#p2ppki.backend.verifier.filterCerts">[docs]</a><span class="k">def</span> <span class="nf">filterCerts</span><span class="p">(</span><span class="n">certs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filters a list of spki.Sequence</span>
+<span class="sd">    objects to only contain sequences with</span>
+<span class="sd">    spki.Cert objects that aren&#39;t namecerts.</span>
+
+
+<span class="sd">    Args:</span>
+<span class="sd">        certs: [spki.Sequence]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        [spki.Sequence]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">filtered</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">certs</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">elt</span> <span class="ow">in</span> <span class="n">seq</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elt</span><span class="p">,</span> <span class="n">spki</span><span class="o">.</span><span class="n">Cert</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">elt</span><span class="o">.</span><span class="n">isNameCert</span><span class="p">():</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">elt</span><span class="o">.</span><span class="n">getTag</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">&#39;CATrusted&#39;</span><span class="p">):</span>
+                    <span class="n">filtered</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">filtered</span></div>
+
+
+<div class="viewcode-block" id="getCertFromSeq"><a class="viewcode-back" href="../../../verifier.html#p2ppki.backend.verifier.getCertFromSeq">[docs]</a><span class="k">def</span> <span class="nf">getCertFromSeq</span><span class="p">(</span><span class="n">seq</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets the certificate</span>
+<span class="sd">    object from a spki.Sequence</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        seq: spki.Sequence</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        spki.Cert</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError. Raised if no cert is found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">elt</span> <span class="ow">in</span> <span class="n">seq</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elt</span><span class="p">,</span> <span class="n">spki</span><span class="o">.</span><span class="n">Cert</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">elt</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Sequence didnt contain certificate&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Verifier"><a class="viewcode-back" href="../../../verifier.html#p2ppki.backend.verifier.Verifier">[docs]</a><span class="k">class</span> <span class="nc">Verifier</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Attepmts to find valid names for a public key.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">certManager</span><span class="p">,</span> <span class="n">keyStore</span><span class="p">,</span> <span class="n">acl</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Init object</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            certManager: CertManager object.</span>
+
+<span class="sd">            keyStore: KeyStore object.</span>
+
+<span class="sd">            acl: String or database.ACL object. If its </span>
+<span class="sd">            a string it creates a new ACL object.</span>
+
+<span class="sd">            dept: Int. The max search depth.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">certManager</span> <span class="o">=</span> <span class="n">certManager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keyStore</span> <span class="o">=</span> <span class="n">keyStore</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">acl</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">acl</span> <span class="o">=</span> <span class="n">database</span><span class="o">.</span><span class="n">ACL</span><span class="p">(</span><span class="n">acl</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">acl</span> <span class="o">=</span> <span class="n">acl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verifier</span> <span class="o">=</span> <span class="n">verify</span><span class="o">.</span><span class="n">ReferenceMonitor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">acl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">keyStore</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maxDepth</span> <span class="o">=</span> <span class="n">depth</span>
+
+    <span class="nd">@inlineCallbacks</span>
+<div class="viewcode-block" id="Verifier.findChain"><a class="viewcode-back" href="../../../verifier.html#p2ppki.backend.verifier.Verifier.findChain">[docs]</a>    <span class="k">def</span> <span class="nf">findChain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">issuer</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Recursively tries to find a valid certificate</span>
+<span class="sd">        chain by getting certificates for the issuer</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            issuer: spki.Hash object.</span>
+
+<span class="sd">            dept: Int. The current recursion depth.</span>
+
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Bool. True if chain found otherwise false.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxDepth</span><span class="p">:</span>
+            <span class="n">returnValue</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">verifier</span><span class="o">.</span><span class="n">checkPermission</span><span class="p">(</span><span class="n">issuer</span><span class="p">,</span> <span class="s1">&#39;CATrusted&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">verify</span><span class="o">.</span><span class="n">SecurityError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">returnValue</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">certs</span> <span class="o">=</span> <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">certManager</span><span class="o">.</span><span class="n">getCertificates</span><span class="p">(</span><span class="n">issuer</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">certs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">returnValue</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">certs</span> <span class="o">=</span> <span class="n">filterCerts</span><span class="p">(</span><span class="n">certs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">certs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">returnValue</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">certs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keyStore</span><span class="o">.</span><span class="n">addCert</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">verifier</span><span class="o">.</span><span class="n">checkPermission</span><span class="p">(</span><span class="n">issuer</span><span class="p">,</span> <span class="s1">&#39;CATrusted&#39;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">verify</span><span class="o">.</span><span class="n">SecurityError</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">getCertFromSeq</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span><span class="o">.</span><span class="n">getIssuer</span><span class="p">()</span><span class="o">.</span><span class="n">getPrincipal</span><span class="p">()</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">findChain</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">depth</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">res</span> <span class="ow">or</span> <span class="n">r</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">returnValue</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">returnValue</span><span class="p">(</span><span class="n">res</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Verifier.checkLocalNames"><a class="viewcode-back" href="../../../verifier.html#p2ppki.backend.verifier.Verifier.checkLocalNames">[docs]</a>    <span class="k">def</span> <span class="nf">checkLocalNames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyHash</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks if there are any name certs</span>
+<span class="sd">        stored locally for the key.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyHash: spki.Hash object</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [Strings]: List of names.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">certs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keyStore</span><span class="o">.</span><span class="n">lookupCertBySubject</span><span class="p">(</span><span class="n">keyHash</span><span class="p">)</span>
+        <span class="n">validNames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">cert</span> <span class="ow">in</span> <span class="n">certs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cert</span><span class="p">,</span> <span class="n">spki</span><span class="o">.</span><span class="n">Sequence</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">elt</span> <span class="ow">in</span> <span class="n">cert</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elt</span><span class="p">,</span> <span class="n">spki</span><span class="o">.</span><span class="n">Cert</span><span class="p">):</span>
+                        <span class="n">cert</span> <span class="o">=</span> <span class="n">elt</span>
+                        <span class="k">break</span>
+            <span class="k">if</span> <span class="n">cert</span><span class="o">.</span><span class="n">isNameCert</span><span class="p">():</span>
+                <span class="c1"># Assume signatures for local certs have already been validated</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">cert</span><span class="o">.</span><span class="n">getIssuer</span><span class="p">()</span><span class="o">.</span><span class="n">getPrincipal</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
+                    <span class="n">validNames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">validNames</span></div>
+
+    <span class="nd">@inlineCallbacks</span>
+<div class="viewcode-block" id="Verifier.checkTrusted"><a class="viewcode-back" href="../../../verifier.html#p2ppki.backend.verifier.Verifier.checkTrusted">[docs]</a>    <span class="k">def</span> <span class="nf">checkTrusted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyHash</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks if any of the keys that </span>
+<span class="sd">        issued name certificates for keyHash</span>
+<span class="sd">        are trusted.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyHash: spki.Hash object.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [String]: List of names.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">newCerts</span> <span class="o">=</span> <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">certManager</span><span class="o">.</span><span class="n">getCertificates</span><span class="p">(</span><span class="n">keyHash</span><span class="p">)</span>
+        <span class="n">nameCerts</span> <span class="o">=</span> <span class="n">filterNameCerts</span><span class="p">(</span><span class="n">newCerts</span><span class="p">)</span>
+        <span class="n">untrustedIssuers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">validNames</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">nameCerts</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">getCertFromSeq</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+
+            <span class="c1">#  Slightly unintuitive but name certs should have a</span>
+            <span class="c1">#  FullyQualifiedName object as the issuer principal</span>
+            <span class="c1">#  where the principle is the hash of the issuer</span>
+            <span class="c1">#  and names is a list of names asigned to the key</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">getIssuer</span><span class="p">()</span><span class="o">.</span><span class="n">getPrincipal</span><span class="p">()</span><span class="o">.</span><span class="n">principal</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">spki</span><span class="o">.</span><span class="n">Hash</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">verifier</span><span class="o">.</span><span class="n">checkPermission</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Trusted&#39;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">verify</span><span class="o">.</span><span class="n">SecurityError</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">verifier</span><span class="o">.</span><span class="n">checkPermission</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;CATrusted&#39;</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">untrustedIssuers</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">seq</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">keyStore</span><span class="o">.</span><span class="n">addCert</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">getIssuer</span><span class="p">()</span><span class="o">.</span><span class="n">getPrincipal</span><span class="p">()</span>
+                    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
+                        <span class="n">validNames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">keyStore</span><span class="o">.</span><span class="n">addCert</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">getIssuer</span><span class="p">()</span><span class="o">.</span><span class="n">getPrincipal</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
+                    <span class="n">validNames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+        <span class="n">returnValue</span><span class="p">((</span><span class="n">validNames</span><span class="p">,</span> <span class="n">untrustedIssuers</span><span class="p">))</span></div>
+
+    <span class="nd">@inlineCallbacks</span>
+<div class="viewcode-block" id="Verifier.checkCA"><a class="viewcode-back" href="../../../verifier.html#p2ppki.backend.verifier.Verifier.checkCA">[docs]</a>    <span class="k">def</span> <span class="nf">checkCA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">untrustedIssuers</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks each of the untrusted issuers</span>
+<span class="sd">        to see if there is a valid certificate chain</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            untrustedIssuers: [(spki,Hash, spki.Sequence)]</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [String]: List of valid names.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">validNames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">issuer</span> <span class="ow">in</span> <span class="n">untrustedIssuers</span><span class="p">:</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">findChain</span><span class="p">(</span><span class="n">issuer</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">found</span><span class="p">:</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">getCertFromSeq</span><span class="p">(</span><span class="n">issuer</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">keyStore</span><span class="o">.</span><span class="n">addCert</span><span class="p">(</span><span class="n">issuer</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">getIssuer</span><span class="p">()</span><span class="o">.</span><span class="n">getPrincipal</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
+                    <span class="n">validNames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+        <span class="n">returnValue</span><span class="p">(</span><span class="n">validNames</span><span class="p">)</span></div>
+
+    <span class="nd">@inlineCallbacks</span>
+<div class="viewcode-block" id="Verifier.identify"><a class="viewcode-back" href="../../../verifier.html#p2ppki.backend.verifier.Verifier.identify">[docs]</a>    <span class="k">def</span> <span class="nf">identify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyHash</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Attepmts to indentify the key</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyHash: spki.Hash.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [String]: List of names.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">validNames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkLocalNames</span><span class="p">(</span><span class="n">keyHash</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">validNames</span> <span class="o">==</span> <span class="p">[]:</span>
+            <span class="n">validNames</span><span class="p">,</span> <span class="n">untrustedIssuers</span> <span class="o">=</span> <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkTrusted</span><span class="p">(</span><span class="n">keyHash</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">validNames</span> <span class="o">==</span> <span class="p">[]:</span>
+            <span class="n">validNames</span> <span class="o">=</span> <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkCA</span><span class="p">(</span><span class="n">untrustedIssuers</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">keyStore</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="n">returnValue</span><span class="p">(</span><span class="n">validNames</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../toc.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">P2PPKI - Peer to Peer Public Key Infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../instalation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basicUsage.html">Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../reference.html">API Reference</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../toc.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Henry Mortimer.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

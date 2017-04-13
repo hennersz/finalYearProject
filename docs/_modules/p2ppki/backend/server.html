@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>p2ppki.backend.server &#8212; p2ppki 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for p2ppki.backend.server</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: server</span>
+<span class="sd">    :platform: UNIX</span>
+<span class="sd">    :synopsis: Initialises and runs server.</span>
+
+<span class="sd">.. moduleauthor:: Henry Mortimer &lt;henry@morti.net&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">reactor</span>
+<span class="kn">from</span> <span class="nn">twisted.internet.defer</span> <span class="k">import</span> <span class="n">inlineCallbacks</span><span class="p">,</span> <span class="n">returnValue</span>
+<span class="kn">from</span> <span class="nn">twisted.python</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">twisted.python.logfile</span> <span class="k">import</span> <span class="n">DailyLogFile</span>
+<span class="kn">from</span> <span class="nn">kademlia.network</span> <span class="k">import</span> <span class="n">Server</span>
+
+<span class="kn">from</span> <span class="nn">pisces.spkilib</span> <span class="k">import</span> <span class="n">keystore</span>
+
+<span class="kn">from</span> <span class="nn">storage</span> <span class="k">import</span> <span class="n">ListStorage</span>
+<span class="kn">from</span> <span class="nn">dhtServer</span> <span class="k">import</span> <span class="n">DHTServer</span>
+<span class="kn">from</span> <span class="nn">localServer</span> <span class="k">import</span> <span class="n">ControlServer</span>
+<span class="kn">from</span> <span class="nn">certManager</span> <span class="k">import</span> <span class="n">CertManager</span>
+<span class="kn">from</span> <span class="nn">keyManager</span> <span class="k">import</span> <span class="n">KeyManager</span>
+<span class="kn">from</span> <span class="nn">verifier</span> <span class="k">import</span> <span class="n">Verifier</span>
+<span class="kn">from</span> <span class="nn">..config</span> <span class="k">import</span> <span class="n">Config</span>
+
+<span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+
+
+<span class="nd">@inlineCallbacks</span>
+<div class="viewcode-block" id="initServer"><a class="viewcode-back" href="../../../server.html#p2ppki.backend.server.initServer">[docs]</a><span class="k">def</span> <span class="nf">initServer</span><span class="p">(</span><span class="n">localPort</span><span class="p">,</span> <span class="n">remoteHost</span><span class="p">,</span> <span class="n">remotePort</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initialises the DHT and connects it to the </span>
+<span class="sd">    bootstrapping server.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        localPort: Int.</span>
+
+<span class="sd">        remoteHost: String - Must be ip address not </span>
+<span class="sd">        domain name.</span>
+
+<span class="sd">        remotePort: Int.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Kademlia Server object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">server</span> <span class="o">=</span> <span class="n">Server</span><span class="p">(</span><span class="n">storage</span><span class="o">=</span><span class="n">ListStorage</span><span class="p">())</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="n">localPort</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="n">server</span><span class="o">.</span><span class="n">bootstrap</span><span class="p">([(</span><span class="n">remoteHost</span><span class="p">,</span> <span class="n">remotePort</span><span class="p">)])</span>
+    <span class="n">returnValue</span><span class="p">(</span><span class="n">server</span><span class="p">)</span></div>
+
+
+<span class="nd">@inlineCallbacks</span>
+<div class="viewcode-block" id="init"><a class="viewcode-back" href="../../../server.html#p2ppki.backend.server.init">[docs]</a><span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="n">conf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates all the required object to run the program</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        conf: Config object.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ControlServer object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Setup logger</span>
+    <span class="n">logPath</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;dataDir&#39;</span><span class="p">],</span> <span class="s1">&#39;logs/server.log&#39;</span><span class="p">)</span>
+    <span class="n">logFile</span> <span class="o">=</span> <span class="n">DailyLogFile</span><span class="o">.</span><span class="n">fromFullPath</span><span class="p">(</span><span class="n">logPath</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">startLogging</span><span class="p">(</span><span class="n">logFile</span><span class="p">)</span>
+
+    <span class="c1"># Create DHT Server</span>
+    <span class="n">server</span> <span class="o">=</span> <span class="k">yield</span> <span class="n">initServer</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;serverPort&#39;</span><span class="p">],</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;bootStrapServer&#39;</span><span class="p">],</span> <span class="mi">8468</span><span class="p">)</span>
+    <span class="n">dht</span> <span class="o">=</span> <span class="n">DHTServer</span><span class="p">(</span><span class="n">server</span><span class="p">)</span>
+
+    <span class="c1"># Create key and cert management objects</span>
+    <span class="n">keyStore</span> <span class="o">=</span> <span class="n">keystore</span><span class="o">.</span><span class="n">KeyStore</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;dataDir&#39;</span><span class="p">])</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="n">KeyManager</span><span class="p">(</span><span class="n">dht</span><span class="p">,</span> <span class="n">keyStore</span><span class="p">)</span>
+    <span class="n">certs</span> <span class="o">=</span> <span class="n">CertManager</span><span class="p">(</span><span class="n">dht</span><span class="p">,</span> <span class="n">keyStore</span><span class="p">)</span>
+    <span class="n">aclDir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;dataDir&#39;</span><span class="p">],</span> <span class="s1">&#39;acl&#39;</span><span class="p">)</span>
+    <span class="n">verifier</span> <span class="o">=</span> <span class="n">Verifier</span><span class="p">(</span><span class="n">certs</span><span class="p">,</span> <span class="n">keyStore</span><span class="p">,</span> <span class="n">aclDir</span><span class="p">,</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;searchDepth&quot;</span><span class="p">])</span>
+
+    <span class="c1"># Return value so it doesn&#39;t get garbage collected</span>
+    <span class="n">returnValue</span><span class="p">(</span><span class="n">ControlServer</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;localPort&#39;</span><span class="p">],</span> <span class="n">dht</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">certs</span><span class="p">,</span> <span class="n">verifier</span><span class="p">,</span> <span class="n">keyStore</span><span class="p">,</span> <span class="n">reactor</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="runServer"><a class="viewcode-back" href="../../../server.html#p2ppki.backend.server.runServer">[docs]</a><span class="k">def</span> <span class="nf">runServer</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Start program.&quot;&quot;&quot;</span>
+    <span class="n">conf</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(</span><span class="s1">&#39;~/.p2ppki/config.cfg&#39;</span><span class="p">)</span>
+    <span class="n">init</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../toc.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">P2PPKI - Peer to Peer Public Key Infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../instalation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basicUsage.html">Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../reference.html">API Reference</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../toc.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Henry Mortimer.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

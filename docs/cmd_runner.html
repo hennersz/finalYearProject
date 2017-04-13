@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cmd_runner — Runs commands from a file &#8212; p2ppki 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cmdLine — Run commands from the terminal" href="cmdLine.html" />
+    <link rel="prev" title="`clients` — Clients to run commands" href="clients.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-p2ppki.clients.cmd_runner">
+<span id="cmd-runner-runs-commands-from-a-file"></span><h1><code class="docutils literal"><span class="pre">cmd_runner</span></code> &#8212; Runs commands from a file<a class="headerlink" href="#module-p2ppki.clients.cmd_runner" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-cmd_runner"></span><dl class="class">
+<dt id="p2ppki.clients.cmd_runner.CMDRunner">
+<em class="property">class </em><code class="descclassname">p2ppki.clients.cmd_runner.</code><code class="descname">CMDRunner</code><a class="reference internal" href="_modules/p2ppki/clients/cmd_runner.html#CMDRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.clients.cmd_runner.CMDRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends commands from a file until
+it is empty. It waits for a response
+before sending each command.</p>
+<dl class="method">
+<dt id="p2ppki.clients.cmd_runner.CMDRunner.dataReceived">
+<code class="descname">dataReceived</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2ppki/clients/cmd_runner.html#CMDRunner.dataReceived"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.clients.cmd_runner.CMDRunner.dataReceived" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if there is another
+message to send and sends it
+or disconnects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="p2ppki.clients.cmd_runner.CMDRunner.sendMessage">
+<code class="descname">sendMessage</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2ppki/clients/cmd_runner.html#CMDRunner.sendMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.clients.cmd_runner.CMDRunner.sendMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Appends CRLF to message</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="p2ppki.clients.cmd_runner.CMDRunnerFactory">
+<em class="property">class </em><code class="descclassname">p2ppki.clients.cmd_runner.</code><code class="descname">CMDRunnerFactory</code><span class="sig-paren">(</span><em>lines</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2ppki/clients/cmd_runner.html#CMDRunnerFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.clients.cmd_runner.CMDRunnerFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates client factory for CMDRunner</p>
+<dl class="method">
+<dt id="p2ppki.clients.cmd_runner.CMDRunnerFactory.buildProtocol">
+<code class="descname">buildProtocol</code><span class="sig-paren">(</span><em>addr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2ppki/clients/cmd_runner.html#CMDRunnerFactory.buildProtocol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.clients.cmd_runner.CMDRunnerFactory.buildProtocol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create protocol and give it a
+reference to the factory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="p2ppki.clients.cmd_runner.CMDRunnerFactory.clientConnectionFailed">
+<code class="descname">clientConnectionFailed</code><span class="sig-paren">(</span><em>connector</em>, <em>reason</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2ppki/clients/cmd_runner.html#CMDRunnerFactory.clientConnectionFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.clients.cmd_runner.CMDRunnerFactory.clientConnectionFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop reactor on client disconnect</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="p2ppki.clients.cmd_runner.CMDRunnerFactory.clientConnectionLost">
+<code class="descname">clientConnectionLost</code><span class="sig-paren">(</span><em>connector</em>, <em>reason</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2ppki/clients/cmd_runner.html#CMDRunnerFactory.clientConnectionLost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.clients.cmd_runner.CMDRunnerFactory.clientConnectionLost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop reactor on client disconnect</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="p2ppki.clients.cmd_runner.CMDRunnerFactory.startedConnecting">
+<code class="descname">startedConnecting</code><span class="sig-paren">(</span><em>connector</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2ppki/clients/cmd_runner.html#CMDRunnerFactory.startedConnecting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.clients.cmd_runner.CMDRunnerFactory.startedConnecting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send message on startup</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="p2ppki.clients.cmd_runner.run">
+<code class="descclassname">p2ppki.clients.cmd_runner.</code><code class="descname">run</code><span class="sig-paren">(</span><em>fp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2ppki/clients/cmd_runner.html#run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.clients.cmd_runner.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run this program</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>fp: File object in read mode.</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="toc.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">P2PPKI - Peer to Peer Public Key Infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="instalation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basicUsage.html">Basic Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="config.html"><code class="docutils literal"><span class="pre">config</span></code> &#8212; Loads config variables from a file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html"><code class="docutils literal"><span class="pre">utils</span></code> &#8212; Various utilities and helper functions</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="clients.html"><code class="docutils literal"><span class="pre">`clients`</span></code> &#8212; Clients to run commands</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="docutils literal"><span class="pre">cmd_runner</span></code> &#8212; Runs commands from a file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmdLine.html"><code class="docutils literal"><span class="pre">cmdLine</span></code> &#8212; Run commands from the terminal</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html"><code class="docutils literal"><span class="pre">`backend`</span></code> &#8212; DHT and key management</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="toc.html">Documentation overview</a><ul>
+  <li><a href="reference.html">API Reference</a><ul>
+  <li><a href="clients.html"><code class="docutils literal"><span class="pre">`clients`</span></code> &#8212; Clients to run commands</a><ul>
+      <li>Previous: <a href="clients.html" title="previous chapter"><code class="docutils literal"><span class="pre">`clients`</span></code> &#8212; Clients to run commands</a></li>
+      <li>Next: <a href="cmdLine.html" title="next chapter"><code class="docutils literal"><span class="pre">cmdLine</span></code> &#8212; Run commands from the terminal</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/cmd_runner.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Henry Mortimer.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/cmd_runner.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

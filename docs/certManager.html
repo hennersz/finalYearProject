@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>certManager — Manages certificates &#8212; p2ppki 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="dhtServer — Wrapper around key value storage" href="dhtServer.html" />
+    <link rel="prev" title="`backend` — DHT and key management" href="backend.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-p2ppki.backend.certManager">
+<span id="certmanager-manages-certificates"></span><h1><code class="docutils literal"><span class="pre">certManager</span></code> &#8212; Manages certificates<a class="headerlink" href="#module-p2ppki.backend.certManager" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-certManager"></span><dl class="class">
+<dt id="p2ppki.backend.certManager.CertManager">
+<em class="property">class </em><code class="descclassname">p2ppki.backend.certManager.</code><code class="descname">CertManager</code><span class="sig-paren">(</span><em>dht</em>, <em>keyStore</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2ppki/backend/certManager.html#CertManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.backend.certManager.CertManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manages certificates. Provides methods for creation,
+storage and retrieval.</p>
+<dl class="method">
+<dt id="p2ppki.backend.certManager.CertManager.addCA">
+<code class="descname">addCA</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2ppki/backend/certManager.html#CertManager.addCA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.backend.certManager.CertManager.addCA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a CA certificate.
+Can also delegate permission
+If issuer is None uses default key from
+keystore.
+Stores certificate locally and in dht.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">subject: spki.Hash</p>
+<p>delegate: Bool - If this is true the subject 
+of the certificate will now also be able to issue 
+valid CA certificates</p>
+<p class="last">issuer: spki.Hash object or None. Must have private
+key for issuer.</p>
+</dd>
+<dt>Returns:</dt>
+<dd>Bool: If dht storage was successful.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="p2ppki.backend.certManager.CertManager.getCertificates">
+<code class="descname">getCertificates</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2ppki/backend/certManager.html#CertManager.getCertificates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.backend.certManager.CertManager.getCertificates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets certificates from dht that correspond to the supplied 
+key hash</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>keyHash: spki.Hash object.</dd>
+<dt>Returns:</dt>
+<dd>list: A list containing all found certificates
+that parse correctly and are well formed.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="p2ppki.backend.certManager.CertManager.name">
+<code class="descname">name</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2ppki/backend/certManager.html#CertManager.name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.backend.certManager.CertManager.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Associates name with a public key
+If issuer is none it uses the default key 
+for the keystore
+Stores certificates in the dht and locally</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">subject: spki.Hash</p>
+<p>name: string or list of strings.</p>
+<p class="last">issuer: spki.Hash or None, Must have private key 
+locally</p>
+</dd>
+<dt>Returns:</dt>
+<dd>Bool: If dht storage was successful.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="p2ppki.backend.certManager.CertManager.storeCert">
+<code class="descname">storeCert</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2ppki/backend/certManager.html#CertManager.storeCert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.backend.certManager.CertManager.storeCert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores a certificate in the dht</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>certificate: spki.Sequence object, should contain a spki.Cert
+and spki.Signature and could contain the public key for the 
+signer as well</dd>
+<dt>Returns:</dt>
+<dd>Bool: If dht storage was successful.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="p2ppki.backend.certManager.CertManager.trust">
+<code class="descname">trust</code><span class="sig-paren">(</span><em>subject</em>, <em>issuer=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2ppki/backend/certManager.html#CertManager.trust"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.backend.certManager.CertManager.trust" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create trust certificate.
+If issuer is none it uses the default 
+key from the keystore.
+Stores certificate in local keystore only</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">subject: spki.Hash object</p>
+<p class="last">issuer: spki.Hash object or None. Must have private
+key for issuer.</p>
+</dd>
+<dt>Returns:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="p2ppki.backend.certManager.VerifyError">
+<em class="property">exception </em><code class="descclassname">p2ppki.backend.certManager.</code><code class="descname">VerifyError</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2ppki/backend/certManager.html#VerifyError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.backend.certManager.VerifyError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple exception for verifiying signatures</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="p2ppki.backend.certManager.verifyCertSig">
+<code class="descclassname">p2ppki.backend.certManager.</code><code class="descname">verifyCertSig</code><span class="sig-paren">(</span><em>certSeq</em>, <em>keyStore</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2ppki/backend/certManager.html#verifyCertSig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.backend.certManager.verifyCertSig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verifies that the signature on the certificate is valid.
+Will store a valid key that is found in the keystore.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">certSeq: An spki.Sequence object. To correctly verify
+the sequence it must contain exactly one spki.Cert object and
+one spki.Signature object. Can also contain one spki.PublicKey
+object.</p>
+<p class="last">keyStore: A keystore.KeyStore object or a subclass of it. Must
+provide addPublicKey and lookupKey methods.</p>
+</dd>
+<dt>Returns:</dt>
+<dd>An spkiSequence with the spki.Cert and spki.Sequence objects from
+certSeq</dd>
+<dt>Raises:</dt>
+<dd>VerifyError: If any stage of verification fails this is raised.</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="toc.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">P2PPKI - Peer to Peer Public Key Infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="instalation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basicUsage.html">Basic Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="config.html"><code class="docutils literal"><span class="pre">config</span></code> &#8212; Loads config variables from a file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html"><code class="docutils literal"><span class="pre">utils</span></code> &#8212; Various utilities and helper functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clients.html"><code class="docutils literal"><span class="pre">`clients`</span></code> &#8212; Clients to run commands</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="backend.html"><code class="docutils literal"><span class="pre">`backend`</span></code> &#8212; DHT and key management</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="docutils literal"><span class="pre">certManager</span></code> &#8212; Manages certificates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dhtServer.html"><code class="docutils literal"><span class="pre">dhtServer</span></code> &#8212; Wrapper around key value storage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="keyManager.html"><code class="docutils literal"><span class="pre">keyManager</span></code> &#8212; Manages keys</a></li>
+<li class="toctree-l3"><a class="reference internal" href="localServer.html"><code class="docutils literal"><span class="pre">localServer</span></code> &#8212; Control the program</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server.html"><code class="docutils literal"><span class="pre">server</span></code> &#8212; Main entry point to start the server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="storage.html"><code class="docutils literal"><span class="pre">storage</span></code> &#8212; List storage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="verifier.html"><code class="docutils literal"><span class="pre">verifier</span></code> &#8212; Find names for keys</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="toc.html">Documentation overview</a><ul>
+  <li><a href="reference.html">API Reference</a><ul>
+  <li><a href="backend.html"><code class="docutils literal"><span class="pre">`backend`</span></code> &#8212; DHT and key management</a><ul>
+      <li>Previous: <a href="backend.html" title="previous chapter"><code class="docutils literal"><span class="pre">`backend`</span></code> &#8212; DHT and key management</a></li>
+      <li>Next: <a href="dhtServer.html" title="next chapter"><code class="docutils literal"><span class="pre">dhtServer</span></code> &#8212; Wrapper around key value storage</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/certManager.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Henry Mortimer.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/certManager.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
