@@ -1,19 +1,55 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+.. module:: keyManager
+    :platform: UNIX
+    :synopsis: Handles storage a retrieval of keys from dht.
+
+.. moduleauthor:: Henry Mortimer <henry@morti.net>
+
+"""
+
 from pisces.spkilib import sexp, spki
 from twisted.internet.defer import inlineCallbacks, returnValue
 from ..utils import hashToB64
 
 
 class KeyManager():
+    """Stores keys in dht and locally and retrieves keys
+    from dht but doesn't store them locally.
+    """
 
     def __init__(self, dht, keyStore):
+        """Initialise key manager
+
+        Args:
+            dht: Some persistent key value storage object that provides
+            get and set methods
+
+            keyStore: KeyStore object or subclass to store and retrieve
+            keys locally
+        """
+
         self.dht = dht
         self.keystore = keyStore
 
     @inlineCallbacks
     def insertKey(self, keyHash):
+        """Inserts a key into the dht. Uses keyhash and local
+        Names as dht key.
+
+        Args:
+            keyHash: spki.Hash object. Public key must be available
+            locally.
+
+        Returns:
+            Bool: If dht storage was successful.
+
+        Raises:
+            ValueError. Raised if public key not found locally.
+        """
+
         h = hashToB64(keyHash)
         k = h + '-key'
 
@@ -43,6 +79,16 @@ class KeyManager():
 
     @inlineCallbacks
     def getKey(self, keyId):
+        """Retrieves keys from dht.
+
+        Args:
+            keyId: String or spki.Hash
+
+        Returns:
+            List or None: List of parsed spki.PublicKeys or None if 
+            they didn't parse or none were found.
+        """
+
         if isinstance(keyId, spki.Hash):
             key = hashToB64(keyId) + '-key'
         else:
@@ -71,6 +117,14 @@ class KeyManager():
             returnValue(None)
 
     def listLocalKeys(self, private=False):
+        """Gets a list of locally stored keys
+
+        Args:
+            private: Bool. Returns private keys if true
+            
+        Returns:
+            ([spki.PublicKey], [spki.PrivateKey]). Private keys may be None. 
+        """
         pubs = self.keystore.listPublicKeys()
         if private:
             privs = self.keystore.listPrivateKeys()

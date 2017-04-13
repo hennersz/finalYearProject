@@ -1,11 +1,31 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+.. module:: verifier
+    :platform: UNIX
+    :synopsis: Attempts to find valid names for a public key from the dht.
+
+.. moduleauthor:: Henry Mortimer <henry@morti.net>
+
+"""
+
 from pisces.spkilib import verify, database, spki
 from twisted.internet.defer import inlineCallbacks, returnValue
 
 
 def filterNameCerts(certs):
+    """Filters a list of spki.Sequence
+    objects to remove any non namecert
+    objects.
+
+    Args:
+        certs: [spki.Sequence]
+
+    Returns:
+        [spki.Sequence]
+    """
+
     nameCerts = []
     for seq in certs:
         for elt in seq:
@@ -15,6 +35,18 @@ def filterNameCerts(certs):
 
 
 def filterCerts(certs):
+    """Filters a list of spki.Sequence
+    objects to only contain sequences with
+    spki.Cert objects that aren't namecerts.
+
+
+    Args:
+        certs: [spki.Sequence]
+
+    Returns:
+        [spki.Sequence]
+    """
+
     filtered = []
     for seq in certs:
         for elt in seq:
@@ -26,6 +58,18 @@ def filterCerts(certs):
 
 
 def getCertFromSeq(seq):
+    """Gets the certificate
+    object from a spki.Sequence
+
+    Args:
+        seq: spki.Sequence
+
+    Returns:
+        spki.Cert
+
+    Raises:
+        ValueError. Raised if no cert is found.
+    """
     for elt in seq:
         if isinstance(elt, spki.Cert):
             return elt
@@ -33,8 +77,23 @@ def getCertFromSeq(seq):
 
 
 class Verifier:
+    """Attepmts to find valid names for a public key.
+    """
 
     def __init__(self, certManager, keyStore, acl, depth):
+        """Init object
+
+        Args:
+            certManager: CertManager object.
+
+            keyStore: KeyStore object.
+
+            acl: String or database.ACL object. If its 
+            a string it creates a new ACL object.
+
+            dept: Int. The max search depth.
+        """
+
         self.certManager = certManager
         self.keyStore = keyStore
         if isinstance(acl, str):
@@ -46,6 +105,19 @@ class Verifier:
 
     @inlineCallbacks
     def findChain(self, issuer, depth):
+        """Recursively tries to find a valid certificate
+        chain by getting certificates for the issuer
+
+        Args:
+            issuer: spki.Hash object.
+
+            dept: Int. The current recursion depth.
+
+
+        Returns:
+            Bool. True if chain found otherwise false.
+        """
+
         if depth > self.maxDepth:
             returnValue(False)
         try:
@@ -78,6 +150,16 @@ class Verifier:
         returnValue(res)
 
     def checkLocalNames(self, keyHash):
+        """Checks if there are any name certs
+        stored locally for the key.
+
+        Args:
+            keyHash: spki.Hash object
+
+        Returns:
+            [Strings]: List of names.
+        """
+
         certs = self.keyStore.lookupCertBySubject(keyHash)
         validNames = []
         for cert in certs:
@@ -95,6 +177,17 @@ class Verifier:
 
     @inlineCallbacks
     def checkTrusted(self, keyHash):
+        """Checks if any of the keys that 
+        issued name certificates for keyHash
+        are trusted.
+
+        Args:
+            keyHash: spki.Hash object.
+
+        Returns:
+            [String]: List of names.
+        """
+
         newCerts = yield self.certManager.getCertificates(keyHash)
         nameCerts = filterNameCerts(newCerts)
         untrustedIssuers = []
@@ -132,6 +225,16 @@ class Verifier:
 
     @inlineCallbacks
     def checkCA(self, untrustedIssuers):
+        """Checks each of the untrusted issuers
+        to see if there is a valid certificate chain
+
+        Args:
+            untrustedIssuers: [(spki,Hash, spki.Sequence)]
+
+        Returns:
+            [String]: List of valid names.
+        """
+
         validNames = []
         for issuer in untrustedIssuers:
             found = yield self.findChain(issuer[0], 1)
@@ -146,7 +249,13 @@ class Verifier:
 
     @inlineCallbacks
     def identify(self, keyHash):
-        """keyHash must be a spki.Hash object
+        """Attepmts to indentify the key
+
+        Args:
+            keyHash: spki.Hash.
+
+        Returns:
+            [String]: List of names.
         """
         validNames = self.checkLocalNames(keyHash)
 

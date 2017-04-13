@@ -1,6 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+.. module:: certManager
+    :platform: UNIX
+    :synopsis: Handles the creation, storage, retrieval and parsing of certificates
+
+.. moduleauthor:: Henry Mortimer <henry@morti.net>
+
+"""
+
 from pisces.spkilib import spki, sexp
 from twisted.internet.defer import inlineCallbacks, returnValue
 from ..utils import getDefaultKey, loadPrivateKey,\
@@ -8,15 +17,37 @@ from ..utils import getDefaultKey, loadPrivateKey,\
 
 
 class VerifyError(Exception):
+    """Simple exception for verifiying signatures"""
+
     def __init__(self, value):
+        """Initialise error with some value, normally a string"""
+
         self.value = value
 
     def __str__(self):
+        """Defines str method for error, simply returns string of value"""
         return repr(self.value)
 
 
 def verifyCertSig(certSeq, keyStore):
-    """Verifies that the signature on the certificate is valid
+    """Verifies that the signature on the certificate is valid.
+    Will store a valid key that is found in the keystore.
+
+    Args:
+        certSeq: An spki.Sequence object. To correctly verify
+        the sequence it must contain exactly one spki.Cert object and
+        one spki.Signature object. Can also contain one spki.PublicKey
+        object.
+
+        keyStore: A keystore.KeyStore object or a subclass of it. Must
+        provide addPublicKey and lookupKey methods.
+
+    Returns:
+       An spkiSequence with the spki.Cert and spki.Sequence objects from
+       certSeq
+
+    Raises:
+        VerifyError: If any stage of verification fails this is raised.
     """
     key = None
     cert = None
@@ -48,11 +79,39 @@ def verifyCertSig(certSeq, keyStore):
 
 
 class CertManager():
+    """Manages certificates. Provides methods for creation,
+    storage and retrieval.
+    """
+
     def __init__(self, dht, keyStore):
+        """Initialise certificate manager
+
+        Args:
+            dht: Some persistent key value storage object that provides
+            get and set methods
+
+            keyStore: KeyStore object or subclass to store and retrieve 
+            certificates and keys locally
+        """
         self.dht = dht
         self.keystore = keyStore
 
     def trust(self, subject, issuer=None):
+        """Create trust certificate.
+        If issuer is none it uses the default 
+        key from the keystore.
+        Stores certificate in local keystore only
+
+        Args:
+            subject: spki.Hash object
+
+            issuer: spki.Hash object or None. Must have private
+            key for issuer.
+
+        Returns:
+            None
+        """
+
         if issuer is None:
             issuer = getDefaultKey(self.keystore)
 
@@ -68,6 +127,25 @@ class CertManager():
 
     @inlineCallbacks
     def addCA(self, subject, delegate, issuer=None):
+        """Creates a CA certificate.
+        Can also delegate permission
+        If issuer is None uses default key from
+        keystore.
+        Stores certificate locally and in dht.
+
+        Args:
+            subject: spki.Hash
+
+            delegate: Bool - If this is true the subject 
+            of the certificate will now also be able to issue 
+            valid CA certificates
+
+            issuer: spki.Hash object or None. Must have private
+            key for issuer.
+
+        Returns:
+            Bool: If dht storage was successful.
+        """
         if issuer is None:
             issuer = getDefaultKey(self.keystore)
 
@@ -85,6 +163,23 @@ class CertManager():
 
     @inlineCallbacks
     def name(self, subject, name, issuer=None):
+        """Associates name with a public key
+        If issuer is none it uses the default key 
+        for the keystore
+        Stores certificates in the dht and locally
+
+        Args:
+            subject: spki.Hash
+
+            name: string or list of strings.
+
+            issuer: spki.Hash or None, Must have private key 
+            locally
+
+        Returns:
+            Bool: If dht storage was successful.
+        """
+
         if issuer is None:
             issuer = getDefaultKey(self.keystore)
 
@@ -102,6 +197,17 @@ class CertManager():
 
     @inlineCallbacks
     def storeCert(self, certificate):
+        """Stores a certificate in the dht
+
+        Args:
+            certificate: spki.Sequence object, should contain a spki.Cert
+            and spki.Signature and could contain the public key for the 
+            signer as well
+
+        Returns:
+            Bool: If dht storage was successful.
+        """
+
         h = getCertSubjectHash(certificate, self.keystore)
         key = hashToB64(h) + '-certificates'
         ret = yield self.dht.set(key, str(certificate.sexp().encode_canonical()))
@@ -109,6 +215,17 @@ class CertManager():
 
     @inlineCallbacks
     def getCertificates(self, keyHash):
+        """Gets certificates from dht that correspond to the supplied 
+        key hash
+
+        Args:
+            keyHash: spki.Hash object.
+
+        Returns:
+            list: A list containing all found certificates
+            that parse correctly and are well formed.
+        """
+
         key = hashToB64(keyHash) + '-certificates'
 
         certs = yield self.dht.get(key)

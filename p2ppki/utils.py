@@ -1,16 +1,30 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+.. module:: utils
+    :platform: UNIX
+    :synopsis: Various utilities and helper functions
+
+.. moduleauthor:: Henry Mortimer <henry@morti.net>
+
+"""
+
 from pisces.spkilib import spki, sexp
 import binascii
 import getpass
 
 
 def getPassword(prompt):
-    """
-    Prompt the user for a password and get them to type it twice
+    """Prompt the user for a password and get them to type it twice
 
     Taken from spkitool
+
+    Args:
+        prompt: The messge to display to the user.
+
+    Returns:
+        String: Password entered.
     """
     while 1:
         first = getpass.getpass(prompt)
@@ -28,6 +42,21 @@ def parseKeyIdInput(buf, keystore, parseName=True):
 
     Taken from the spkitool.py in pisces but doesn't use global variables
     and raises different exceptions.
+
+    Args:
+        buf: String to be parsed.
+
+        keystore: KeyStore object.
+
+        parseName: Bool.
+
+    Returns:
+        spki.Hash object
+
+    Raises:
+        ValueError: Raised if buf fails to parse
+
+        NameError: Raised if buf is an unbound name.
     """
 
     try:
@@ -79,7 +108,16 @@ def parseKeyIdInput(buf, keystore, parseName=True):
 
 def getDefaultKey(keyStore, returnHash=True):
     """Gets the default key from a keystore
+
+    Args:
+        keyStore: KeyStore object
+
+        returnHash: Bool
+
+    Returns:
+        spki.Hash|spki.PublicKey
     """
+
     privKeyHash = keyStore.getDefaultKey()
 
     if privKeyHash is None:
@@ -100,6 +138,14 @@ def loadPrivateKey(keystore, hash=None):
 
     Based on the pisces spkitool function but without
     using global variables.
+
+    Args:
+        keystore: KeyStore object
+
+        hash: spki.Hash
+
+    Returns:
+        spki.PrivateKey
     """
 
     if hash is None:
@@ -116,6 +162,17 @@ def loadPrivateKey(keystore, hash=None):
 
 
 def getCertSubjectHash(cert, keystore):
+    """Gets the hash of a certificate subject
+
+    Args:
+        cert: spki.Sequence
+
+        keystore: KeyStore object
+
+    Returns:
+        spki.Hash
+    """
+
     issuer, subject = spki.getIssuerAndSubject(cert)
     if subject.isName():
         names = subject.getPrincipal().names
@@ -132,7 +189,14 @@ def getCertSubjectHash(cert, keystore):
 
 def hashToB64(h):
     """Converts a hash object to its base 64 representation
+
+    Args:
+        h; spki.Hash
+
+    Returns:
+        String
     """
+
     if spki.isa(h, spki.Hash):
         return sexp.str_to_b64(h.value)
     else:

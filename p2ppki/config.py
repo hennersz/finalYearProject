@@ -1,6 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+.. module:: config
+    :platform: UNIX
+    :synopsis: Parses config from file.
+
+.. moduleauthor:: Henry Mortimer <henry@morti.net>
+
+"""
+
 import ConfigParser
 from distutils.util import strtobool
 from os import path
@@ -8,12 +17,25 @@ import sys
 
 
 def fullPath(p):
+    """Expands all variables in a path."""
     return path.expanduser(path.expandvars(p))
 
 
 class Config(dict):
+    """Config class parses a config file then
+    acts as a disctionary containing all
+    parsed values.
+    """
 
     def __init__(self, loc='~/.p2ppki/config.cfg'):
+        """Init object
+        if loc is a string open the file
+        otherwise assume its a file object.
+
+        Args:
+            loc: String or File.
+        """
+
         if isinstance(loc, str):
             self.loc = open(fullPath(loc), 'r')
         else:
@@ -22,6 +44,9 @@ class Config(dict):
         self.parseConfig()
 
     def parseConfig(self):
+        """Tries to parse the config file
+        Exits on faliure.
+        """
 
         try:
             if self.parser.readfp(self.loc) == []:
@@ -38,6 +63,8 @@ class Config(dict):
             sys.exit(-1)
 
     def genConfig(self):
+        """Generates a config file."""
+
         print 'No config file found, please create one'
         configLoc = raw_input('Enter file location [%s]: ' % self.loc)
         if configLoc == '':

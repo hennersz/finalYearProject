@@ -1,6 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+.. module:: localServer
+    :platform: UNIX
+    :synopsis: Server that clients can connect to, to interface with the rest of the program.
+
+.. moduleauthor:: Henry Mortimer <henry@morti.net>
+
+"""
+
 from twisted.protocols.basic import LineReceiver
 from twisted.internet.protocol import Factory
 from twisted.internet.endpoints import TCP4ServerEndpoint
@@ -11,13 +20,26 @@ from ..utils import parseKeyIdInput, hashToB64
 
 
 class ControlProtocol(LineReceiver):
+    """Extends a twisted LineReceiver to create
+    a contorl protocol.
+    """
+
     supportedCommands = ['GET', 'SET', 'LIST', 'NAME',
                          'TRUST', 'TRUSTCA', 'IDENTIFY', 'STOP']
 
     def connectionMade(self):
+        """Sends a response to clients up connection"""
+
         self.sendLine("Connected")
 
     def lineReceived(self, line):
+        """Splits line on spaces and identifies
+        the appropriate command.
+        From LineReceiver.
+
+        Args:
+            line: String.
+        """
         data = line.split()
         command = data[0].upper()
 
@@ -42,6 +64,14 @@ class ControlProtocol(LineReceiver):
             self.handleUnknown(data[0])
 
     def handleList(self, args):
+        """Sends hashes of local keys to client
+         
+         Args:
+            args: [String]
+
+        Returns:
+            None
+        """
         usage = "LIST usage: LIST [True|False]"
         if len(args) > 1:
             self.sendLine(usage)
@@ -70,6 +100,16 @@ class ControlProtocol(LineReceiver):
             self.sendLine("No keys found")
 
     def handleGet(self, args):
+        """Parses get command and delegates
+        to key or cert function
+
+        Args:
+            args: [String]
+
+        Returns:
+            None
+        """
+
         usage = "GET usage: GET [KEY|CERTS]"
         if(len(args) < 2):
             self.sendLine(usage)
@@ -85,6 +125,16 @@ class ControlProtocol(LineReceiver):
             self.sendLine(usage)
 
     def handleSet(self, args):
+        """Parses set command and delegates
+        to key or cert function
+
+        Args:
+            args: [String]
+
+        Returns:
+            None
+        """
+
         usage = "SET usage: SET [KEY|CERTS] <args>"
         if(len(args) < 2):
             self.sendLine(usage)
@@ -101,6 +151,15 @@ class ControlProtocol(LineReceiver):
 
     @inlineCallbacks
     def setKey(self, args):
+        """Set a key in the DHT
+
+        Args:
+            args: [String]
+
+        Returns:
+            None
+        """
+
         usage = "SET KEY usage: SET KEY <keyId>"
 
         if len(args) != 1:
@@ -126,6 +185,16 @@ class ControlProtocol(LineReceiver):
 
     @inlineCallbacks
     def getKey(self, args):
+        """Gets a key from the DHT and stores
+        it locally.
+
+        Args:
+            args: [String]
+
+        Returns:
+            None
+        """
+
         usage = "GET KEY <keyHash>"
 
         if len(args) != 1:
@@ -156,6 +225,16 @@ class ControlProtocol(LineReceiver):
 
     @inlineCallbacks
     def getCerts(self, args):
+        """Gets certificates from certifcates 
+        and stores them locally
+
+        Args:
+            args: [String]
+
+        Returns:
+            None
+        """
+
         usage = "GET CERTS <subjectId>"
 
         if len(args) != 1:
@@ -180,6 +259,15 @@ class ControlProtocol(LineReceiver):
 
     @inlineCallbacks
     def setCerts(self, args):
+        """Sets all local certs in the dht for 
+        a subject.
+
+        Args:
+            args: [String]
+
+        Returns:
+            None
+        """
         usage = "SET CERTS <subjId>"
 
         if len(args) != 1:
@@ -205,6 +293,16 @@ class ControlProtocol(LineReceiver):
 
     @inlineCallbacks
     def name(self, args):
+        """Generates a name certificate for a key 
+        and stores it in the DHT.
+
+        Args:
+            args: [String]
+
+        Returns:
+            None
+        """
+
         usage = "NAME <subjectHash> <name> [issuerId]"
 
         if len(args) < 2:
@@ -239,6 +337,16 @@ class ControlProtocol(LineReceiver):
 
     @inlineCallbacks
     def trust(self, args):
+        """Creates a trust certificate and
+        stores it locally.
+
+        Args:
+            args: [String]
+
+        Returns:
+            None
+        """
+
         usage = "TRUST <subjectId>"
 
         if len(args) != 1:
@@ -256,6 +364,16 @@ class ControlProtocol(LineReceiver):
 
     @inlineCallbacks
     def trustCA(self, args):
+        """Creates a CA certificate and stores 
+        it in the DHT and locally.
+
+        Args:
+            args: [String]
+
+        Returns:
+            None
+        """
+
         usage = "TRUSTCA  <subjectId> <delegate> [issuerId]"
 
         if len(args) < 2:
@@ -291,6 +409,16 @@ class ControlProtocol(LineReceiver):
 
     @inlineCallbacks
     def identify(self, args):
+        """Attempts to find certified 
+        name for a key. 
+
+        Args:
+            args: [String]
+
+        Returns:
+            None
+        """
+
         usage = "IDENTIFY <keyHash>"
 
         if len(args) != 1:
@@ -315,18 +443,48 @@ class ControlProtocol(LineReceiver):
             self.sendLine(name)
 
     def stopServer(self):
+        """Stops the server from running."""
         self.factory.keystore.close()
         self.factory.reactor.stop()
 
     def handleUnknown(self, command):
+        """Creates response for unknown commands
+
+        Args:
+            command: String
+
+        Returns:
+            None
+        """
+
         self.sendLine("Unknown command: %s" % (command))
         self.sendLine("Supported commands: %s" % (str(self.supportedCommands)))
 
 
 class ControlFactory(Factory):
+    """Extends the twisted protocol factory 
+    to create a control protocol
+    """
+
     protocol = ControlProtocol
 
     def __init__(self, dht, keys, certs, verifier, keystore, reactor):
+        """Initialises factory
+
+        Args:
+            dht: dhtServer.DHTServer object.
+
+            keys: keyManager.Keymanager object.
+            
+            certs: certManager.CertManager object.
+
+            verifier: verifier.Verifier object.
+
+            keystore: pisces KeyStore object.
+
+            reactor: twisted reactor.
+        """
+
         self.dht = dht
         self.keys = keys
         self.certs = certs
@@ -336,6 +494,28 @@ class ControlFactory(Factory):
 
 
 class ControlServer(object):
+    """Creates a ControlFactory and binds
+    it to a local port.
+    """
+
     def __init__(self, port, dht, keys, certs, verifier, keystore, reactor):
+        """Init server object
+
+        Args:
+            port: Int.
+
+            dht: dhtServer.DHTServer object.
+
+            keys: keyManager.Keymanager object.
+
+            certs: certManager.CertManager object.
+
+            verifier: verifier.Verifier object.
+
+            keystore: pisces KeyStore object.
+
+            reactor: twisted reactor.
+        """
+
         endpoint = TCP4ServerEndpoint(reactor, port)
         endpoint.listen(ControlFactory(dht, keys, certs, verifier, keystore, reactor))

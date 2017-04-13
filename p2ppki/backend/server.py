@@ -1,4 +1,15 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+
+"""
+.. module:: server
+    :platform: UNIX
+    :synopsis: Initialises and runs server.
+
+.. moduleauthor:: Henry Mortimer <henry@morti.net>
+
+"""
 
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, returnValue
@@ -21,6 +32,21 @@ from os import path
 
 @inlineCallbacks
 def initServer(localPort, remoteHost, remotePort):
+    """Initialises the DHT and connects it to the 
+    bootstrapping server.
+
+    Args:
+        localPort: Int.
+
+        remoteHost: String - Must be ip address not 
+        domain name.
+
+        remotePort: Int.
+
+    Returns:
+        Kademlia Server object.
+    """
+
     server = Server(storage=ListStorage())
     server.listen(localPort)
     yield server.bootstrap([(remoteHost, remotePort)])
@@ -29,6 +55,14 @@ def initServer(localPort, remoteHost, remotePort):
 
 @inlineCallbacks
 def init(conf):
+    """Creates all the required object to run the program
+
+    Args:
+        conf: Config object.
+
+    Returns:
+        ControlServer object.
+    """
     # Setup logger
     logPath = path.join(conf['dataDir'], 'logs/server.log')
     logFile = DailyLogFile.fromFullPath(logPath)
@@ -50,6 +84,7 @@ def init(conf):
 
 
 def runServer():
+    """Start program."""
     conf = Config('~/.p2ppki/config.cfg')
     init(conf)
     reactor.run()
