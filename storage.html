@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>storage — List storage &#8212; p2ppki 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="verifier — Find names for keys" href="verifier.html" />
+    <link rel="prev" title="server — Main entry point to start the server" href="server.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-p2ppki.backend.storage">
+<span id="storage-list-storage"></span><h1><code class="docutils literal"><span class="pre">storage</span></code> &#8212; List storage<a class="headerlink" href="#module-p2ppki.backend.storage" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-storage"></span><dl class="class">
+<dt id="p2ppki.backend.storage.ListStorage">
+<em class="property">class </em><code class="descclassname">p2ppki.backend.storage.</code><code class="descname">ListStorage</code><a class="reference internal" href="_modules/p2ppki/backend/storage.html#ListStorage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.backend.storage.ListStorage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements a storage object for 
+a kademlia dht.</p>
+<dl class="method">
+<dt id="p2ppki.backend.storage.ListStorage.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>key</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2ppki/backend/storage.html#ListStorage.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.backend.storage.ListStorage.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets item from dict or
+returns default value if it
+doesn&#8217;t exist.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">key: String</p>
+<p class="last">default: object.</p>
+</dd>
+<dt>Return:</dt>
+<dd>String. JSON encoded list.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="p2ppki.backend.storage.ListStorage.iteritems">
+<code class="descname">iteritems</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2ppki/backend/storage.html#ListStorage.iteritems"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.backend.storage.ListStorage.iteritems" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates iterator of tuples
+containing keys and values from
+dict.</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Iterator.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="p2ppki.backend.storage.ListStorage.iteritemsOlderThan">
+<code class="descname">iteritemsOlderThan</code><span class="sig-paren">(</span><em>secondsOld</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/p2ppki/backend/storage.html#ListStorage.iteritemsOlderThan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#p2ppki.backend.storage.ListStorage.iteritemsOlderThan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all items older than
+seconds old and creates an iterator.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>secondsOld: Int.</dd>
+<dt>Returns:</dt>
+<dd>Iterator.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="toc.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">P2PPKI - Peer to Peer Public Key Infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="instalation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basicUsage.html">Basic Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="config.html"><code class="docutils literal"><span class="pre">config</span></code> &#8212; Loads config variables from a file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html"><code class="docutils literal"><span class="pre">utils</span></code> &#8212; Various utilities and helper functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clients.html"><code class="docutils literal"><span class="pre">`clients`</span></code> &#8212; Clients to run commands</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="backend.html"><code class="docutils literal"><span class="pre">`backend`</span></code> &#8212; DHT and key management</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="certManager.html"><code class="docutils literal"><span class="pre">certManager</span></code> &#8212; Manages certificates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dhtServer.html"><code class="docutils literal"><span class="pre">dhtServer</span></code> &#8212; Wrapper around key value storage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="keyManager.html"><code class="docutils literal"><span class="pre">keyManager</span></code> &#8212; Manages keys</a></li>
+<li class="toctree-l3"><a class="reference internal" href="localServer.html"><code class="docutils literal"><span class="pre">localServer</span></code> &#8212; Control the program</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server.html"><code class="docutils literal"><span class="pre">server</span></code> &#8212; Main entry point to start the server</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="docutils literal"><span class="pre">storage</span></code> &#8212; List storage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="verifier.html"><code class="docutils literal"><span class="pre">verifier</span></code> &#8212; Find names for keys</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="toc.html">Documentation overview</a><ul>
+  <li><a href="reference.html">API Reference</a><ul>
+  <li><a href="backend.html"><code class="docutils literal"><span class="pre">`backend`</span></code> &#8212; DHT and key management</a><ul>
+      <li>Previous: <a href="server.html" title="previous chapter"><code class="docutils literal"><span class="pre">server</span></code> &#8212; Main entry point to start the server</a></li>
+      <li>Next: <a href="verifier.html" title="next chapter"><code class="docutils literal"><span class="pre">verifier</span></code> &#8212; Find names for keys</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/storage.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Henry Mortimer.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/storage.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>p2ppki.utils &#8212; p2ppki 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for p2ppki.utils</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: utils</span>
+<span class="sd">    :platform: UNIX</span>
+<span class="sd">    :synopsis: Various utilities and helper functions</span>
+
+<span class="sd">.. moduleauthor:: Henry Mortimer &lt;henry@morti.net&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">pisces.spkilib</span> <span class="k">import</span> <span class="n">spki</span><span class="p">,</span> <span class="n">sexp</span>
+<span class="kn">import</span> <span class="nn">binascii</span>
+<span class="kn">import</span> <span class="nn">getpass</span>
+
+
+<div class="viewcode-block" id="getPassword"><a class="viewcode-back" href="../../utils.html#p2ppki.utils.getPassword">[docs]</a><span class="k">def</span> <span class="nf">getPassword</span><span class="p">(</span><span class="n">prompt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Prompt the user for a password and get them to type it twice</span>
+
+<span class="sd">    Taken from spkitool</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prompt: The messge to display to the user.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        String: Password entered.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">first</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+        <span class="n">second</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span><span class="s1">&#39;Re-enter password: &#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">first</span> <span class="o">==</span> <span class="n">second</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="nb">print</span> <span class="s2">&quot;Passwords do not match&quot;</span>
+    <span class="k">return</span> <span class="n">first</span></div>
+
+
+<div class="viewcode-block" id="parseKeyIdInput"><a class="viewcode-back" href="../../utils.html#p2ppki.utils.parseKeyIdInput">[docs]</a><span class="k">def</span> <span class="nf">parseKeyIdInput</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">keystore</span><span class="p">,</span> <span class="n">parseName</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parses a string into a spki.Hash object</span>
+
+<span class="sd">    String  could be a sexp, a base 64 encoded version of the hash or a name</span>
+
+<span class="sd">    Taken from the spkitool.py in pisces but doesn&#39;t use global variables</span>
+<span class="sd">    and raises different exceptions.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        buf: String to be parsed.</span>
+
+<span class="sd">        keystore: KeyStore object.</span>
+
+<span class="sd">        parseName: Bool.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        spki.Hash object</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: Raised if buf fails to parse</span>
+
+<span class="sd">        NameError: Raised if buf is an unbound name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">spki</span><span class="o">.</span><span class="n">parseText</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">sexp</span><span class="o">.</span><span class="n">ParseError</span><span class="p">:</span>
+        <span class="c1"># It wasnt an sexp, try next potential format</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">spki</span><span class="o">.</span><span class="n">isa</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">spki</span><span class="o">.</span><span class="n">Hash</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">p</span>
+
+    <span class="c1">#  Parse an MD5 hash in B64 representation</span>
+    <span class="c1">#  Will always be 24 chars long and end in ==</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span> <span class="o">==</span> <span class="mi">24</span> <span class="ow">and</span> <span class="n">buf</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;==&#39;</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">digest</span> <span class="o">=</span> <span class="n">sexp</span><span class="o">.</span><span class="n">b64_to_str</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">spki</span><span class="o">.</span><span class="n">Hash</span><span class="p">(</span><span class="s1">&#39;md5&#39;</span><span class="p">,</span> <span class="n">digest</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">binascii</span><span class="o">.</span><span class="n">Error</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">p</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">parseName</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unable to parse </span><span class="si">%s</span><span class="s2"> to hash&quot;</span> <span class="o">%</span> <span class="n">buf</span><span class="p">)</span>
+
+    <span class="n">ns</span> <span class="o">=</span> <span class="n">keystore</span><span class="o">.</span><span class="n">getDefaultKey</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">ns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No default key specified&#39;</span><span class="p">)</span>
+
+    <span class="n">certs</span> <span class="o">=</span> <span class="n">keystore</span><span class="o">.</span><span class="n">lookupName</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">ns</span><span class="p">)</span>
+
+    <span class="n">matches</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">certs</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">elt</span> <span class="ow">in</span> <span class="n">seq</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elt</span><span class="p">,</span> <span class="n">spki</span><span class="o">.</span><span class="n">Cert</span><span class="p">)</span> <span class="ow">and</span> <span class="n">elt</span><span class="o">.</span><span class="n">isNameCert</span><span class="p">():</span>
+                <span class="n">subj</span> <span class="o">=</span> <span class="n">elt</span><span class="o">.</span><span class="n">getSubject</span><span class="p">()</span><span class="o">.</span><span class="n">getPrincipal</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">subj</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
+                    <span class="n">matches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subj</span><span class="p">)</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">l</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s1">&#39;No key bound to name: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">buf</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">l</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s1">&#39;Ambiguous name: </span><span class="si">%s</span><span class="s1"> matches </span><span class="si">%d</span><span class="s1"> keys&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">l</span><span class="p">))</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">p</span></div>
+
+
+<div class="viewcode-block" id="getDefaultKey"><a class="viewcode-back" href="../../utils.html#p2ppki.utils.getDefaultKey">[docs]</a><span class="k">def</span> <span class="nf">getDefaultKey</span><span class="p">(</span><span class="n">keyStore</span><span class="p">,</span> <span class="n">returnHash</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets the default key from a keystore</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        keyStore: KeyStore object</span>
+
+<span class="sd">        returnHash: Bool</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        spki.Hash|spki.PublicKey</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">privKeyHash</span> <span class="o">=</span> <span class="n">keyStore</span><span class="o">.</span><span class="n">getDefaultKey</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">privKeyHash</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No default key set&#39;</span><span class="p">)</span>
+
+    <span class="n">key</span> <span class="o">=</span> <span class="n">keyStore</span><span class="o">.</span><span class="n">lookupKey</span><span class="p">(</span><span class="n">privKeyHash</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">returnHash</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">key</span><span class="o">.</span><span class="n">getPrincipal</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">key</span></div>
+
+
+<div class="viewcode-block" id="loadPrivateKey"><a class="viewcode-back" href="../../utils.html#p2ppki.utils.loadPrivateKey">[docs]</a><span class="k">def</span> <span class="nf">loadPrivateKey</span><span class="p">(</span><span class="n">keystore</span><span class="p">,</span> <span class="nb">hash</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Loads a private key object from the keystore</span>
+<span class="sd">    given a hash value.</span>
+
+<span class="sd">    If no hash is given the default key is used</span>
+
+<span class="sd">    Based on the pisces spkitool function but without</span>
+<span class="sd">    using global variables.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        keystore: KeyStore object</span>
+
+<span class="sd">        hash: spki.Hash</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        spki.PrivateKey</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">hash</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">hash</span> <span class="o">=</span> <span class="n">getDefaultKey</span><span class="p">(</span><span class="n">keystore</span><span class="p">)</span>
+
+    <span class="n">enc</span> <span class="o">=</span> <span class="n">keystore</span><span class="o">.</span><span class="n">lookupPrivateKey</span><span class="p">(</span><span class="nb">hash</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">enc</span><span class="o">.</span><span class="n">isBogus</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">enc</span><span class="o">.</span><span class="n">decrypt</span><span class="p">()</span>
+
+    <span class="n">pw</span> <span class="o">=</span> <span class="n">getPassword</span><span class="p">(</span><span class="s1">&#39;Enter password for private key </span><span class="si">%s</span><span class="s1">: &#39;</span> <span class="o">%</span> <span class="nb">hash</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">pw</span>
+    <span class="k">return</span> <span class="n">enc</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pw</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="getCertSubjectHash"><a class="viewcode-back" href="../../utils.html#p2ppki.utils.getCertSubjectHash">[docs]</a><span class="k">def</span> <span class="nf">getCertSubjectHash</span><span class="p">(</span><span class="n">cert</span><span class="p">,</span> <span class="n">keystore</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets the hash of a certificate subject</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cert: spki.Sequence</span>
+
+<span class="sd">        keystore: KeyStore object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        spki.Hash</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">issuer</span><span class="p">,</span> <span class="n">subject</span> <span class="o">=</span> <span class="n">spki</span><span class="o">.</span><span class="n">getIssuerAndSubject</span><span class="p">(</span><span class="n">cert</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">subject</span><span class="o">.</span><span class="n">isName</span><span class="p">():</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="n">subject</span><span class="o">.</span><span class="n">getPrincipal</span><span class="p">()</span><span class="o">.</span><span class="n">names</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1">#  Gets hash object for name then converts to base 64 string</span>
+                <span class="k">return</span> <span class="n">parseKeyIdInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">keystore</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">NameError</span><span class="p">):</span>
+                <span class="k">continue</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unbound spki name: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">subject</span><span class="o">.</span><span class="n">getPrincipal</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="hashToB64"><a class="viewcode-back" href="../../utils.html#p2ppki.utils.hashToB64">[docs]</a><span class="k">def</span> <span class="nf">hashToB64</span><span class="p">(</span><span class="n">h</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts a hash object to its base 64 representation</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        h; spki.Hash</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        String</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">spki</span><span class="o">.</span><span class="n">isa</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">spki</span><span class="o">.</span><span class="n">Hash</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">sexp</span><span class="o">.</span><span class="n">str_to_b64</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Hash object not supplied&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../toc.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">P2PPKI - Peer to Peer Public Key Infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../instalation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../basicUsage.html">Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference.html">API Reference</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../toc.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Henry Mortimer.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
